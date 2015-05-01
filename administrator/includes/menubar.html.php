@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: menubar.html.php 1056 2005-11-16 18:34:33Z stingrey $
+* @version $Id: menubar.html.php 1574 2005-12-29 15:31:09Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -616,7 +616,7 @@ class mosMenuBar {
 		$image2 = mosAdminMenus::ImageCheckAdmin( 'upload_f2.png', '/administrator/images/', NULL, NULL, 'Upload Image', 'uploadPic', 1 );
 		?>
 		<td>
-			<a class="toolbar" href="#" onclick="popupWindow('popups/uploadimage.php?directory=<?php echo $directory; ?>&t=<?php echo $cur_template; ?>','win1',250,100,'no');">
+			<a class="toolbar" href="#" onclick="popupWindow('popups/uploadimage.php?directory=<?php echo $directory; ?>&amp;t=<?php echo $cur_template; ?>','win1',250,100,'no');">
 				<?php echo $image2; ?>
 				<br /><?php echo $alt;?></a>
 		</td>

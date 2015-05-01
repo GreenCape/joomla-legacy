@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_fullmenu.php 1090 2005-11-17 23:32:03Z Jinx $
+* @version $Id: mod_fullmenu.php 1833 2006-01-15 12:59:27Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -54,9 +54,13 @@ class mosFullAdminMenu {
 		$database->setQuery( $query );
 		$sections = $database->loadObjectList();
 		$nonemptySections = 0;
-		foreach ($sections as $section)
-			if ($section->numcat > 0)
-				$nonemptySections++;
+		if (count($sections) > 0) {
+			foreach ($sections as $section) {
+				if ($section->numcat > 0) {
+					$nonemptySections++;
+				}
+			}
+		}
 		$menuTypes = mosAdminMenus::menutypes();
 		?>
 		<div id="myMenuID"></div>
@@ -317,7 +321,7 @@ class mosFullAdminMenu {
 	* @param string The current user type
 	*/
 	function showDisabled( $usertype='' ) {
-		global $acl, $_LANG;
+		global $acl;
 
 		$canConfig 			= $acl->acl_check( 'administration', 'config', 'users', $usertype );
 		$installModules 	= $acl->acl_check( 'administration', 'install', 'users', $usertype, 'modules', 'all' );
