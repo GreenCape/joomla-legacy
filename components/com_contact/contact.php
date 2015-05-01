@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.php 202 2005-09-20 18:46:34Z stingrey $
+* @version $Id: contact.php 283 2005-09-30 22:37:27Z troozers $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -21,11 +21,8 @@ require_once( $mainframe->getPath( 'class' ) );
 
 $mainframe->setPageTitle( _CONTACT_TITLE );
 
-if ( !isset( $op ) ) {
-	$op = '';
-}
-
 //Load Vars
+$op			= mosGetParam( $_REQUEST, 'op' );
 $con_id 	= intval( mosGetParam( $_REQUEST ,'con_id', 0 ) );
 $contact_id = intval( mosGetParam( $_REQUEST ,'contact_id', 0 ) );
 $catid 		= intval( mosGetParam( $_REQUEST ,'catid', 0 ) );

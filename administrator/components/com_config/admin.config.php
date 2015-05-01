@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.php 196 2005-09-20 10:56:09Z stingrey $
+* @version $Id: admin.config.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -16,7 +16,7 @@
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 if (!$acl->acl_check( 'administration', 'config', 'users', $my->usertype )) {
-	mosRedirect( 'index2.php', _NOT_AUTH );
+	mosRedirect( 'index2.php?', _NOT_AUTH );
 }
 
 require_once( $mainframe->getPath( 'class' ) );

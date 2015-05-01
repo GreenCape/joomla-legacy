@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.categories.php 88 2005-09-16 02:10:02Z stingrey $
+* @version $Id: admin.categories.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Categories
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -254,8 +254,20 @@ function editCategory( $uid=0, $section='' ) {
 	global $database, $my;
 
 	$type 		= mosGetParam( $_REQUEST, 'type', '' );
-	$redirect 	= mosGetParam( $_REQUEST, 'section', 'content' );
-
+	$redirect 	= mosGetParam( $_REQUEST, 'section', 'content' );	
+	
+	// check for existance of any sections
+	$query = "SELECT COUNT( id )"
+	. "\n FROM #__sections"
+	. "\n WHERE scope = 'content'"
+	;
+	$database->setQuery( $query );
+	$sections = $database->loadResult();
+	if (!$sections) {
+		echo "<script> alert('You need to have at least one Section before you can create a Category'); window.history.go(-1); </script>\n";
+		exit();
+	}	
+	
 	$row = new mosCategory( $database );
 	// load the row from the db table
 	$row->load( $uid );
@@ -901,6 +913,10 @@ function menuLink( $id ) {
 	$row->componentid	= $id;
 	$row->link			= $link;
 	$row->ordering		= 9999;
+	
+	if ( $type == 'content_blog_category' ) {
+		$row->params = 'categoryid='. $id;
+	}
 
 	if (!$row->check()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";

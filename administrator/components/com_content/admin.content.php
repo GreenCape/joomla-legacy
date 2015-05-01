@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.php 169 2005-09-18 09:03:48Z stingrey $
+* @version $Id: admin.content.php 322 2005-10-02 14:32:15Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -190,7 +190,7 @@ function viewContent( $sectionid, $option ) {
 
 	// get the total number of records
 	$query = "SELECT COUNT(*)"
-	. "\n FROM #__content AS c, #__categories AS cc, #__sections AS s"
+	. "\n FROM ( #__content AS c, #__categories AS cc, #__sections AS s )"
 	. ( count( $where ) ? "\n WHERE " . implode( ' AND ', $where ) : "" )
 	;
 	$database->setQuery( $query );
@@ -199,7 +199,7 @@ function viewContent( $sectionid, $option ) {
 	$pageNav = new mosPageNav( $total, $limitstart, $limit );
 
 	$query = "SELECT c.*, g.name AS groupname, cc.name, u.name AS editor, f.content_id AS frontpage, s.title AS section_name, v.name AS author"
-	. "\n FROM #__content AS c, #__categories AS cc, #__sections AS s"
+	. "\n FROM ( #__content AS c, #__categories AS cc, #__sections AS s )"
 	. "\n LEFT JOIN #__groups AS g ON g.id = c.access"
 	. "\n LEFT JOIN #__users AS u ON u.id = c.checked_out"
 	. "\n LEFT JOIN #__users AS v ON v.id = c.created_by"
@@ -300,7 +300,7 @@ function viewArchive( $sectionid, $option ) {
 
 	// get the total number of records
 	$query = "SELECT COUNT(*)"
-	. "FROM #__content AS c, #__categories AS cc, #__sections AS s"
+	. "FROM ( #__content AS c, #__categories AS cc, #__sections AS s )"
 	. ( count( $where ) ? "\n WHERE " . implode( ' AND ', $where ) : '' )
 	;
 	$database->setQuery( $query );
@@ -310,7 +310,7 @@ function viewArchive( $sectionid, $option ) {
 	$pageNav = new mosPageNav( $total, $limitstart, $limit  );
 
 	$query = "SELECT c.*, g.name AS groupname, cc.name, v.name AS author"
-	. "\n FROM #__content AS c, #__categories AS cc, #__sections AS s"
+	. "\n FROM ( #__content AS c, #__categories AS cc, #__sections AS s )"
 	. "\n LEFT JOIN #__groups AS g ON g.id = c.access"
 	. "\n LEFT JOIN #__users AS v ON v.id = c.created_by"
 	. ( count( $where ) ? "\n WHERE " . implode( ' AND ', $where ) : '' )
@@ -454,6 +454,17 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		$and = "\n AND componentid = $row->id";
 		$menus = mosAdminMenus::Links2Menu( 'content_item_link', $and );
 	} else {
+		if ( !$sectionid && $_POST['filter_sectionid'] ) {
+			$sectionid = $_POST['filter_sectionid'];
+		}
+		if ( $_POST['catid'] ) {
+			$row->catid 	= $_POST['catid'];
+			$category = new mosCategory( $database );
+			$category->load( $_POST['catid'] );
+			$sectionid = $category->section;
+		} else {
+			$row->catid 	= NULL;
+		}
 		$row->sectionid 	= $sectionid;
 		$row->version 		= 0;
 		$row->state 		= 1;
@@ -461,7 +472,6 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		$row->images 		= array();
 		$row->publish_up 	= date( 'Y-m-d', time() + $mosConfig_offset * 60 * 60 );
 		$row->publish_down 	= 'Never';
-		$row->catid 		= NULL;
 		$row->creator 		= '';
 		$row->modifier 		= '';
 		$row->frontpage 	= 0;
@@ -1165,7 +1175,7 @@ function menuLink( $redirect, $id ) {
 	$row->checkin();
 	$row->updateOrder( "menutype = '$row->menutype' AND parent = $row->parent" );
 
-	$msg = $link .' (Link - Static Content) in menu: '. $menu .' successfully created';
+	$msg = $link .' (Link - Content Item) in menu: '. $menu .' successfully created';
 	mosRedirect( 'index2.php?option=com_content&sectionid='. $redirect .'&task=edit&hidemainmenu=1&id='. $id, $msg );
 }
 

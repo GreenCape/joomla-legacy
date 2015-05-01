@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: newsfeed_link.menu.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: newsfeed_link.menu.html.php 266 2005-09-30 04:44:59Z Levis $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -84,7 +84,7 @@ class newsfeed_link_menu_html {
 				<tr>
 					<td width="10%" align="right">Url:</td>
 					<td width="80%">
-					<?php echo $lists['link']; ?>
+                    <?php echo ampReplace($lists['link']); ?>
 					</td>
 				</tr>
 				<tr>

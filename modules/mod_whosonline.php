@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_whosonline.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mod_whosonline.php 241 2005-09-28 10:53:15Z jick $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -29,9 +29,6 @@ if ($showmode==0 || $showmode==2) {
 	$query2 = "SELECT DISTINCT COUNT( username ) AS user_online"
 	. "\n FROM #__session"
 	. "\n WHERE guest = 0"
-	. "\n AND LOWER( usertype ) <> 'administrator'"
-	. "\n AND LOWER( usertype ) <> 'superadministrator'"
-	. "\n AND LOWER( usertype ) <> 'super administrator'"
 	;
 	$database->setQuery($query2);
 	$user_array = $database->loadResult();

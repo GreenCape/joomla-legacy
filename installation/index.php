@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 195 2005-09-20 10:05:51Z stingrey $
+* @version $Id: index.php 322 2005-10-02 14:32:15Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -18,7 +18,7 @@ if (file_exists( '../configuration.php' ) && filesize( '../configuration.php' ) 
 require_once( '../includes/version.php' );
 
 /** Include common.php */
-include_once( "common.php" );
+include_once( 'common.php' );
 
 function get_php_setting($val) {
 	$r =  (ini_get($val) == '1' ? 1 : 0);

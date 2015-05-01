@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index2.php 161 2005-09-18 03:18:52Z stingrey $
+* @version $Id: index2.php 311 2005-10-02 12:26:08Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -98,6 +98,9 @@ $database->query();
 
 $cur_template = $mainframe->getTemplate();
 
+// set for overlib check
+$mainframe->set( 'loadOverlib', false );
+
 // precapture the output of the component
 require_once( $mosConfig_absolute_path . '/editor/editor.php' );
 
@@ -107,7 +110,7 @@ if ($path = $mainframe->getPath( 'admin' )) {
 		require_once ( $path );
 } else {
 	?>
-	<img src="images/joomla_logo_black.png" border="0" alt="<?php echo 'Joomla! Logo'; ?>" />
+	<img src="images/joomla_logo_black.jpg" border="0" alt="<?php echo 'Joomla! Logo'; ?>" />
 	<br />
 	<?php
 }

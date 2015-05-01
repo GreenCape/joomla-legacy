@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: auth.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: auth.php 262 2005-09-29 23:20:41Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -38,7 +38,7 @@ $session_id 	= mosGetParam( $_SESSION, 'session_id', '' );
 $logintime 		= mosGetParam( $_SESSION, 'session_logintime', '' );
 
 if ( $session_id != md5( $my->id.$my->username.$my->usertype.$logintime ) ) {
-	mosRedirect( "../index.php" );
+	mosRedirect( "index.php" );
 	die;
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.messages.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.messages.php 300 2005-10-02 05:46:21Z Levis $
 * @package Joomla
 * @subpackage Messages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

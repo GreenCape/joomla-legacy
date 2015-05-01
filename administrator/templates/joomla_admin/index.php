@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 157 2005-09-18 02:33:06Z stingrey $
+* @version $Id: index.php 280 2005-09-30 21:56:34Z rhuk $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -82,20 +82,27 @@ initEditor();
 	</div>
 </div>
 
-<div align="center" style="float: left;">
+<div align="center" class="footer">
 	<table width="99%" border="0">
 	<tr>
 		<td align="center">
 			<div align="center">
 				<?php echo $_VERSION->URL; ?>
 			</div>
+			<div align="center" class="smallgrey">
+				<?php echo $version; ?>
+				<br/>
+				<a href="http://www.joomla.org/content/blogcategory/32/66/" target="_blank">Check for latest Version</a>
+			</div>			
 			<?php
-			echo '<div class="smallgrey">';
-			$tend = mosProfiler::getmicrotime();
-			$totaltime = ($tend - $tstart);
-			printf ("Page was generated in %f seconds", $totaltime);
-			echo '</div>';
-			?>
+			if ( $mosConfig_debug ) {
+				echo '<div class="smallgrey">';
+				$tend = mosProfiler::getmicrotime();
+				$totaltime = ($tend - $tstart);
+				printf ("Page was generated in %f seconds", $totaltime);
+				echo '</div>';
+			}
+			?>			
 		</td>
 	</tr>
 	</table>

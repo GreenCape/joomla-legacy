@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: offline.php 207 2005-09-20 20:10:49Z stingrey $
+* @version $Id: offline.php 323 2005-10-02 14:37:07Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -67,6 +67,7 @@ if (!defined( '_ADMIN_OFFLINE' ) || defined( '_INSTALL_CHECK' )) {
 	<head>
 		<title><?php echo $mosConfig_sitename; ?> - Offline</title>
 		<link rel="stylesheet" href="<?php echo $mosConfig_live_site; ?>/templates/css/offline.css" type="text/css" />
+		<link rel="shortcut icon" href="<?php echo $mosConfig_live_site; ?>/images/favicon.ico" />
 		<meta http-equiv="Content-Type" content="text/html; <?php echo _ISO; ?>" />
 	</head>
 	<body>
@@ -75,7 +76,7 @@ if (!defined( '_ADMIN_OFFLINE' ) || defined( '_INSTALL_CHECK' )) {
 		<table width="550" align="center" class="outline">
 		<tr>
 			<td width="60%" height="50" align="center">
-			<img src="<?php echo $mosConfig_live_site; ?>/images/joomla_logo_black.png" alt="Joomla! Logo" align="middle" />
+			<img src="<?php echo $mosConfig_live_site; ?>/images/joomla_logo_black.jpg" alt="Joomla! Logo" align="middle" />
 			</td>
 		</tr>
 		<tr>

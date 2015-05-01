@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.php 218 2005-09-21 15:46:00Z stingrey $
+* @version $Id: content.php 319 2005-10-02 14:07:10Z Jinx $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -22,6 +22,7 @@ $sectionid 	= mosGetParam( $_REQUEST, 'sectionid', 0 );
 $pop 		= intval( mosGetParam( $_REQUEST, 'pop', 0 ) );
 $id 		= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 $limit 		= intval( mosGetParam( $_REQUEST, 'limit', '' ) );
+$order 		= mosGetParam( $_REQUEST, 'order', '' );
 $limitstart = intval( mosGetParam( $_REQUEST, 'limitstart', 0 ) );
 
 $now = date( 'Y-m-d H:i', time() + $mosConfig_offset * 60 * 60 );
@@ -56,7 +57,7 @@ switch ( strtolower( $task ) ) {
 		break;
 
 	case 'category':
-		$cache->call( 'showCategory', $id, $gid, $access, $sectionid, $limit, $limitstart, $now );
+		$cache->call( 'showCategory', $id, $gid, $access, $sectionid, $limit, $order, $limitstart, $now );
 		break;
 
 	case 'blogsection':
@@ -169,6 +170,8 @@ function frontpage( $gid, &$access, $pop, $now ) {
 	. ( $noauth ? "\n AND a.access <= $my->gid" : '' )
 	. "\n AND ( publish_up = '$nullDate' OR publish_up <= '$now'  )"
 	. "\n AND ( publish_down = '$nullDate' OR publish_down >= '$now' )"
+	. "\n AND s.published = 1"
+	. "\n AND cc.published = 1"
 	. "\n ORDER BY $order_pri $order_sec"
 	;
 	$database->setQuery( $query );
@@ -260,7 +263,7 @@ function showSection( $id, $gid, &$access, $now ) {
 	$mainframe->SetPageTitle( $menu->name );
 
 	$null = null;
-	HTML_content::showContentList( $section, $null, $access, $id, $null,  $gid, $params, $null, $categories, $null );
+	HTML_content::showContentList( $section, $null, $access, $id, $null,  $gid, $params, $null, $categories, $null, $null );
 }
 
 
@@ -272,12 +275,11 @@ function showSection( $id, $gid, &$access, $now ) {
 * @param int The number of items to dislpay
 * @param int The offset for pagination
 */
-function showCategory( $id, $gid, &$access, $sectionid, $limit, $limitstart, $now  ) {
+function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limitstart, $now  ) {
 	global $database, $mainframe, $Itemid, $mosConfig_list_limit;
 
 	$nullDate = $database->getNullDate();
 	$noauth = !$mainframe->getCfg( 'shownoauth' );
-	$selected = mosGetParam( $_POST, 'order', '' );
 
 	// Paramters
 	$params = new stdClass();
@@ -471,7 +473,7 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $limitstart, $no
 	// Dynamic Page Title
 	$mainframe->SetPageTitle( $pagetitle );
 
-	HTML_content::showContentList( $category, $items, $access, $id, $sectionid, $gid, $params, $pageNav, $other_categories, $lists );
+	HTML_content::showContentList( $category, $items, $access, $id, $sectionid, $gid, $params, $pageNav, $other_categories, $lists, $selected );
 } // showCategory
 
 
@@ -514,6 +516,8 @@ function showBlogSection( $id=0, $gid, &$access, $pop, $now=NULL ) {
 	. "\n LEFT JOIN #__groups AS g ON a.access = g.id"
 	. ( count( $where ) ? "\n WHERE ".implode( "\n AND ", $where ) : '' )
 	. "\n AND s.access <= $gid"
+	. "\n AND s.published = 1"
+	. "\n AND cc.published = 1"
 	. "\n ORDER BY $order_pri $order_sec"
 	;
 	$database->setQuery( $query );
@@ -566,6 +570,8 @@ function showBlogCategory( $id=0, $gid, &$access, $pop, $now ) {
 	. "\n LEFT JOIN #__groups AS g ON a.access = g.id"
 	. ( count( $where ) ? "\n WHERE ".implode( "\n AND ", $where ) : '' )
 	. "\n AND s.access <= $gid"
+	. "\n AND s.published = 1"
+	. "\n AND cc.published = 1"
 	. "\n ORDER BY $order_pri $order_sec"
 	;
 	$database->setQuery( $query );
@@ -636,6 +642,8 @@ function showArchiveSection( $id=NULL, $gid, &$access, $pop, $option ) {
 	. "\n LEFT JOIN #__groups AS g ON a.access = g.id"
 	. ( count( $where ) ? "\n WHERE ". implode( "\n AND ", $where ) : '')
 	. "\n AND s.access <= $gid"
+	. "\n AND s.published = 1"
+	. "\n AND cc.published = 1"
 	. "\n ORDER BY $order_pri $order_sec"
 	;
 	$database->setQuery( $query );
@@ -710,12 +718,15 @@ function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
 
 	$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, g.name AS groups"
 	. "\n FROM #__content AS a"
+	. "\n INNER JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"
 	. "\n LEFT JOIN #__content_rating AS v ON a.id = v.content_id"
 	. "\n LEFT JOIN #__sections AS s ON a.sectionid = s.id"
 	. "\n LEFT JOIN #__groups AS g ON a.access = g.id"
 	. ( count( $where ) ? "\n WHERE ". implode( "\n AND ", $where ) : '' )
 	. "\n AND s.access <= $gid"
+	. "\n AND s.published = 1"
+	. "\n AND cc.published = 1"
 	. "\n ORDER BY $order_sec"
 	;
 	$database->setQuery( $query );
@@ -978,7 +989,7 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 
 	$nullDate = $database->getNullDate();
 	if ( $access->canEdit ) {
-		$xwhere='';
+		$xwhere = '';
 	} else {
 		$xwhere = " AND ( a.state = 1 OR a.state = -1 )"
 		. "\n AND ( publish_up = '$nullDate' OR publish_up <= '$now' )"
@@ -986,10 +997,10 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 		;
 	}
 
-	$query = "SELECT a.*, ROUND(v.rating_sum/v.rating_count) AS rating, v.rating_count, u.name AS author, u.usertype, cc.name AS category, s.name AS section, g.name AS groups"
+	$query = "SELECT a.*, ROUND(v.rating_sum/v.rating_count) AS rating, v.rating_count, u.name AS author, u.usertype, cc.name AS category, s.name AS section, g.name AS groups, s.published AS sec_pub, cc.published AS cat_pub"
 	. "\n FROM #__content AS a"
 	. "\n LEFT JOIN #__categories AS cc ON cc.id = a.catid"
-	. "\n LEFT JOIN #__sections AS s ON s.id = cc.section AND s.scope='content'"
+	. "\n LEFT JOIN #__sections AS s ON s.id = cc.section AND s.scope = 'content'"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"
 	. "\n LEFT JOIN #__content_rating AS v ON a.id = v.content_id"
 	. "\n LEFT JOIN #__groups AS g ON a.access = g.id"
@@ -1001,6 +1012,17 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 	$row = NULL;
 
 	if ( $database->loadObject( $row ) ) {
+		if ( !$row->cat_pub && $row->catid ) {
+		// check whether category is published
+			mosNotAuth();
+			return;
+		}
+		if ( !$row->sec_pub && $row->sectionid ) {
+		// check whether section is published
+			mosNotAuth();
+			return;
+		}
+
 		$params = new mosParameters( $row->attribs );
 		$params->set( 'intro_only', 0 );
 		$params->def( 'back_button', $mainframe->getCfg( 'back_button' ) );
@@ -1451,7 +1473,7 @@ function cancelContent( &$access ) {
 
 	$row = new mosContent( $database );
 	$row->bind( $_POST );
-
+	
 	if ( $access->canEdit || ( $access->canEditOwn && $row->created_by == $my->id ) ) {
 		$row->checkin();
 	}
@@ -1466,7 +1488,7 @@ function cancelContent( &$access ) {
 		$Itemid  = mosGetParam( $_POST, 'Returnid', '' );
 		$referer = 'index.php?option=com_content&task=view&id='. $row->id.'&Itemid='. $Itemid;
 	}
-
+	
 	if ( $referer && !( $query['task'] == 'new' ) ) {
 		mosRedirect( $referer );
 	} else {

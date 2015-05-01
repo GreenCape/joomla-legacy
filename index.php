@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 223 2005-09-21 16:27:10Z stingrey $
+* @version $Id: index.php 322 2005-10-02 14:32:15Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -16,7 +16,7 @@ define( '_VALID_MOS', 1 );
 
 // checks for configuration file, if none found loads installation page
 if (!file_exists( 'configuration.php' ) || filesize( 'configuration.php' ) < 10) {
-	header( 'Location: installation/index.php' );
+    header("Location: http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/installation/index.php" );
 	exit();
 }
 
@@ -89,7 +89,11 @@ if ($option == '') {
 		}
 	}
 }
-
+if ( !$Itemid ) {
+// when no Itemid give a default value	$Itemid = 99999999;
+	$Itemid = 99999999;	
+} 
+	
 // mainframe is an API workhorse, lots of 'core' interaction routines
 $mainframe = new mosMainFrame( $database, $option, '.' );
 $mainframe->initSession();
@@ -144,7 +148,7 @@ if ($option == 'login') {
 		</script>
 		<?php
 	}
-
+	
 	if ($return) {
 		mosRedirect( $return );
 	} else {
@@ -177,6 +181,9 @@ $my = $mainframe->getUser();
 
 // detect first visit
 $mainframe->detect();
+
+// set for overlib check
+$mainframe->set( 'loadOverlib', false );
 
 $gid = intval( $my->gid );
 

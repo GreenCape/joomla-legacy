@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: HTML_toolbar.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: HTML_toolbar.php 239 2005-09-27 19:37:55Z jick $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -282,7 +282,7 @@ class mosToolBar {
 	* @param string An override for the alt text
 	*/
 	function apply( $task='apply', $alt='Apply' ) {
-		$image = mosAdminMenus::ImageCheck( 'apply_f2.png', '/administrator/images/', NULL, NULL, $alt, $task, 1 );
+		$image = mosAdminMenus::ImageCheck( 'apply_f2.png', '/images/', NULL, NULL, $alt, $task, 1 );
 		?>
 		<td>
 			<a class="toolbar" href="javascript:submitbutton('<?php echo $task;?>');" >

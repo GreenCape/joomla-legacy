@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: config.class.php 215 2005-09-21 14:16:38Z stingrey $
+* @version $Id: config.class.php 228 2005-09-22 05:51:01Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -66,7 +66,7 @@ class mosConfig {
 	/** @var int */
 	var $config_error_reporting	= 0;
 	/** @var string */
-	var $config_helpurl			= '';
+	var $config_helpurl			= 'http://help.joomla.org';
 	/** @var string */
 	var $config_fileperms		= '0644';
 	/** @var string */

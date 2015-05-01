@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menus.html.php 210 2005-09-21 07:23:20Z stingrey $
+* @version $Id: admin.menus.html.php 254 2005-09-29 17:10:05Z stingrey $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -219,7 +219,7 @@ class HTML_menusections {
 
 						$link = 'index2.php?option=com_menus&menutype='. $menutype .'&task=edit&hidemainmenu=1&type='. $row->type;
 						
-						HTML_menusections::htmlOptions( &$row, $link, $k, $i );
+						HTML_menusections::htmlOptions( $row, $link, $k, $i );
 						
 						$k = 1 - $k;
 					}

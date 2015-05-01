@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.contact.html.php 108 2005-09-16 17:39:25Z stingrey $
+* @version $Id: toolbar.contact.html.php 257 2005-09-29 19:06:43Z jick $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -42,9 +42,9 @@ class TOOLBAR_contact {
 
 	function _DEFAULT() {
 		mosMenuBar::startTable();
-		mosMenuBar::publish();
+		mosMenuBar::publishList();
 		mosMenuBar::spacer();
-		mosMenuBar::unpublish();
+		mosMenuBar::unpublishList();
 		mosMenuBar::spacer();
 		mosMenuBar::deleteList();
 		mosMenuBar::spacer();

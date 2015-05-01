@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.php 106 2005-09-16 11:36:10Z eddieajau $
+* @version $Id: admin.admin.php 319 2005-10-02 14:07:10Z Jinx $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -36,7 +36,7 @@ switch ($task) {
 			exit();
 		}
 		$goto = str_replace( "'", '', $goto );
-		mosRedirect($goto);
+		mosRedirect( $goto );
 		break;
 
 	case 'listcomponents':
@@ -55,6 +55,10 @@ switch ($task) {
 		HTML_admin_misc::help();
 		break;
 
+	case 'version':
+		HTML_admin_misc::version();
+		break;
+	
 	case 'preview':
 		HTML_admin_misc::preview();
 		break;

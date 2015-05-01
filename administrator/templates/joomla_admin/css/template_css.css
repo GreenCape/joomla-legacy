@@ -1,5 +1,5 @@
 /**
-* @version $Id: template_css.css 95 2005-09-16 04:02:28Z rhuk $
+* @version $Id: template_css.css 280 2005-09-30 21:56:34Z rhuk $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -549,4 +549,9 @@ span.editlinktip {
 
 table.paramlist td {
 	height: 30px;
+}
+
+div.footer {
+	clear: both;
+	margin-top: 10px;
 }

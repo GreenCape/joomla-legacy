@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.media.php 181 2005-09-19 01:01:12Z stingrey $
+* @version $Id: admin.media.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

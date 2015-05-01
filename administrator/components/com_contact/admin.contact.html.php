@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.contact.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.contact.html.php 294 2005-10-02 01:05:31Z Jinx $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -154,6 +154,7 @@ class HTML_contact {
 		mosMakeHtmlSafe( $row, ENT_QUOTES, 'misc' );
 		?>
 		<script language="javascript" type="text/javascript">
+		<!--
 		function submitbutton(pressbutton) {
 			var form = document.adminForm;
 			if (pressbutton == 'cancel') {
@@ -170,10 +171,10 @@ class HTML_contact {
 				submitform( pressbutton );
 			}
 		}
+		//-->
 		</script>
-		<div id="overDiv" style="position:absolute; visibility:hidden; z-index:10000;"></div>
+		
 		<form action="index2.php" method="post" name="adminForm">
-
 		<table class="adminheading">
 		<tr>
 			<th>

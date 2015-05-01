@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index3.php 136 2005-09-17 00:00:54Z stingrey $
+* @version $Id: index3.php 280 2005-09-30 21:56:34Z rhuk $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -137,7 +137,7 @@ if ($path = $mainframe->getPath( 'admin' )) {
 	require $path;
 } else {
 	?>
-	<img src="images/joomla_logo_black.png" border="0" alt="Joomla! Logo" />
+	<img src="images/joomla_logo_black.jpg" border="0" alt="Joomla! Logo" />
 	<br />
 	<?php
 }

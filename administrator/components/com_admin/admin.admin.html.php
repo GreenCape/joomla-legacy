@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.html.php 217 2005-09-21 15:15:58Z stingrey $
+* @version $Id: admin.admin.html.php 310 2005-10-02 11:17:00Z stingrey $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -364,7 +364,17 @@ class HTML_admin_misc {
 	}
 
 	function ListComponents() {
-		mosLoadAdminModule( 'components' );
+		global $database;
+		
+		$query = "SELECT params"
+		. "\n FROM #__modules "
+		. "\n WHERE module = 'mod_components'"
+		;
+		$database->setQuery( $query );
+		$row = $database->loadResult();
+		$params = new mosParameters( $row );
+		
+		mosLoadAdminModule( 'components', $params );
 	}
 
 	/**
@@ -461,6 +471,9 @@ class HTML_admin_misc {
 							|
 							<a href="<?php echo $mosConfig_live_site;?>/administrator/index3.php?option=com_admin&task=sysinfo" target="helpFrame">
 								System Info</a>
+							|
+							<a href="http://www.joomla.org/content/blogcategory/32/66/" target="_blank">
+								Latest Version Check</a>
 						</td>
 					</tr>
 				</table>

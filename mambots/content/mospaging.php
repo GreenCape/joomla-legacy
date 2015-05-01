@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mospaging.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mospaging.php 318 2005-10-02 14:05:30Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -73,7 +73,7 @@ function botMosPaging( $published, &$row, &$params, $page=0 ) {
 			$row->page_title = _PN_PAGE .' '. $page_text;
 			if ( !$page ) {
 				// processing for first page
-				parse_str( $matches[0][2], $args );
+				parse_str( str_replace( '&amp;', '&', $matches[0][2] ), $args );
 
 				if ( @$args['heading'] ) {
 					$row->page_title = $args['heading'];
@@ -81,7 +81,7 @@ function botMosPaging( $published, &$row, &$params, $page=0 ) {
 					$row->page_title = '';
 				}
 			} else if ( $matches[$page-1][2] ) {
-				parse_str( $matches[$page-1][2], $args );
+				parse_str(  str_replace( '&amp;', '&', $matches[$page-1][2] ), $args );
 
 				if ( @$args['title'] ) {
 					$row->page_title = $args['title'];
@@ -142,10 +142,11 @@ function createTOC( &$row, &$matches, &$page ) {
 	$heading = $row->title;
 	// allows customization of first page title by checking for `heading` attribute in first bot
 	if ( @$matches[0][2] ) {
-		parse_str( $matches[0][2], $args );
+		parse_str( str_replace( '&amp;', '&', $matches[0][2] ), $args );
 
 		if ( @$args['heading'] ) {
 			$heading = $args['heading'];
+			$row->title .= ': '. $heading;
 		}
 	}
 

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: logout.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: logout.php 302 2005-10-02 06:23:10Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

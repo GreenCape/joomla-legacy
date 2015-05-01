@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: module.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: module.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

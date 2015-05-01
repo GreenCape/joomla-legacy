@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_components.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mod_components.php 310 2005-10-02 11:17:00Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -25,6 +25,8 @@ $installComponents 	= $acl->acl_check( 'administration', 'install', 'users', $my
 $editAllComponents 	= $acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'components', 'all' );
 $canMassMail 		= $acl->acl_check( 'administration', 'manage', 'users', $my->usertype, 'components', 'com_massmail' );
 $canManageUsers 	= $acl->acl_check( 'administration', 'manage', 'users', $my->usertype, 'components', 'com_users' );
+
+$count = intval( $params->def( 'count', 10 ) );
 
 $query = "SELECT *"
 . "\n FROM #__components"
@@ -53,23 +55,38 @@ foreach ($comps as $row) {
 </tr>
 <tr>
 	<td>
-		<table width="100%" class="adminlist">
 		<?php
-		$topLevelLimit = 100;
+		if ( $task == 'listcomponents' ) {
+			$topLevelLimit = 10000;
+		} else {
+			$topLevelLimit = $count;
+		}
 		$i = 0;
+		$z = 0;
 		foreach ($comps as $row) {
-
 			if ( $editAllComponents | $acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'components', $row->option ) ) {
 
 				if ($row->parent == 0 && (trim( $row->admin_menu_link ) || array_key_exists( $row->id, $subs ))) {
 
 					if ($i >= $topLevelLimit) {
 						if ($i == $topLevelLimit) {
-
-							echo "Error!<br />";
+							?>
+							<div>
+							<table width="100%" class="adminlist">
+							<tr>
+								<td align="center" style="text-align: center; font-weight: bold;">
+									<a href="index2.php?option=com_admin&task=listcomponents">Full Component List</a>
+								</td>
+							</tr>		
+							</table>					
+							</div>
+							<?php
 							$i = 1000;
 						} // if
 					} else {
+						?>
+						<table width="50%" class="adminlist" border="1">						
+						<?php
 						if ($i < $topLevelLimit ) {
 							$i++;
 							$name = htmlspecialchars( $row->name, ENT_QUOTES );
@@ -129,12 +146,16 @@ foreach ($comps as $row) {
 								} // foreach
 							} // if
 						} // if
+						?>
+						</table>											
+						<?php
 					} // if else
 				} // if
 			} // if
+			
+			$z++;
 		} // foreach
 		?>
-		</table>
 	</td>
 </tr>
 <tr>

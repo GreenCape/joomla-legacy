@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.checkin.php 104 2005-09-16 10:29:04Z eddieajau $
+* @version $Id: admin.checkin.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Checkin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -16,7 +16,7 @@
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 if (!$acl->acl_check( 'administration', 'config', 'users', $my->usertype )) {
-	mosRedirect( 'index2.php', _NOT_AUTH );
+	mosRedirect( 'index2.php?', _NOT_AUTH );
 }
 $nullDate = $database->getNullDate();
 ?>

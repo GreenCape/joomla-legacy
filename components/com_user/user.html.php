@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: user.html.php 171 2005-09-18 09:53:20Z stingrey $
+* @version $Id: user.html.php 311 2005-10-02 12:26:08Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -41,7 +41,7 @@ class HTML_user {
 
 		require_once( $mosConfig_absolute_path .'/includes/HTML_toolbar.php' );
 
-		mosCommonHTML::loadOverlib();
+		mosCommonHTML::loadOverlib();		
 		?>
 		<script language="javascript" type="text/javascript">
 		function submitbutton( pressbutton ) {

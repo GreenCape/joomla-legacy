@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: banners.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: banners.php 240 2005-09-28 06:58:17Z jick $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -16,6 +16,7 @@
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 $bid = intval( mosGetParam( $_REQUEST, 'bid', 0 ) );
+$task = mosGetParam( $_REQUEST, 'task' ,'' );
 
 switch($task) {
 	case 'click':

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content_section.menu.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: content_section.menu.html.php 266 2005-09-30 04:44:59Z Levis $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -105,7 +105,7 @@ class content_section_menu_html {
 				<tr>
 					<td align="right">Url:</td>
 					<td colspan="2">
-					<?php echo $lists['link']; ?>
+                    <?php echo ampReplace($lists['link']); ?>
 					</td>
 				</tr>
 				<tr>

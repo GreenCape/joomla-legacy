@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install3.php 188 2005-09-19 12:06:19Z stingrey $
+* @version $Id: install3.php 278 2005-09-30 20:54:09Z troozers $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -161,7 +161,8 @@ function changeDirPermsMode(mode)
 	if ($configArray['siteUrl'])
 		$url = $configArray['siteUrl'];
 	else {
-		$root = $_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+		$port = ( $_SERVER['SERVER_PORT'] == 80 ) ? '' : ":".$_SERVER['SERVER_PORT'];
+		$root = $_SERVER['SERVER_NAME'].$port.$_SERVER['PHP_SELF'];
 		$root = str_replace("installation/","",$root);
 		$root = str_replace("/install3.php","",$root);
 		$url = "http://".$root;

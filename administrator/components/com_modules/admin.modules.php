@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.modules.php 158 2005-09-18 02:53:14Z stingrey $
+* @version $Id: admin.modules.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -354,6 +354,7 @@ function editModule( $option, $uid, $client ) {
 	$query = "SELECT position, description"
 	. "\n FROM #__template_positions"
 	. "\n WHERE position <> ''"
+	. "\n ORDER BY position"
 	;
 	$database->setQuery( $query );
 	// hard code options for now

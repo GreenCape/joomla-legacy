@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.php 202 2005-09-20 18:46:34Z stingrey $
+* @version $Id: joomla.php 321 2005-10-02 14:26:25Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -371,6 +371,8 @@ class mosMainFrame {
 	var $_head				= null;
 	/** @var string Custom html string to append to the pathway */
 	var $_custom_pathway	= null;
+	/** @var boolean True if in the admin client */
+	var $_isAdmin 			= false;
 
 	/**
 	* Class constructor
@@ -393,6 +395,9 @@ class mosMainFrame {
 		$this->_head['title'] 	= $GLOBALS['mosConfig_sitename'];
 		$this->_head['meta'] 	= array();
 		$this->_head['custom'] 	= array();
+		
+		//set the admin check
+		$this->_isAdmin 		= (boolean) $isAdmin;
 	}
 	/**
 	* @param string
@@ -1117,6 +1122,20 @@ class mosMainFrame {
 			$_Itemid = $this->_db->loadResult();
 		}
 
+		if ($_Itemid == '') {
+			// Search in categories
+			$query = "SELECT m.id "
+			. "\n FROM #__content AS i"
+			. "\n LEFT JOIN #__categories AS cc ON i.catid = cc.id"
+			. "\n LEFT JOIN #__menu AS m ON m.componentid = cc.id "
+			. "\n WHERE m.type = 'content_category'"
+			. "\n AND m.published = 1"
+			. "\n AND i.id = $id"
+			;
+			$this->_db->setQuery( $query );
+			$_Itemid = $this->_db->loadResult();
+		}
+		
 		if ( $_Itemid != '' ) {
 			return $_Itemid;
 		} else {
@@ -1218,6 +1237,14 @@ class mosMainFrame {
 		} else {
 			return $default;
 		}
+	}
+	
+	/** Is admin interface?
+	 * @return boolean
+	 * @since 1.0.2
+	 */
+	function isAdmin() {
+		return $this->_isAdmin;
 	}
 }
 
@@ -2366,16 +2393,20 @@ function mosReadDirectory( $path, $filter='.', $recurse=false, $fullpath=false  
 * @param string A filter for the names
 */
 function mosRedirect( $url, $msg='' ) {
-	// specific filters
+   
+   global $mainframe;
+   
+    // specific filters
 	$iFilter = new InputFilter();
 	$url = $iFilter->process( $url );
 	if (!empty($msg)) {
 		$msg = $iFilter->process( $msg );
 	}
+	
 	if ($iFilter->badAttributeValue( array( 'href', $url ))) {
 		$url = $GLOBALS['mosConfig_live_site'];
 	}
-
+	
 	if (trim( $msg )) {
 	 	if (strpos( $url, '?' )) {
 			$url .= '&mosmsg=' . urlencode( $msg );
@@ -2383,13 +2414,13 @@ function mosRedirect( $url, $msg='' ) {
 			$url .= '?mosmsg=' . urlencode( $msg );
 		}
 	}
-
+	
 	if (headers_sent()) {
 		echo "<script>document.location.href='$url';</script>\n";
 	} else {
 		@ob_end_clean(); // clear output buffer
 		header( 'HTTP/1.1 301 Moved Permanently' );
-		header( "Location: $url" );
+		header( "Location: ". $url );
 	}
 	exit();
 }
@@ -2871,6 +2902,7 @@ function mosToolTip( $tooltip, $title='', $width='', $image='tooltip.png', $text
 	if ( $href ) {
 		$style = '';
 	}
+	else{ $href = "#"; }
 
 	if ( $link ) {
 		$tip = "<a href=\"". $href ."\" onMouseOver=\"return overlib('" . $tooltip . "'". $title .", BELOW, RIGHT". $width .");\" onmouseout=\"return nd();\" ". $style .">". $text ."</a>";
@@ -3150,13 +3182,27 @@ class mosMambotHandler {
 		}
 
 		$group = trim( $group );
-		$query = "SELECT folder, element, published, params"
-		. "\n FROM #__mambots"
-		. "\n WHERE published >= 1"
-		. "\n AND access <= $gid"
-		. "\n AND folder = '$group'"
-		. "\n ORDER BY ordering"
-		;
+		
+		switch ( $group ) {
+			case 'content':
+				$query = "SELECT folder, element, published, params"
+				. "\n FROM #__mambots"
+				. "\n WHERE access <= $gid"
+				. "\n AND folder = '$group'"
+				. "\n ORDER BY ordering"
+				;
+				break;
+			
+			default:
+				$query = "SELECT folder, element, published, params"
+				. "\n FROM #__mambots"
+				. "\n WHERE published >= 1"
+				. "\n AND access <= $gid"
+				. "\n AND folder = '$group'"
+				. "\n ORDER BY ordering"
+				;
+				break;
+		}
 		$database->setQuery( $query );
 
 		if (!($bots = $database->loadObjectList())) {
@@ -3469,7 +3515,7 @@ class mosAdminMenus {
 	/**
 	* build the multiple select list for Menu Links/Pages
 	*/
-	function MenuLinks( &$lookup, $all=NULL, $none=NULL ) {
+	function MenuLinks( &$lookup, $all=NULL, $none=NULL, $unassigned=1 ) {
 		global $database;
 
 		// get a list of the menu items
@@ -3528,6 +3574,12 @@ class mosAdminMenus {
 		if ( $none ) {
 			// prepare an array with 'all' as the first item
 			$mitems[] = mosHTML::makeOption( -999, 'None' );
+			// adds space, in select box which is not saved
+			$mitems[] = mosHTML::makeOption( -999, '----' );
+		}
+		if ( $none ) {
+			// prepare an array with 'all' as the first item
+			$mitems[] = mosHTML::makeOption( 99999999, 'Unassigned' );
 			// adds space, in select box which is not saved
 			$mitems[] = mosHTML::makeOption( -999, '----' );
 		}
@@ -4282,11 +4334,17 @@ class mosCommonHTML {
 	* Loads all necessary files for JS Overlib tooltips
 	*/
 	function loadOverlib() {
-		global  $mosConfig_live_site;
-		?>
-		<script language="Javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/overlib_mini.js"></script>
-		<div id="overDiv" style="position:absolute; visibility:hidden; z-index:10000;"></div>
-		<?php
+		global  $mosConfig_live_site, $mainframe;
+		
+		if ( !$mainframe->get( 'loadOverlib' ) ) {
+		// check if this function is already loaded
+			?>
+			<script language="Javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/overlib_mini.js"></script>
+			<div id="overDiv" style="position:absolute; visibility:hidden; z-index:10000;"></div>
+			<?php
+			// change state so it isnt loaded a second time
+			$mainframe->set( 'loadOverlib', true );
+		}
 	}
 
 
@@ -4429,6 +4487,7 @@ function mosNotAuth() {
 function ampReplace( $text ) {
 	$text = str_replace( '&#', '*-*', $text );
 	$text = preg_replace( '|&(?![\w]+;)|', '&amp;', $text );
+    $text = str_replace( '&amp;amp;', '&amp;', $text );
 	$text = str_replace( '*-*', '&#', $text );
 
 	return $text;

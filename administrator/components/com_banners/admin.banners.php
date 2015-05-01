@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.banners.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.banners.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -211,7 +211,7 @@ function publishBanner( $cid, $publish=1 ) {
 	if (!is_array( $cid ) || count( $cid ) < 1) {
 		$action = $publish ? 'publish' : 'unpublish';
 		echo "<script> alert('Select an item to $action'); window.history.go(-1);</script>\n";
-		exit;
+		exit();
 	}
 
 	$cids = implode( ',', $cid );

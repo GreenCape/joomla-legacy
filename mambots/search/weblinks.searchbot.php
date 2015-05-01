@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: weblinks.searchbot.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: weblinks.searchbot.php 242 2005-09-28 11:05:13Z jick $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -92,7 +92,7 @@ function botSearchWeblinks( $text, $phrase='', $ordering='' ) {
 	. "\n FROM #__weblinks AS a"
 	. "\n INNER JOIN #__categories AS b ON b.id = a.catid AND b.access <= '$my->gid'"
 	. "\n WHERE ($where)"
-	. "\n AND published = 1"
+	. "\n AND a.published = 1"
 	. "\n ORDER BY $order"
 	;
 	$database->setQuery( $query );

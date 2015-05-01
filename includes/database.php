@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: database.php 192 2005-09-19 19:16:58Z stingrey $
+* @version $Id: database.php 268 2005-09-30 13:49:04Z stingrey $
 * @package Joomla
 * @subpackage Database
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -87,6 +87,7 @@ class database {
 			}
 		}
 		$this->_table_prefix = $table_prefix;
+        //@mysql_query("SET NAMES 'utf8'", $this->_resource);
 		$this->_ticker = 0;
 		$this->_log = array();
 	}
@@ -1027,7 +1028,7 @@ class mosDBTable {
 		if ($oid !== null) {
 			$this->$k = $oid;
 		}
-		$time = date( '%Y-%m-%d H:i:s' );
+		$time = date( 'Y-m-d H:i:s' );
 		if (intval( $who )) {
 			// new way of storing editor, by id
 			$query = "UPDATE $this->_tbl"
@@ -1035,6 +1036,9 @@ class mosDBTable {
 			. "\n WHERE $this->_tbl_key = '". $this->$k ."'"
 			;
 			$this->_db->setQuery( $query );
+
+            $this->checked_out = $who;
+            $this->checked_out_time = $time;
 		} else {
 			// old way of storing editor, by name
 			$query = "UPDATE $this->_tbl"
@@ -1042,7 +1046,12 @@ class mosDBTable {
 			. "\n WHERE $this->_tbl_key = '". $this->$k ."'"
 			;
 			$this->_db->setQuery( $query );
+
+            $this->checked_out = 1;
+            $this->checked_out_time = $time;
+            $this->checked_out_editor = $who;
 		}
+
 		return $this->_db->query();
 	}
 
@@ -1061,6 +1070,10 @@ class mosDBTable {
 		. "\n WHERE $this->_tbl_key = '". $this->$k ."'"
 		;
 		$this->_db->setQuery( $query );
+
+        $this->checked_out = 0;
+        $this->checked_out_time = '';
+
 		return $this->_db->query();
 	}
 

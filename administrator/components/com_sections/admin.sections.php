@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.sections.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.sections.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Sections
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -680,7 +680,7 @@ function menuLink( $id ) {
 		exit();
 	}
 	$row->checkin();
-	$row->updateOrder( "scope = '$row->scope'" );
+	$row->updateOrder( "menutype = '$menu'" );
 
 	$msg = $name .' ( '. $menutype .' ) in menu: '. $menu .' successfully created';
 	mosRedirect( 'index2.php?option=com_sections&scope=content&task=editA&hidemainmenu=1&id='. $id,  $msg );

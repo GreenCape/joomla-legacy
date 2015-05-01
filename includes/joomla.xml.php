@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.xml.php 153 2005-09-18 01:44:39Z stingrey $
+* @version $Id: joomla.xml.php 313 2005-10-02 12:55:47Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -503,7 +503,9 @@ class mosParameters {
 	function textareaHandling( &$txt ) {
 		$total = count( $txt );
 		for( $i=0; $i < $total; $i++ ) {
-			$txt[$i] = nl2br( $txt[$i] );
+			if ( strstr( $txt[$i], "\n" ) ) {
+				$txt[$i] = str_replace( "\n", '<br />', $txt[$i] );
+			}
 		}
 		$txt = implode( "\n", $txt );
 

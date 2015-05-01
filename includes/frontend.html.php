@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: frontend.html.php 185 2005-09-19 08:39:45Z stingrey $
+* @version $Id: frontend.html.php 272 2005-09-30 15:12:47Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -112,6 +112,7 @@ class modules_html {
 		$rssimage 			= $params->get( 'rssimage', 1 );
 		$rssitemdesc		= $params->get( 'rssitemdesc', 1 );
 		$words 				= $params->def( 'word_count', 0 );
+		$rsstitle			= $params->get( 'rsstitle', 1 );
 
 		$cacheDir 		= $mosConfig_absolute_path .'/cache/';
 		$LitePath 		= $mosConfig_absolute_path .'/includes/Cache/Lite.php';
@@ -137,16 +138,21 @@ class modules_html {
 			// feed title
 			?>
 			<table cellpadding="0" cellspacing="0" class="moduletable<?php echo $moduleclass_sfx; ?>">			
-			<tr>
-				<td>
-					<strong>
-					<a href="<?php echo $currChannel->getLink(); ?>" target="_blank">
-						<?php echo $currChannel->getTitle(); ?></a>
-					</strong>
-				</td>
-			</tr>
-
 			<?php
+			// feed description
+			if ( $currChannel->getTitle() && $rsstitle ) {
+				?>
+				<tr>
+					<td>
+						<strong>
+						<a href="<?php echo $currChannel->getLink(); ?>" target="_blank">
+							<?php echo $currChannel->getTitle(); ?></a>
+						</strong>
+					</td>
+				</tr>
+				<?php
+			}
+
 			// feed description
 			if ( $rssdesc ) {
 				?>
@@ -190,14 +196,15 @@ class modules_html {
 						<li class="newsfeed<?php echo $moduleclass_sfx; ?>">
 							<strong>
 							<a href="<?php echo $currItem->getLink(); ?>" target="_blank">
-								<?php echo $currItem->getTitle(); ?></a>
+                                <?php echo str_replace('&apos;', "'", html_entity_decode( $currItem->getTitle() ) ); ?></a>
 							</strong>
 							<?php
 							// item description
 							if ( $rssitemdesc ) {
 								// item description
-								$text 	= html_entity_decode( $currItem->getDescription() );
-
+								$text = html_entity_decode( $currItem->getDescription() );
+                                $text = str_replace('&apos;', "'", $text);
+                                
 								// word limit check
 								if ( $words ) {
 									$texts = explode( ' ', $text );

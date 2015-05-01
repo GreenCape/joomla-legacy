@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content_blog_category.class.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: content_blog_category.class.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -102,7 +102,7 @@ class content_blog_category {
 		$catids	= mosGetParam( $_POST, 'catid', array() );
 		$catid	= implode( ',', $catids );
 
-		$params[categoryid]	= $catid;
+		$params['categoryid']	= $catid;
 		if (is_array( $params )) {
 			$txt = array();
 			foreach ($params as $k=>$v) {

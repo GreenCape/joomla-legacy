@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_sections.php 220 2005-09-21 16:20:30Z stingrey $
+* @version $Id: mod_sections.php 305 2005-10-02 09:36:51Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -46,8 +46,12 @@ if ( $rows ) {
 	<ul>
 	<?php
 		foreach ($rows as $row) {
-			$_Itemid = $mainframe->getItemid( $row->id, 0, 0, $bs, $bc, $gbs );
-			$link 	= sefRelToAbs( "index.php?option=com_content&task=blogsection&id=". $row->id ."&Itemid=". $_Itemid );
+			$_Itemid 	= $mainframe->getItemid( $row->id, 0, 0, $bs, $bc, $gbs );
+			if ( $Itemid == $_Itemid ) {
+				$link 		= sefRelToAbs( "index.php?option=com_content&task=blogsection&id=". $row->id );
+			} else {
+				$link 		= sefRelToAbs( "index.php?option=com_content&task=blogsection&id=". $row->id ."&Itemid=". $_Itemid );
+			}
 			?>
 			<li>
 				<a href="<?php echo $link;?>">

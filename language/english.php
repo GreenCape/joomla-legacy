@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: english.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: english.php 263 2005-09-30 03:14:29Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -386,7 +386,7 @@ DEFINE('_SEARCH_ALPHABETICAL','Alphabetical');
 DEFINE('_SEARCH_CATEGORY','Section/Category');
 
 /** templates/*.php */
-DEFINE('_ISO','charset=iso-8859-1');
+DEFINE('_ISO','charset=utf-8');
 DEFINE('_DATE_FORMAT','l, F d Y');  //Uses PHP's DATE Command Format - Depreciated
 /**
 * Modify this line to reflect how you want the date to appear in your site

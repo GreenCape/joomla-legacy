@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: CHANGELOG.php 220 2005-09-21 16:20:30Z stingrey $
+* @version $Id: CHANGELOG.php 325 2005-10-02 15:04:52Z troozers $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -31,6 +31,103 @@ Legend:
 ! -> Note
 
 
+-------------------- 1.0.2 Released ----------------------
+
+02-Oct-2005 Rey Gigataras
+ ^ Added check to mosCommonHTML::loadOverlib(); function that will stop it from being loaded twice on a page
+ # Fixed Content display not honouring Section or Category publish state
+ # Fixed artf1344 : Link to menu shows wrong menu type
+ # Fixed artf1189 : Long menu names get truncated, duplicate menus made
+ # Fixed artf1192 : Unpublished Bots
+ # Fixed artf1223 : Error with Edit items in categories and sections
+ # Fixed artf1219 : Joomla Component Module displays Error!
+ # Fixed artf1183 : Section module: Still "no items to display"
+ # Fixed artf1241 : Editing content fails with MySQL 5.0.12b
+ # Fixed artf1306 : modules - parameters of type text not stored correctly
+
+01-Oct-2005 Andy Miller
+ # Fixed base href in Content Preview for broken images
+
+01-Oct-2005 Johan Janssens 
+ ^ Updated TinyMCE editor to version RC 3
+ # Fixed artf1221 : Unable to Submit Content (still not working post-patch)
+ # Fixed artf1108 : Tooltips on mouseover causes parameter panel to widen
+ # Fixed artf1217 : WYSIWYG-Editor and mospagebreak with 2 parameters
+
+01-Oct-2005 Andy Stewart
+ # Fixed artf1305 - Added a check within mosimage mambot for introtext being hidden
+ # Fixes artf1343 - Removed xml declaration at top of gpl.html
+ 
+01-Oct-2005 Arno Zijlstra
+ ^ Changed OSM banner 2 a little to show banner changing
+ 
+01-Oct-2005 Levis Bisson
+ # Fixed artf1311 : Banners not showing / returning PHP error
+ # Fixed artf1319 : Banners not showing in frontend / admin
+ 
+30-Sep-2005 Andy Miller
+ # Fixed poor rendering of fieldset with solarflare2
+ ^ Updated solarflare2 template with new colors and logos
+ ^ Moved modules to divs, and shuffled pathway to give more button room
+ ^ Updated favicon and other Joomla! logos for admin
+ # Fixed alignment of footer in admin for safari/opera
+
+30-Sep-2005 Andy Stewart
+ + Updated installation routine to recognise port numbers other than 80
+ # Fixed artf1293 : added $op=mosGetParam so sendmail is called when running globals.php-off 
+ 
+30-Sep-2005 Rey Gigataras
+ ^ Module Manager `position` dropdown ordering alphabetically
+ ^ Ability to Hide feed title for `New` modules used to display feeds
+ ^ Content Items `New` button sensitive to dropdown filters
+ # Fixed Seach Module not using Itemid of existng `Seach` component menu item
+ # Fixed `Link to Menu` problem with Sections menu ordering
+ # Fixed `Link to Menu` problem with Category = `Content Category`
+ # Fixed artf1300 : PDF shows Author name despite setting content item
+
+30-Sep-2005 Levis Bisson
+ + Added UTF-8 support
+ # Fixed tooltips empty links
+ # Fixed artf1265 : url in 'edit-menue-item' of submenues is wrong
+ # Fixed artf1277 : News Feed Display Bad Accent character
+
+29-Sep-2005 Arno Zijlstra
+ # Fixed publish/unpublish select check in contacts
+
+29-Sep-2005 Rey Gigataras
+ # Fixed artf1276 : tiny mce background
+ # Fixed artf1281 : Bad name of XML file
+ # Fixed artf1180 : Call-by-reference warning when editing menu
+ # Fixed artf1188 : includes/vcard.class.php uses short open tags
+ 
+29-Sep-2005 Levis Bisson
+# Fixed artf1274 : Module display bug when using register/forgot password links
+# Fixed artf1238 : header("Location: $url")- some servers require an absolute URI
+
+28-Sep-2005 Levis Bisson
+ # Fixed artf1250 : Order is no use when many pages
+ # Fixed artf1254 : Unable to delete when count > 1
+ # Fixed artf1248 : Invalid argument supplied for 3P modules
+ 
+27-Sep-2005 Arno Zijlstra
+ # Fixed artf1253 : Apply button image path
+ # Fixed artf1240 : WITH FIX: banners component - undefined var task
+ # Fixed artf1242 : Problem with "Who's online"
+ # Fixed artf1218 : 'Search' does not include weblinks?
+ 
+25-Sep-2005 Emir Sakic
+ # Fixed artf1185 : globals.php-off breaks pathway
+ # Fixed artf1196 : undefined constant categoryid
+ # Fixed artf1216 : madeyourweb no </head> TAG
+
+24-Sep-2005 Rey Gigataras
+ ^ artf1214 : pastarchives.jpg seems unintuitive.
+
+22-Sep-2005 Rey Gigataras
+ + Added Version Information to bottom of joomla_admin template, with link to 'Joomla! 1.0.x Series Information'
+ # Fixed artf1175 : Create catagory with selection of Section
+ # Fixed artf1179 : Custom RSS Newsfeed Module has nested <TR>
+
 -------------------- 1.0.1 Released ----------------------
 
 21-Sep-2005 Rey Gigataras
@@ -47,14 +144,14 @@ Legend:
 20-Sep-2005 Levis Bisson
  ^ added a chmod to the install unlink function
  # Fixed artf1150 : the created_by on initial creation of Static Content Item
- 
+
 20-Sep-2005 Marko Schmuck
  ^ Changed Time Offsets to hardcoded list with country/city names
- 
+
 20-Sep-2005 Rey Gigataras
  # Fixed /installation/ folder check
  # Fixed artf1153 : Quote appears in com_poll error
- # Fixed artf1151 : empty span 
+ # Fixed artf1151 : empty span
  # Fixed artf1089 : multile select image insert reverses list order
  # Fixed artf1138 : Joomla allows creation of double used username
  # Fixed artf1133 : There is no install request to make /mambot/editor writeable
@@ -74,12 +171,12 @@ Legend:
  # Installed Editor Mambots are now published by default
  # Fixed error in RSS module
  # Fixed artf1106 : Default Editor Will Not Take Codes Like Java Script
- # Fixed delete file in Media Manager 
+ # Fixed delete file in Media Manager
 
 18-Sep-2005 Arno Zijlstra
  # Fixed artf1084 : <br> stays in empty content
  # Fixed artf1101: Typo in Global Config
- 
+
 18-Sep-2005 Andrew Eddie
  # Fixed issues in patTemplate Translate Function and Modifier
  # Fixed issue with patTemplate variable for Tabs graphics
@@ -111,7 +208,7 @@ Legend:
  # Fixed artf1025: Registration admin notification
  # Fixed artf1043: Template Chooser doesn't work
  # Fixed artf1042: Template Chooser shows rogue entry
- 
+
 -------------------- 1.0.0 Released ----------------------
 
 16-Sep-2005 Andrew Eddie
@@ -127,7 +224,7 @@ Legend:
 16-Sep-2005 Emir Sakic
  # Fixed sorting by author on frontend category listing
  + Added time offset to copyright year in footer
- # Fixed spelling in sample data
+ # Fixed spelling in sam        
  # Reflected some file name changes in installer CHMOD
  # Fixed bugs in paged search component
 

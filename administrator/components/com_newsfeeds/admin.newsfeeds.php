@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.newsfeeds.php 165 2005-09-18 06:11:15Z stingrey $
+* @version $Id: admin.newsfeeds.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Newsfeeds
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

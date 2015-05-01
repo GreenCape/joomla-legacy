@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.weblinks.php 160 2005-09-18 03:11:33Z stingrey $
+* @version $Id: admin.weblinks.php 328 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Weblinks
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

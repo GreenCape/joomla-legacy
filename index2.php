@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index2.php 217 2005-09-21 15:15:58Z stingrey $
+* @version $Id: index2.php 323 2005-10-02 14:37:07Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -127,6 +127,7 @@ if ( $no_html == 0 ) {
 	<html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 	<link rel="stylesheet" href="templates/<?php echo $cur_template;?>/css/template_css.css" type="text/css" />
+	<link rel="shortcut icon" href="<?php echo $mosConfig_live_site; ?>/images/favicon.ico" />
 	<meta http-equiv="Content-Type" content="text/html; <?php echo _ISO; ?>" />
 	<meta name="robots" content="noindex, nofollow">
 	</head>
