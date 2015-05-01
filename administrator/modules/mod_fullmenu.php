@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_fullmenu.php 158 2005-09-18 02:53:14Z stingrey $
+* @version $Id: mod_fullmenu.php 393 2005-10-08 13:37:52Z akede $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -178,8 +178,8 @@ class mosFullAdminMenu {
 <?php
 		$query = "SELECT *"
 		. "\n FROM #__components"
-		. "\n WHERE name <> 'frontpage'"
-		. "\n AND name <> 'media manager'"
+		. "\n WHERE name != 'frontpage'"
+		. "\n AND name != 'media manager'"
 		. "\n ORDER BY ordering, name"
 		;
 		$database->setQuery( $query );
