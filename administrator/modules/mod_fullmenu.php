@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_fullmenu.php 1833 2006-01-15 12:59:27Z stingrey $
+* @version $Id: mod_fullmenu.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -95,7 +95,6 @@ class mosFullAdminMenu {
 <?php
 			if ($mosConfig_enable_stats == 1) {
 ?>					['<img src="../includes/js/ThemeOffice/globe4.png" />', 'Browser, OS, Domain', 'index2.php?option=com_statistics', null, 'Browser, OS, Domain'],
-  					['<img src="../includes/js/ThemeOffice/globe3.png" />', 'Page Impressions', 'index2.php?option=com_statistics&task=pageimp', null, 'Page Impressions'],
 <?php
 			}
 ?>					['<img src="../includes/js/ThemeOffice/search_text.png" />', 'Search Text', 'index2.php?option=com_statistics&task=searches', null, 'Search Text']
@@ -173,6 +172,7 @@ class mosFullAdminMenu {
 				_cmSplit,
   				['<img src="../includes/js/ThemeOffice/home.png" />','Frontpage Manager','index2.php?option=com_frontpage',null,'Manage Frontpage Items'],
   				['<img src="../includes/js/ThemeOffice/edit.png" />','Archive Manager','index2.php?option=com_content&task=showarchive&sectionid=0',null,'Manage Archive Items'],
+  				['<img src="../includes/js/ThemeOffice/globe3.png" />', 'Page Impressions', 'index2.php?option=com_statistics&task=pageimp', null, 'Page Impressions'],
 			],
 <?php
 	// Components Sub-Menu
@@ -439,7 +439,7 @@ class mosFullAdminMenu {
 }
 $cache =& mosCache::getCache( 'mos_fullmenu' );
 
-$hide = mosGetParam( $_REQUEST, 'hidemainmenu', 0 );
+$hide = intval( mosGetParam( $_REQUEST, 'hidemainmenu', 0 ) );
 
 if ( $hide ) {
 	mosFullAdminMenu::showDisabled( $my->usertype );

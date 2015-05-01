@@ -89,6 +89,8 @@ class database {
 		$this->_table_prefix = $table_prefix;
 		$this->_ticker = 0;
 		$this->_log = array();
+		
+		$this->setSQLMode();		
 	}
 	/**
 	 * @param int
@@ -1195,12 +1197,17 @@ class mosDBTable {
 			$this->_error = "WARNING: ".strtolower(get_class( $this ))." does not support checkin.";
 			return false;
 		}
-		$k = $this->_tbl_key;
+		
+		$k 			= $this->_tbl_key;
+		$nullDate 	= $this->_db->getNullDate();
+
 		if ($oid !== null) {
 			$this->$k = intval( $oid );
 		}
-		$time = date( 'H:i:s' );
-		$nullDate = $this->_db->getNullDate();
+		if ($this->$k == NULL) {
+			return false;
+		}
+		
 		$query = "UPDATE $this->_tbl"
 		. "\n SET checked_out = 0, checked_out_time = '$nullDate'"
 		. "\n WHERE $this->_tbl_key = ". $this->$k

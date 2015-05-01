@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.users.html.php 736 2005-10-31 03:35:38Z stingrey $
+* @version $Id: admin.users.html.php 3513 2006-05-15 20:52:25Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -120,7 +120,7 @@ class HTML_users {
 				</a>
 				</td>
 				<td nowrap="nowrap">
-				<?php echo mosFormatDate( $row->lastvisitDate, "%Y-%m-%d %H:%M:%S" ); ?>
+				<?php echo mosFormatDate( $row->lastvisitDate, _CURRENT_SERVER_TIME_FORMAT ); ?>
 				</td>
 				<td>
 				<?php echo $row->id; ?>
@@ -207,11 +207,11 @@ class HTML_users {
 					</th>
 				</tr>
 				<tr>
-					<td width="100">
+					<td width="130">
 					Name:
 					</td>
-					<td width="85%">
-					<input type="text" name="name" class="inputbox" size="40" value="<?php echo $row->name; ?>" />
+					<td>
+					<input type="text" name="name" class="inputbox" size="40" value="<?php echo $row->name; ?>" maxlength="50" />
 					</td>
 				</tr>
 				<tr>
@@ -219,7 +219,7 @@ class HTML_users {
 					Username:
 					</td>
 					<td>
-					<input type="text" name="username" class="inputbox" size="40" value="<?php echo $row->username; ?>" />
+					<input type="text" name="username" class="inputbox" size="40" value="<?php echo $row->username; ?>" maxlength="25" />
 					</td>
 				<tr>
 					<td>

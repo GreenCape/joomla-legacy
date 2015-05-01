@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.frontpage.html.php 104 2005-09-16 10:29:04Z eddieajau $
+* @version $Id: admin.frontpage.html.php 2711 2006-03-08 15:07:22Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -102,7 +102,7 @@ class HTML_content {
 			$row->sect_link = 'index2.php?option=com_sections&task=editA&hidemainmenu=1&id='. $row->sectionid;
 			$row->cat_link 	= 'index2.php?option=com_categories&task=editA&hidemainmenu=1&id='. $row->catid;
 
-			$now = date( 'Y-m-d H:i:s' );
+			$now = _CURRENT_SERVER_TIME;
 			if ( $now <= $row->publish_up && $row->state == '1' ) {
 				$img = 'publish_y.png';
 				$alt = 'Published';

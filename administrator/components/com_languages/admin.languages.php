@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.languages.php 2526 2006-02-22 15:33:24Z stingrey $
+* @version $Id: admin.languages.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Languages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -20,14 +20,11 @@ if (!$acl->acl_check( 'administration', 'config', 'users', $my->usertype )) {
 	mosRedirect( 'index2.php', _NOT_AUTH );
 }
 
-
 require_once( $mainframe->getPath( 'admin_html' ) );
 // XML library
 require_once( "$mosConfig_absolute_path/includes/domit/xml_domit_lite_include.php" );
 
-$task 	= trim( strtolower( mosGetParam( $_REQUEST, 'task', '' ) ) );
 $cid 	= mosGetParam( $_REQUEST, 'cid', array(0) );
-
 if (!is_array( $cid )) {
 	$cid = array(0);
 }
@@ -217,8 +214,8 @@ function editLanguageSource( $p_lname, $option) {
 }
 
 function saveLanguageSource( $option ) {
-	$language = mosGetParam( $_POST, 'language', '' );
-	$filecontent = mosGetParam( $_POST, 'filecontent', '', _MOS_ALLOWHTML );
+	$language 		= mosGetParam( $_POST, 'language', '' );
+	$filecontent 	= mosGetParam( $_POST, 'filecontent', '', _MOS_ALLOWHTML );
 
 	if (!$language) {
 		mosRedirect( "index2.php?option=$option&mosmsg=Operation failed: No language specified." );

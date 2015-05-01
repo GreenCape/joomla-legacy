@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mosimage.php 2424 2006-02-16 23:52:16Z stingrey $
+* @version $Id: mosimage.php 2942 2006-03-29 10:01:29Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -180,10 +180,9 @@ function processImages ( &$row, &$params, &$introCount ) {
 				$caption = '<div class="mosimage_caption"';
 				if ( $attrib[6] ) {
 					$caption .= ' style="text-align: '. $attrib[6] .';"';
-				}				
-				if ( $attrib[6] ) {
-					$caption .= ' align="'. $attrib[6] .'">';
+					$caption .= ' align="'. $attrib[6] .'"';
 				}
+				$caption .= '>';
 				$caption .= $attrib[4];
 				$caption .= '</div>';
 			}
@@ -195,6 +194,7 @@ function processImages ( &$row, &$params, &$introCount ) {
 				$padding 		= '';
 				$float			= '';
 				$border_width 	= '';
+				$style			= '';
 				if ( $params->def( 'margin' ) ) {
 					$margin 		= ' margin: '. $params->def( 'margin' ).'px;';
 				}				

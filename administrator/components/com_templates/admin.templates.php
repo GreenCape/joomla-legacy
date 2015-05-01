@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.templates.php 2381 2006-02-15 16:43:06Z stingrey $
+* @version $Id: admin.templates.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Templates
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -25,9 +25,8 @@ require_once( $mosConfig_absolute_path .'/administrator/components/com_templates
 // XML library
 require_once( $mosConfig_absolute_path .'/includes/domit/xml_domit_lite_include.php' );
 
+$client = strval( mosGetParam( $_REQUEST, 'client', '' ) );
 $cid 	= mosGetParam( $_REQUEST, 'cid', array(0) );
-$client = mosGetParam( $_REQUEST, 'client', '' );
-
 if (!is_array( $cid )) {
 	$cid = array(0);
 }
@@ -308,7 +307,7 @@ function editTemplateSource( $p_tname, $option, $client ) {
 function saveTemplateSource( $option, $client ) {
 	global $mosConfig_absolute_path;
 
-	$template 		= mosGetParam( $_POST, 'template', '' );
+	$template 		= strval( mosGetParam( $_POST, 'template', '' ) );
 	$filecontent 	= mosGetParam( $_POST, 'filecontent', '', _MOS_ALLOWHTML );
 
 	if ( !$template ) {
@@ -324,8 +323,9 @@ function saveTemplateSource( $option, $client ) {
 		$file = $mosConfig_absolute_path .'/templates/'. $template .'/index.php';
 	}
 
-	$enable_write = mosGetParam($_POST,'enable_write',0);
-	$oldperms = fileperms($file);
+	$enable_write 	= mosGetParam($_POST,'enable_write',0);
+	$oldperms 		= fileperms($file);
+	
 	if ($enable_write) @chmod($file, $oldperms | 0222);
 
 	clearstatcache();
@@ -372,8 +372,9 @@ function editTemplateCSS( $p_tname, $option, $client ) {
 
 function saveTemplateCSS( $option, $client ) {
 	global $mosConfig_absolute_path;
-	$template = mosGetParam( $_POST, 'template', '' );
-	$filecontent = mosGetParam( $_POST, 'filecontent', '', _MOS_ALLOWHTML );
+	
+	$template 		= strval( mosGetParam( $_POST, 'template', '' ) );
+	$filecontent 	= mosGetParam( $_POST, 'filecontent', '', _MOS_ALLOWHTML );
 
 	if ( !$template ) {
 		mosRedirect( 'index2.php?option='. $option .'&client='. $client, 'Operation failed: No template specified.' );
@@ -389,9 +390,12 @@ function saveTemplateCSS( $option, $client ) {
 		$file = $mosConfig_absolute_path .'/templates/'. $template .'/css/template_css.css';
 	}
 
-	$enable_write = mosGetParam($_POST,'enable_write',0);
-	$oldperms = fileperms($file);
-	if ($enable_write) @chmod($file, $oldperms | 0222);
+	$enable_write 	= mosGetParam($_POST,'enable_write',0);
+	$oldperms 		= fileperms($file);
+	
+	if ($enable_write) {
+		@chmod($file, $oldperms | 0222);
+	}
 
 	clearstatcache();
 	if ( is_writable( $file ) == false ) {
@@ -442,7 +446,7 @@ function saveTemplateAssign( $option, $client ) {
 	global $database;
 
 	$menus 		= mosGetParam( $_POST, 'selections', array() );
-	$template 	= mosGetParam( $_POST, 'template', '' );
+	$template 	= strval( mosGetParam( $_POST, 'template', '' ) );
 
 	$query = "DELETE FROM #__templates_menu"
 	. "\n WHERE client_id = 0"
@@ -504,8 +508,8 @@ function savePositions( $option ) {
 	$database->query();
 
 	foreach ($positions as $id=>$position) {
-		$position = trim( $database->getEscaped( $position ) );
-		$description = mosGetParam( $descriptions, $id, '' );
+		$position 		= trim( $database->getEscaped( $position ) );
+		$description 	= strval( mosGetParam( $descriptions, $id, '' ) );
 		if ($position != '') {
 			$id = intval( $id );
 			$query = "INSERT INTO #__template_positions"

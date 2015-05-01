@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mossef.php 2597 2006-02-24 05:51:13Z stingrey $
+* @version $Id: mossef.php 3536 2006-05-17 15:49:40Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -23,13 +23,20 @@ $_MAMBOTS->registerFunction( 'onPrepareContent', 'botMosSef' );
 * <code><a href="...relative link..."></code>
 */
 function botMosSef( $published, &$row, &$params, $page=0 ) {
-	// simple performance check to determine whether bot should process further
-	if ( strpos( $row->text, 'href="' ) === false ) {
-		return true;
-	}
+	global $mosConfig_sef;
 	
 	// check whether mambot has been unpublished
 	if ( !$published ) {
+		return true;
+	}
+	
+	// check whether SEF is off
+	//if ( !$mosConfig_sef ) {
+	//	return true;
+	//}
+	
+	// simple performance check to determine whether bot should process further
+	if ( strpos( $row->text, 'href="' ) === false ) {
 		return true;
 	}
 	
@@ -41,6 +48,7 @@ function botMosSef( $published, &$row, &$params, $page=0 ) {
 
 	return true;
 }
+
 /**
 * Replaces the matched tags
 * @param array An array of matches (see preg_match_all)
@@ -49,27 +57,30 @@ function botMosSef( $published, &$row, &$params, $page=0 ) {
 function botMosSef_replacer( &$matches ) {
 	global $mosConfig_live_site;
 
-	// disable bot from being applied to mailto tags
-	if (strpos($matches[1],'mailto:')) {
-		return 'href="'. $matches[1] .'"';
-	}
+	// original text that might be replaced
+	$original = 'href="'. $matches[1] .'"';
+
+	// array list of non http/https	URL schemes
+	$url_schemes = explode( ', ', _URL_SCHEMES );
 	
-	if ( substr($matches[1],0,1) == '#' ) {
-		// anchor
-		$temp 		= split('index.php', $_SERVER['REQUEST_URI']);
-		$link 		= sefRelToAbs( 'index.php' . @$temp[1] );
-		$replace 	= 'href="'. $link . $matches[1] .'"';
-	} else {
-		$link 		= sefRelToAbs( $matches[1] );
-		$replace 	= 'href="'. $link .'"';
+	foreach ( $url_schemes as $url ) {
+		// disable bot from being applied to specific URL Scheme tag
+		if ( strpos( $matches[1], $url ) !== false ) {
+			return $original;
+		}
 	}
 
-	// needed to stop site url to external site links
-	$count = explode( 'http://', $replace );
-	if ( count( $count ) > 2 ) {
-		$replace = str_replace( $mosConfig_live_site .'/', '', $replace );
+	// will only process links containing 'index.php?option or links starting with '#'	
+	if ( strpos( $matches[1], 'index.php?option' ) !== false || strpos( $matches[1], '#' ) === 0  ) {
+		// convert url to SEF link
+		$link 		= sefRelToAbs( $matches[1] );
+		
+		// reconstruct html output
+		$replace 	= 'href="'. $link .'"';
+		
+		return $replace;
+	} else {
+		return $original;
 	}
-	
-	return $replace;
 }
 ?>

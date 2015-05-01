@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.html.php 2385 2006-02-15 21:43:20Z stingrey $
+* @version $Id: admin.content.html.php 3723 2006-05-29 16:14:03Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -26,11 +26,11 @@ class HTML_content {
 	* @param array An array of content objects
 	*/
 	function showContent( &$rows, $section, &$lists, $search, $pageNav, $all=NULL, $redirect ) {
-		global $my, $acl, $database;
+		global $my, $acl, $database, $mosConfig_offset;
 
 		mosCommonHTML::loadOverlib();
 		?>
-		<form action="index2.php" method="post" name="adminForm">
+		<form action="index2.php?option=com_content" method="post" name="adminForm">
 
 		<table class="adminheading">
 		<tr>
@@ -79,7 +79,7 @@ class HTML_content {
 			#
 			</th>
 			<th width="5">
-			<input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $rows ); ?>);" />
+			<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count( $rows ); ?>);" />
 			</th>
 			<th class="title">
 			Title
@@ -132,37 +132,45 @@ class HTML_content {
 
 			$link 	= 'index2.php?option=com_content&sectionid='. $redirect .'&task=edit&hidemainmenu=1&id='. $row->id;
 
-			$row->sect_link = 'index2.php?option=com_sections&task=editA&hidemainmenu=1&id='. $row->sectionid;
-			$row->cat_link 	= 'index2.php?option=com_categories&task=editA&hidemainmenu=1&id='. $row->catid;
+			$row->sect_link 	= 'index2.php?option=com_sections&task=editA&hidemainmenu=1&id='. $row->sectionid;
+			$row->cat_link 		= 'index2.php?option=com_categories&task=editA&hidemainmenu=1&id='. $row->catid;
 
-			$now = date( 'Y-m-d H:i:s' );
-			if ( $now <= $row->publish_up && $row->state == "1" ) {
+			$now = _CURRENT_SERVER_TIME;
+			if ( $now <= $row->publish_up && $row->state == 1 ) {
+			// Published
 				$img = 'publish_y.png';
 				$alt = 'Published';
-			} else if ( ( $now <= $row->publish_down || $row->publish_down == $nullDate ) && $row->state == "1" ) {
+			} else if ( ( $now <= $row->publish_down || $row->publish_down == $nullDate ) && $row->state == 1 ) {
+			// Pending
 				$img = 'publish_g.png';
 				$alt = 'Published';
-			} else if ( $now > $row->publish_down && $row->state == "1" ) {
+			} else if ( $now > $row->publish_down && $row->state == 1 ) {
+			// Expired
 				$img = 'publish_r.png';
 				$alt = 'Expired';
-			} elseif ( $row->state == "0" ) {
-				$img = "publish_x.png";
+			} elseif ( $row->state == 0 ) {
+			// Unpublished
+				$img = 'publish_x.png';
 				$alt = 'Unpublished';
 			}
-			$times = '';
-			if (isset($row->publish_up)) {
-				if ($row->publish_up == $nullDate) {
-					$times .= "<tr><td>Start: Always</td></tr>";
-				} else {
-					$times .= "<tr><td>Start: $row->publish_up</td></tr>";
-				}
+			
+			// correct times to include server offset info
+			$row->publish_up 	= mosFormatDate( $row->publish_up, _CURRENT_SERVER_TIME_FORMAT );			
+			if (trim( $row->publish_down ) == $nullDate || trim( $row->publish_down ) == '' || trim( $row->publish_down ) == '-' ) {
+				$row->publish_down = 'Never';
 			}
-			if (isset($row->publish_down)) {
-				if ($row->publish_down == $nullDate) {
-					$times .= "<tr><td>Finish: No Expiry</td></tr>";
-				} else {
-					$times .= "<tr><td>Finish: $row->publish_down</td></tr>";
-				}
+			$row->publish_down 	= mosFormatDate( $row->publish_down, _CURRENT_SERVER_TIME_FORMAT );		
+
+			$times = '';
+			if ($row->publish_up == $nullDate) {
+				$times .= "<tr><td>Start: Always</td></tr>";
+			} else {
+				$times .= "<tr><td>Start: $row->publish_up</td></tr>";
+			}
+			if ($row->publish_down == $nullDate || $row->publish_down = 'Never') {
+				$times .= "<tr><td>Finish: No Expiry</td></tr>";
+			} else {
+				$times .= "<tr><td>Finish: $row->publish_down</td></tr>";
 			}
 
 			if ( $acl->acl_check( 'administration', 'manage', 'users', $my->usertype, 'components', 'com_users' ) ) {
@@ -209,7 +217,7 @@ class HTML_content {
 				if ( $times ) {
 					?>
 					<td align="center">
-					<a href="javascript: void(0);" onMouseOver="return overlib('<table><?php echo $times; ?></table>', CAPTION, 'Publish Information', BELOW, RIGHT);" onMouseOut="return nd();" onClick="return listItemTask('cb<?php echo $i;?>','<?php echo $row->state ? "unpublish" : "publish";?>')">
+					<a href="javascript: void(0);" onMouseOver="return overlib('<table><?php echo $times; ?></table>', CAPTION, 'Publish Information', BELOW, RIGHT);" onMouseOut="return nd();" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $row->state ? "unpublish" : "publish";?>')">
 					<img src="images/<?php echo $img;?>" width="12" height="12" border="0" alt="<?php echo $alt; ?>" />
 					</a>
 					</td>
@@ -217,7 +225,7 @@ class HTML_content {
 				}
 				?>
 				<td align="center">
-				<a href="javascript: void(0);" onClick="return listItemTask('cb<?php echo $i;?>','toggle_frontpage')">
+				<a href="javascript: void(0);" onclick="return listItemTask('cb<?php echo $i;?>','toggle_frontpage')">
 				<img src="images/<?php echo ( $row->frontpage ) ? 'tick.png' : 'publish_x.png';?>" width="12" height="12" border="0" alt="<?php echo ( $row->frontpage ) ? 'Yes' : 'No';?>" />
 				</a>
 				</td>
@@ -349,7 +357,7 @@ class HTML_content {
 			#
 			</th>
 			<th width="20">
-			<input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $rows ); ?>);" />
+			<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count( $rows ); ?>);" />
 			</th>
 			<th class="title">
 			Title
@@ -448,16 +456,18 @@ class HTML_content {
 	* @param string The html for the groups select list
 	*/
 	function editContent( &$row, $section, &$lists, &$sectioncategories, &$images, &$params, $option, $redirect, &$menus ) {
-		global $mosConfig_live_site;
+		global $database;
 
 		mosMakeHtmlSafe( $row );
-
-		$create_date = null;
-		if ( $row->created != '0000-00-00 00:00:00' ) {
+		
+		$nullDate 		= $database->getNullDate();
+		$create_date 	= null;
+		
+		if ( $row->created != $nullDate ) {
 			$create_date 	= mosFormatDate( $row->created, '%A, %d %B %Y %H:%M', '0' );
 		}
 		$mod_date = null;
-		if ( $row->modified != '0000-00-00 00:00:00' ) {
+		if ( $row->modified != $nullDate ) {
 			$mod_date 		= mosFormatDate( $row->modified, '%A, %d %B %Y %H:%M', '0' );
 		}
 		
@@ -480,7 +490,7 @@ class HTML_content {
 		$i = 0;
 		foreach ($sectioncategories as $k=>$items) {
 			foreach ($items as $v) {
-				echo "sectioncategories[".$i++."] = new Array( '$k','".addslashes( $v->id )."','".addslashes( $v->name )."' );\n\t\t";
+				echo "sectioncategories[".$i++."] = new Array( '$k','".addslashes( $v->id )."','".addslashes( $v->name )."' );\t";
 			}
 		}
 		?>
@@ -490,7 +500,7 @@ class HTML_content {
 		$i = 0;
 		foreach ($images as $k=>$items) {
 			foreach ($items as $v) {
-				echo "folderimages[".$i++."] = new Array( '$k','".addslashes( $v->value )."','".addslashes( $v->text )."' );\n\t\t";
+				echo "folderimages[".$i++."] = new Array( '$k','".addslashes( ampReplace( $v->value ) )."','".addslashes( ampReplace( $v->text ) )."' );\t";
 			}
 		}
 		?>
@@ -568,7 +578,7 @@ class HTML_content {
 							<th colspan="4">
 							Item Details
 							</th>
-						<tr>
+						</tr>
 						<tr>
 							<td>
 							Title:
@@ -605,7 +615,7 @@ class HTML_content {
 					Intro Text: (required)
 					<br /><?php
 					// parameters : areaname, content, hidden field, width, height, rows, cols
-					editorArea( 'editor1',  $row->introtext , 'introtext', '100%;', '350', '75', '20' ) ; ?>
+					editorArea( 'editor1', $row->introtext, 'introtext', '100%;', '350', '75', '20' ) ; ?>
 					</td>
 				</tr>
 				<tr>
@@ -613,7 +623,7 @@ class HTML_content {
 					Main Text: (optional)
 					<br /><?php
 					// parameters : areaname, content, hidden field, width, height, rows, cols
-					editorArea( 'editor2',  $row->fulltext , 'fulltext', '100%;', '400', '75', '30' ) ; ?>
+					editorArea( 'editor2', $row->fulltext, 'fulltext', '100%;', '400', '75', '30' ) ; ?>
 					</td>
 				</tr>
 				</table>
@@ -628,7 +638,7 @@ class HTML_content {
 					<th colspan="2">
 					Publishing Info
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td valign="top" align="right" width="120">
 					Show on Frontpage:
@@ -650,8 +660,9 @@ class HTML_content {
 					Access Level:
 					</td>
 					<td>
-					<?php echo $lists['access']; ?> </td>
-					</tr>
+					<?php echo $lists['access']; ?> 
+					</td>
+				</tr>
 				<tr>
 					<td valign="top" align="right">
 					Author Alias:
@@ -665,12 +676,14 @@ class HTML_content {
 					Change Creator:
 					</td>
 					<td>
-					<?php echo $lists['created_by']; ?> </td>
+					<?php echo $lists['created_by']; ?> 
+					</td>
 				</tr>
 				<tr>
 					<td valign="top" align="right">Ordering:</td>
 					<td>
-					<?php echo $lists['ordering']; ?> </td>
+					<?php echo $lists['ordering']; ?> 
+					</td>
 				</tr>
 				<tr>
 					<td valign="top" align="right">
@@ -678,7 +691,7 @@ class HTML_content {
 					</td>
 					<td>
 					<input class="text_area" type="text" name="created" id="created" size="25" maxlength="19" value="<?php echo $row->created; ?>" />
-					<input name="reset" type="reset" class="button" onClick="return showCalendar('created', 'y-mm-dd');" value="...">
+					<input name="reset" type="reset" class="button" onclick="return showCalendar('created', 'y-mm-dd');" value="..." />
 					</td>
 				</tr>
 				<tr>
@@ -687,7 +700,7 @@ class HTML_content {
 					</td>
 					<td>
 					<input class="text_area" type="text" name="publish_up" id="publish_up" size="25" maxlength="19" value="<?php echo $row->publish_up; ?>" />
-					<input type="reset" class="button" value="..." onClick="return showCalendar('publish_up', 'y-mm-dd');">
+					<input type="reset" class="button" value="..." onclick="return showCalendar('publish_up', 'y-mm-dd');" />
 					</td>
 				</tr>
 				<tr>
@@ -696,7 +709,7 @@ class HTML_content {
 					</td>
 					<td>
 					<input class="text_area" type="text" name="publish_down" id="publish_down" size="25" maxlength="19" value="<?php echo $row->publish_down; ?>" />
-					<input type="reset" class="button" value="..." onClick="return showCalendar('publish_down', 'y-mm-dd');">
+					<input type="reset" class="button" value="..." onclick="return showCalendar('publish_down', 'y-mm-dd');" />
 					</td>
 				</tr>
 				</table>
@@ -733,7 +746,7 @@ class HTML_content {
 					<td>
 					<?php echo $row->hits;?>
 					<div <?php echo $visibility; ?>>
-					<input name="reset_hits" type="button" class="button" value="Reset Hit Count" onClick="submitbutton('resethits');">
+					<input name="reset_hits" type="button" class="button" value="Reset Hit Count" onclick="submitbutton('resethits');" />
 					</div>
 					</td>
 				</tr>
@@ -802,19 +815,17 @@ class HTML_content {
 					<td colspan="2">
 						<table width="100%">
 						<tr>
-							<td width="48%">
+							<td width="48%" valign="top">
 								<div align="center">
 									Gallery Images:
 									<br />
 									<?php echo $lists['imagefiles'];?>
-									<br />
-									Sub-folder: <?php echo $lists['folders'];?>
 								</div>
 							</td>
 							<td width="2%">
-								<input class="button" type="button" value=">>" onclick="addSelectedToList('adminForm','imagefiles','imagelist')" title="Add"/>
-								<br/>
-								<input class="button" type="button" value="<<" onclick="delSelectedFromList('adminForm','imagelist')" title="Remove"/>
+								<input class="button" type="button" value=">>" onclick="addSelectedToList('adminForm','imagefiles','imagelist')" title="Add" />
+								<br />
+								<input class="button" type="button" value="<<" onclick="delSelectedFromList('adminForm','imagelist')" title="Remove" />
 							</td>
 							<td width="48%">
 								<div align="center">
@@ -828,19 +839,20 @@ class HTML_content {
 							</td>
 						</tr>
 						</table>
+						Sub-folder: <?php echo $lists['folders'];?>
 					</td>
 				</tr>
 				<tr valign="top">
 					<td>
 						<div align="center">
-							Sample Image:<br/>
-							<img name="view_imagefiles" src="../images/M_images/blank.png" width="100" />
+							Sample Image:<br />
+							<img name="view_imagefiles" src="../images/M_images/blank.png" alt="Sample Image" width="100" />
 						</div>
 					</td>
 					<td valign="top">
 						<div align="center">
-							Active Image:<br/>
-							<img name="view_imagelist" src="../images/M_images/blank.png" width="100" />
+							Active Image:<br />
+							<img name="view_imagelist" src="../images/M_images/blank.png" alt="Active Image" width="100" />
 						</div>
 					</td>
 				</tr>
@@ -914,7 +926,7 @@ class HTML_content {
 						</tr>
 						<tr>
 							<td colspan="2">
-							<input class="button" type="button" value="Apply" onClick="applyImageProps()" />
+							<input class="button" type="button" value="Apply" onclick="applyImageProps()" />
 							</td>
 						</tr>
 						</table>
@@ -930,7 +942,7 @@ class HTML_content {
 					<th colspan="2">
 					Parameter Control
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td>
 					* These Parameters only control what you see when you click to view an item fully *
@@ -952,24 +964,24 @@ class HTML_content {
 					<th colspan="2">
 					Meta Data
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td>
 					Description:
 					<br />
-					<textarea class="text_area" cols="30" rows="3" style="width:300px; height:50px" name="metadesc" width="500"><?php echo str_replace('&','&amp;',$row->metadesc); ?></textarea>
+					<textarea class="text_area" cols="30" rows="3" style="width: 350px; height: 50px" name="metadesc"><?php echo str_replace('&','&amp;',$row->metadesc); ?></textarea>
 					</td>
 				</tr>
 					<tr>
 					<td>
 					Keywords:
 					<br />
-					<textarea class="text_area" cols="30" rows="3" style="width:300px; height:50px" name="metakey" width="500"><?php echo str_replace('&','&amp;',$row->metakey); ?></textarea>
+					<textarea class="text_area" cols="30" rows="3" style="width: 350px; height: 50px" name="metakey"><?php echo str_replace('&','&amp;',$row->metakey); ?></textarea>
 					</td>
 				</tr>
 				<tr>
 					<td>
-					<input type="button" class="button" value="Add Sect/Cat/Title" onClick="f=document.adminForm;f.metakey.value=document.adminForm.sectionid.options[document.adminForm.sectionid.selectedIndex].text+', '+getSelectedText('adminForm','catid')+', '+f.title.value+f.metakey.value;" />
+					<input type="button" class="button" value="Add Sect/Cat/Title" onclick="f=document.adminForm;f.metakey.value=document.adminForm.sectionid.options[document.adminForm.sectionid.selectedIndex].text+', '+getSelectedText('adminForm','catid')+', '+f.title.value+f.metakey.value;" />
 					</td>
 				</tr>
 				</table>
@@ -982,36 +994,36 @@ class HTML_content {
 					<th colspan="2">
 					Link to Menu
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td colspan="2">
 					This will create a 'Link - Content Item' in the menu you select
 					<br /><br />
 					</td>
+				</tr>
 				<tr>
-				<tr>
-					<td valign="top" width="90px">
+					<td valign="top" width="90">
 					Select a Menu
 					</td>
 					<td>
 					<?php echo $lists['menuselect']; ?>
 					</td>
+				</tr>
 				<tr>
-				<tr>
-					<td valign="top" width="90px">
+					<td valign="top" width="90">
 					Menu Item Name
 					</td>
 					<td>
 					<input type="text" name="link_name" class="inputbox" value="" size="30" />
 					</td>
-				<tr>
+				</tr>
 				<tr>
 					<td>
 					</td>
 					<td>
-					<input name="menu_link" type="button" class="button" value="Link to Menu" onClick="submitbutton('menulink');" />
+					<input name="menu_link" type="button" class="button" value="Link to Menu" onclick="submitbutton('menulink');" />
 					</td>
-				<tr>
+				</tr>
 				<tr>
 					<th colspan="2">
 					Existing Menu Links

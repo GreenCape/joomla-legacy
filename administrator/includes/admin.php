@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.php 2488 2006-02-19 08:42:36Z stingrey $
+* @version $Id: admin.php 3830 2006-06-03 15:53:37Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -107,10 +107,9 @@ function mosLoadAdminModules( $position='left', $style=0 ) {
 * Loads an admin module
 */
 function mosLoadAdminModule( $name, $params=NULL ) {
-	global $mosConfig_absolute_path, $mosConfig_live_site;
+	global $mosConfig_absolute_path, $mosConfig_live_site, $task;
 	global $database, $acl, $my, $mainframe, $option;
 
-	$task = mosGetParam( $_REQUEST, 'task', '' );
 	// legacy support for $act
 	$act = mosGetParam( $_REQUEST, 'act', '' );
 
@@ -129,6 +128,7 @@ function mosLoadCustomModule( &$module, &$params ) {
 	$rssitems 			= $params->get( 'rssitems', '' );
 	$rssdesc 			= $params->get( 'rssdesc', '' );
 	$moduleclass_sfx 	= $params->get( 'moduleclass_sfx', '' );
+	$rsscache			= $params->get( 'rsscache', 3600 );
 	$cachePath			= $mosConfig_cachepath .'/';
 	
 	echo '<table cellpadding="0" cellspacing="0" class="moduletable' . $moduleclass_sfx . '">';
@@ -149,23 +149,17 @@ function mosLoadCustomModule( &$module, &$params ) {
 			$LitePath = $mosConfig_absolute_path .'/includes/Cache/Lite.php';
 			require_once( $mosConfig_absolute_path .'/includes/domit/xml_domit_rss_lite.php');
 			$rssDoc = new xml_domit_rss_document_lite();
-			$rssDoc->useCacheLite(true, $LitePath, $cachePath, 3600);
-			$rssDoc->useHTTPClient(true); 
+			$rssDoc->useCacheLite(true, $LitePath, $cachePath, $rsscache);
 			$success = $rssDoc->loadRSS( $rssurl );
 			
 			if ( $success )	{		
 				$totalChannels = $rssDoc->getChannelCount();
-	
-				// special handling for feed encoding
-				$encoding = mosCommonHTML::newsfeedEncoding( $rssDoc );
 				
 				for ($i = 0; $i < $totalChannels; $i++) {
 					$currChannel =& $rssDoc->getChannel($i);
 					
 					$feed_title = $currChannel->getTitle();
-					$feed_title = $encoding( $feed_title );
-					$feed_title = html_entity_decode($feed_title);
-					$feed_title = str_replace('&apos;', "'", $feed_title);				
+					$feed_title = mosCommonHTML::newsfeedEncoding( $rssDoc, $feed_title );
 
 					echo '<tr>';
 					echo '<td><strong><a href="'. $currChannel->getLink() .'" target="_child">';
@@ -174,17 +168,15 @@ function mosLoadCustomModule( &$module, &$params ) {
 					
 					if ($rssdesc) {
 						$feed_descrip = $currChannel->getDescription();
-						$feed_descrip = $encoding( $feed_descrip );
-						$feed_descrip = html_entity_decode($feed_descrip);
-						$feed_descrip = str_replace('&apos;', "'", $feed_descrip);
+						$feed_descrip = mosCommonHTML::newsfeedEncoding( $rssDoc, $feed_descrip );
 						
 						echo '<tr>';
 						echo '<td>'. $feed_descrip .'</td>';
 						echo '</tr>';
 					}
 	
-					$actualItems = $currChannel->getItemCount();
-					$setItems = $rssitems;
+					$actualItems 	= $currChannel->getItemCount();
+					$setItems 		= $rssitems;
 	
 					if ($setItems > $actualItems) {
 						$totalItems = $actualItems;
@@ -196,14 +188,10 @@ function mosLoadCustomModule( &$module, &$params ) {
 						$currItem =& $currChannel->getItem($j);
 	
 						$item_title = $currItem->getTitle();
-						$item_title = $encoding( $item_title );
-						$item_title = html_entity_decode($item_title);
-						$item_title = str_replace('&apos;', "'", $item_title);
+						$item_title = mosCommonHTML::newsfeedEncoding( $rssDoc, $item_title );
 						
 						$text 		= $currItem->getDescription();
-						$text 		= $encoding( $text );
-						$text 		= html_entity_decode($text);
-						$text 		= str_replace('&apos;', "'", $text);					
+						$text 		= mosCommonHTML::newsfeedEncoding( $rssDoc, $text );
 
 						echo '<tr>';
 						echo '<td><strong><a href="'. $currItem->getLink() .'" target="_child">';

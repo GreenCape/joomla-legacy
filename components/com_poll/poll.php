@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: poll.php 2613 2006-02-25 01:44:55Z stingrey $
+* @version $Id: poll.php 3594 2006-05-22 17:29:07Z stingrey $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -25,7 +25,6 @@ $polls_maxcolors 	= 5;
 $polls_barcolor 	= 0;
 
 $id 	= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
-$task 	= mosGetParam( $_REQUEST, 'task', '' );
 
 switch ($task) {
 	case 'vote':
@@ -67,7 +66,7 @@ function pollAddVote( $uid ) {
 		return;
 	}
 
-	$voteid = mosGetParam( $_POST, 'voteid', 0 );
+	$voteid = intval( mosGetParam( $_POST, 'voteid', 0 ) );
 	if (!$voteid) {
 		echo "<h3>"._NO_SELECTION."</h3>";
 		echo '<input class="button" type="button" value="'. _CMN_CONTINUE .'" onClick="window.history.go(-1);">';
@@ -92,7 +91,8 @@ function pollAddVote( $uid ) {
 
 	$database->query();
 
-	$now = date( 'Y-m-d G:i:s' );
+	$now = _CURRENT_SERVER_TIME;
+	
 	$query = "INSERT INTO #__poll_date"
 	. "\n SET date = '$now', vote_id = $voteid, poll_id = $poll->id"
 	;
@@ -148,14 +148,14 @@ function pollresult( $uid ) {
 			$last_vote = mosFormatDate( $dates[0]->maxdate, _DATE_FORMAT_LC2 );
 		}
 		
-		$query = "SELECT a.id, a.text, count( DISTINCT b.id ) AS hits, count( DISTINCT b.id )/COUNT( DISTINCT a.id )*100.0 AS percent"
+		$query = "SELECT a.id, a.text, a.hits, b.voters"
 		. "\n FROM #__poll_data AS a"
-		. "\n LEFT JOIN #__poll_date AS b ON b.vote_id = a.id"
+		. "\n INNER JOIN #__polls AS b ON b.id = a.pollid"
 		. "\n WHERE a.pollid = $poll->id"
 		. "\n AND a.text != ''"
-		. "\n GROUP BY a.id"
-		. "\n ORDER BY a.id"
+		. "\n AND b.published = 1"
 		;
+
 		$database->setQuery( $query );
 		$votes = $database->loadObjectList();		
 	}
@@ -189,8 +189,7 @@ function pollresult( $uid ) {
 	$pollist .= '</select>';
 
 	// Adds parameter handling
-	$menu = new mosMenu( $database );
-	$menu->load( $Itemid );
+	$menu = $mainframe->get( 'menu' );
 
 	$params = new mosParameters( $menu->params );
 	$params->def( 'page_title', 1 );

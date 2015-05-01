@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install1.php 2510 2006-02-21 04:59:41Z stingrey $
+* @version $Id: install1.php 2796 2006-03-15 14:58:05Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -148,7 +148,7 @@ function check() {
 			  				<input class="inputbox" type="text" name="DBpassword" value="<?php echo "$DBpassword"; ?>" />
 			  			</td>
 			  			<td>
-			  				<em>For site security using a password for the mysql account in mandatory</em>
+			  				<em>For site security using a password for the mysql account is mandatory</em>
 			  			</td>
 					</tr>
   		  			<tr>

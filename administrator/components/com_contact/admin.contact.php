@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.contact.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.contact.php 3494 2006-05-14 23:51:02Z stingrey $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -24,7 +24,6 @@ if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'compon
 require_once( $mainframe->getPath( 'admin_html' ) );
 require_once( $mainframe->getPath( 'class' ) );
 
-$id 	= intval( mosGetParam( $_GET, 'id', 0 ) );
 $cid 	= mosGetParam( $_POST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
@@ -302,7 +301,9 @@ function orderContacts( $uid, $inc, $option ) {
 
 	$row = new mosContact( $database );
 	$row->load( $uid );
+	$row->updateOrder();
 	$row->move( $inc, "published >= 0" );
+	$row->updateOrder();
 
 	mosRedirect( "index2.php?option=$option" );
 }

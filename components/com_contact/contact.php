@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.php 2336 2006-02-13 22:25:09Z stingrey $
+* @version $Id: contact.php 3829 2006-06-03 14:40:00Z stingrey $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -22,10 +22,10 @@ require_once( $mainframe->getPath( 'class' ) );
 $mainframe->setPageTitle( _CONTACT_TITLE );
 
 //Load Vars
-$op			= mosGetParam( $_REQUEST, 'op' );
-$con_id 	= (int) mosGetParam( $_REQUEST ,'con_id', 0 );
-$contact_id = (int) mosGetParam( $_REQUEST ,'contact_id', 0 );
-$catid 		= (int) mosGetParam( $_REQUEST ,'catid', 0 );
+$op			= strval( mosGetParam( $_REQUEST, 'op', '' ) );
+$con_id 	= intval( mosGetParam( $_REQUEST ,'con_id', 0 ) );
+$contact_id = intval( mosGetParam( $_REQUEST ,'contact_id', 0 ) );
+$catid 		= intval( mosGetParam( $_REQUEST ,'catid', 0 ) );
 
 switch( $task ) {
 	case 'view':
@@ -78,8 +78,7 @@ function listContacts( $option, $catid ) {
 		$currentcat = NULL;
 
 		// Parameters
-		$menu = new mosMenu( $database );
-		$menu->load( $Itemid );
+		$menu = $mainframe->get( 'menu' );
 		$params = new mosParameters( $menu->params );
 
 		$params->def( 'page_title', 		1 );
@@ -126,7 +125,7 @@ function listContacts( $option, $catid ) {
 			$rows = $database->loadObjectList();
 
 			// current category info
-			$query = "SELECT name, description, image, image_position"
+			$query = "SELECT id, name, description, image, image_position"
 			. "\n FROM #__categories"
 			. "\n WHERE id = $catid"
 			. "\n AND published = 1"
@@ -230,7 +229,7 @@ function contactpage( $contact_id ) {
 
 		$list = array();
 		foreach ( $checks as $check ) {
-			if ( $check->catid == $contact->catid && $check->cat_access > $my->gid ) {
+			if ( $check->catid == $contact->catid ) {
 				$list[] = $check;
 			}
 		}		
@@ -278,7 +277,7 @@ function contactpage( $contact_id ) {
 		}
 
 		// loads current template for the pop-up window
-		$pop = mosGetParam( $_REQUEST, 'pop', 0 );
+		$pop = intval( mosGetParam( $_REQUEST, 'pop', 0 ) );
 		if ( $pop ) {
 			$params->set( 'popup', 1 );
 			$params->set( 'back_button', 0 );
@@ -336,9 +335,8 @@ function contactpage( $contact_id ) {
 		}
 
 		// params from menu item
-		$menu = new mosMenu( $database );
-		$menu->load( $Itemid );
-		$menu_params = new mosParameters( $menu->params );
+		$menu 			= $mainframe->get( 'menu' );
+		$menu_params 	= new mosParameters( $menu->params );
 
 		$menu_params->def( 'page_title', 1 );
 		$menu_params->def( 'header', $menu->name );
@@ -354,7 +352,7 @@ function contactpage( $contact_id ) {
 
 
 function sendmail( $con_id, $option ) {
-	global $database, $Itemid;
+	global $mainframe, $database, $Itemid;
 	global $mosConfig_sitename, $mosConfig_live_site, $mosConfig_mailfrom, $mosConfig_fromname, $mosConfig_db;
 
 	$validate = mosGetParam( $_POST, mosHash( $mosConfig_db ), 0 );
@@ -409,15 +407,14 @@ function sendmail( $con_id, $option ) {
 
 	if (count( $contact ) > 0) {
 		$default 	= $mosConfig_sitename.' '. _ENQUIRY;
-		$email 		= mosGetParam( $_POST, 'email', 		'' );
-		$text 		= mosGetParam( $_POST, 'text', 			'' );
-		$name 		= mosGetParam( $_POST, 'name', 			'' );
-		$subject 	= mosGetParam( $_POST, 'subject', 		$default );
-		$email_copy = mosGetParam( $_POST, 'email_copy', 	0 );
+		$email 		= strval( mosGetParam( $_POST, 'email', 		'' ) );
+		$text 		= strval( mosGetParam( $_POST, 'text', 			'' ) );
+		$name 		= strval( mosGetParam( $_POST, 'name', 			'' ) );
+		$subject 	= strval( mosGetParam( $_POST, 'subject', 		$default ) );
+		$email_copy = strval( mosGetParam( $_POST, 'email_copy', 	0 ) );
 
-		$menu = new mosMenu( $database );
-		$menu->load( $Itemid );
-		$mparams = new mosParameters( $menu->params );		
+		$menu 			= $mainframe->get( 'menu' );
+		$mparams 		= new mosParameters( $menu->params );		
 		$bannedEmail 	= $mparams->get( 'bannedEmail', 	'' );		
 		$bannedSubject 	= $mparams->get( 'bannedSubject', 	'' );		
 		$bannedText 	= $mparams->get( 'bannedText', 		'' );		
@@ -466,7 +463,7 @@ function sendmail( $con_id, $option ) {
 		// test to ensure that only one email address is entered
 		$check = explode( '@', $email );
 		if ( strpos( $email, ';' ) || strpos( $email, ',' ) || strpos( $email, ' ' ) || count( $check ) > 2 ) {
-			mosErrorAlert( 'You cannot enter more than one email address' );
+			mosErrorAlert( _CONTACT_MORE_THAN );
 		}
 		
 		if ( !$email || !$text || ( is_email( $email ) == false ) ) {
@@ -490,7 +487,7 @@ function sendmail( $con_id, $option ) {
 			mosMail( $mosConfig_mailfrom, $mosConfig_fromname, $email, $copy_subject, $copy_text );
 		}
 		
-		$link = 'index.php?option=com_contact&task=view&contact_id='. $contact[0]->id .'&Itemid='. $Itemid;
+		$link = sefRelToAbs( 'index.php?option=com_contact&task=view&contact_id='. $contact[0]->id .'&Itemid='. $Itemid );
 
 		mosRedirect( $link, _THANK_MESSAGE );
 	}

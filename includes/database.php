@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: database.php 2364 2006-02-14 12:59:20Z stingrey $
+* @version $Id: database.php 3749 2006-05-31 10:27:15Z stingrey $
 * @package Joomla
 * @subpackage Database
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -792,13 +792,21 @@ class mosDBTable {
 			return false;
 		}
 		//Note: Prior to PHP 4.2.0, Uninitialized class variables will not be reported by get_class_vars().
+		/*
+		$class_vars = $this->getPublicProperties();
+		foreach ($class_vars as $name => $value) {
+			if ($name != $k) {
+				$this->$name = $value;
+			}
+		}
+		*/
 		$class_vars = get_class_vars(get_class($this));
 		foreach ($class_vars as $name => $value) {
 			if (($name != $k) and ($name != "_db") and ($name != "_tbl") and ($name != "_tbl_key")) {
 				$this->$name = $value;
 			}
 		}
-		
+
 		$this->reset();
 		
 		$query = "SELECT *"
@@ -1122,12 +1130,17 @@ class mosDBTable {
 			$this->_error = "WARNING: ".strtolower(get_class( $this ))." does not support checkin.";
 			return false;
 		}
-		$k = $this->_tbl_key;
+		
+		$k 			= $this->_tbl_key;
+		$nullDate 	= $this->_db->getNullDate();
+
 		if ($oid !== null) {
 			$this->$k = intval( $oid );
 		}
-		$time = date( 'H:i:s' );
-		$nullDate = $this->_db->getNullDate();
+		if ($this->$k == NULL) {
+			return false;
+		}		
+		
 		$query = "UPDATE $this->_tbl"
 		. "\n SET checked_out = 0, checked_out_time = '$nullDate'"
 		. "\n WHERE $this->_tbl_key = ". $this->$k

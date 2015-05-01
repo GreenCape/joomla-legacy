@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.sections.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.sections.php 3876 2006-06-05 14:08:05Z stingrey $
 * @package Joomla
 * @subpackage Sections
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -17,10 +17,12 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
+define( 'COM_IMAGE_BASE', $mosConfig_absolute_path . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'stories' );
+
 // get parameters from the URL or submitted form
 $scope 		= mosGetParam( $_REQUEST, 'scope', '' );
-$cid 		= mosGetParam( $_REQUEST, 'cid', array(0) );
 $section 	= mosGetParam( $_REQUEST, 'scope', '' );
+$cid 		= mosGetParam( $_REQUEST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
 }
@@ -185,7 +187,7 @@ function showSections( $scope, $option ) {
 * @param string The name of the current user
 */
 function editSection( $uid=0, $scope='', $option ) {
-	global $database, $my;
+	global $database, $my, $mainframe;
 
 	$row = new mosSection( $database );
 	// load the row from the db table
@@ -197,6 +199,7 @@ function editSection( $uid=0, $scope='', $option ) {
 		mosRedirect( 'index2.php?option='. $option .'&scope='. $row->scope .'&mosmsg='. $msg );
 	}
 
+	$selected_folders = NULL;
 	if ( $uid ) {
 		$row->checkout( $my->id );
 		if ( $row->id > 0 ) {
@@ -226,10 +229,27 @@ function editSection( $uid=0, $scope='', $option ) {
 		} else {
 			$menus = array();
 		}
+		
+		// handling for MOSImage directories
+		if ( trim( $row->params ) ) {
+			// get params definitions
+			$params = new mosParameters( $row->params, $mainframe->getPath( 'com_xml', 'com_sections' ), 'component' );
+			$temps 	= $params->get( 'imagefolders', '' );
+			
+			$temps 	= explode( ',', $temps );
+			foreach( $temps as $temp ) {
+				$selected_folders[] = mosHTML::makeOption( $temp, $temp );
+			}
+		} else {
+			$selected_folders[] = mosHTML::makeOption( '*1*' );
+		}			
 	} else {
 		$row->scope 		= $scope;
 		$row->published 	= 1;
-		$menus 			= array();
+		$menus 				= array();
+		
+		// handling for MOSImage directories
+		$selected_folders[]	= mosHTML::makeOption( '*1*' );
 	}
 
 	// build the html select list for section types
@@ -258,6 +278,21 @@ function editSection( $uid=0, $scope='', $option ) {
 	// build the html select list for menu selection
 	$lists['menuselect']		= mosAdminMenus::MenuSelect( );
 
+	// list of folders in images/stories/
+	$imgFiles 	= recursive_listdir( COM_IMAGE_BASE );
+	$len 		= strlen( COM_IMAGE_BASE );
+	
+	// handling for MOSImage directories
+	$folders[] 	= mosHTML::makeOption( '*1*', 'All'  );
+	$folders[] 	= mosHTML::makeOption( '*0*', 'None' );
+	$folders[] 	= mosHTML::makeOption( '*#*', '---------------------' );
+	$folders[] 	= mosHTML::makeOption( '/' );
+	foreach ($imgFiles as $file) {
+		$folders[] = mosHTML::makeOption( substr( $file, $len ) );
+	}
+	
+	$lists['folders'] = mosHTML::selectList( $folders, 'folders[]', 'class="inputbox" size="17" multiple="multiple"', 'value', 'text', $selected_folders );
+	
 	sections_html::edit( $row, $option, $lists, $menus );
 }
 
@@ -269,9 +304,9 @@ function editSection( $uid=0, $scope='', $option ) {
 function saveSection( $option, $scope, $task ) {
 	global $database;
 
-	$menu 		= mosGetParam( $_POST, 'menu', 'mainmenu' );
-	$menuid		= mosGetParam( $_POST, 'menuid', 0 );
-	$oldtitle 	= mosGetParam( $_POST, 'oldtitle', null );
+	$menu 		= strval( mosGetParam( $_POST, 'menu', 'mainmenu' ) );
+	$menuid		= intval( mosGetParam( $_POST, 'menuid', 0 ) );
+	$oldtitle 	= strval( mosGetParam( $_POST, 'oldtitle', null ) );
 
 	$row = new mosSection( $database );
 	if (!$row->bind( $_POST )) {
@@ -294,12 +329,31 @@ function saveSection( $option, $scope, $task ) {
 		}
 	}
 
+	// handling for MOSImage directories
+	$folders 		= mosGetParam( $_POST, 'folders', array() );
+	$folders 		= implode( ',', $folders );	
+	if ( strpos( $folders, '*1*' ) !== false  ) {
+		$folders 	= '*1*';
+	} else if ( strpos( $folders, '*0*' ) !== false ) {
+		$folders	= '*0*';
+	} else if ( strpos( $folders, ',*#*' ) !== false ) {
+		$folders 	= str_replace( ',*#*', '', $folders );
+	} else if ( strpos( $folders, '*#*,' ) !== false ) {
+		$folders 	= str_replace( '*#*,', '', $folders );
+	} else if ( strpos( $folders, '*#*' ) !== false ) {
+		$folders 	= str_replace( '*#*', '', $folders );
+	} 	
+	$row->params	= 'imagefolders='. $folders;
+	
 	if (!$row->store()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
 	}
 	$row->checkin();
 	$row->updateOrder( "scope='$row->scope'" );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	switch ( $task ) {
 		case 'go2menu':
@@ -380,6 +434,9 @@ function removeSections( $cid, $scope, $option ) {
 		$msg = 'Sections(s): '. $cids .' cannot be removed as they contain categories';
 		mosRedirect( 'index2.php?option='. $option .'&scope='. $scope, $msg );
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$names = implode( ', ', $name );
 	$msg = 'Section(s): '. $names .' successfully deleted';
@@ -450,6 +507,9 @@ function publishSections( $scope, $cid=null, $publish=1, $option ) {
 			}
 		}
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( 'index2.php?option='. $option .'&scope='. $scope );
 }
@@ -479,6 +539,9 @@ function orderSection( $uid, $inc, $option, $scope ) {
 	$row = new mosSection( $database );
 	$row->load( $uid );
 	$row->move( $inc, "scope = '$row->scope'" );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( 'index2.php?option='. $option .'&scope='. $scope );
 }
@@ -523,7 +586,7 @@ function copySectionSelect( $option, $cid, $section ) {
 function copySectionSave( $sectionid ) {
 	global $database;
 
-	$title 		= mosGetParam( $_REQUEST, 'title', '' );
+	$title 		= strval( mosGetParam( $_REQUEST, 'title', '' ) );
 	$contentid 	= mosGetParam( $_REQUEST, 'content', '' );
 	$categoryid = mosGetParam( $_REQUEST, 'category', '' );
 
@@ -608,6 +671,9 @@ function copySectionSave( $sectionid ) {
 	}
 	$sectionOld = new mosSection ( $database );
 	$sectionOld->load( $sectionMove );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$msg = 'Section '. $sectionOld-> name .' and all its Categories and Items have been copied as '. $title;
 	mosRedirect( 'index2.php?option=com_sections&scope=content&mosmsg='. $msg );
@@ -630,6 +696,9 @@ function accessMenu( $uid, $access, $option ) {
 	if ( !$row->store() ) {
 		return $row->getError();
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( 'index2.php?option='. $option .'&scope='. $row->scope );
 }
@@ -641,10 +710,12 @@ function menuLink( $id ) {
 	$section->bind( $_POST );
 	$section->checkin();
 
-	$menu 		= mosGetParam( $_POST, 'menuselect', '' );
-	$name 		= mosGetParam( $_POST, 'link_name', '' );
-	$type 		= mosGetParam( $_POST, 'link_type', '' );
+	$menu 	= strval( mosGetParam( $_POST, 'menuselect', '' ) );
+	$name 	= strval( mosGetParam( $_POST, 'link_name', '' ) );
+	$type 	= strval( mosGetParam( $_POST, 'link_type', '' ) );
 
+	$name	= stripslashes( ampReplace($name) );
+	
 	switch ( $type ) {
 		case 'content_section':
 			$link 		= 'index.php?option=com_content&task=section&id='. $id;
@@ -685,6 +756,9 @@ function menuLink( $id ) {
 	}
 	$row->checkin();
 	$row->updateOrder( "menutype = '$menu'" );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$msg = $name .' ( '. $menutype .' ) in menu: '. $menu .' successfully created';
 	mosRedirect( 'index2.php?option=com_sections&scope=content&task=editA&hidemainmenu=1&id='. $id,  $msg );
@@ -725,7 +799,28 @@ function saveOrder( &$cid ) {
 		$row->updateOrder( $cond[1] );
 	} // foreach
 
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
+
 	$msg 	= 'New ordering saved';
 	mosRedirect( 'index2.php?option=com_sections&scope=content', $msg );
 } // saveOrder
+
+function recursive_listdir( $base ) {
+	static $filelist = array();
+	static $dirlist = array();
+	
+	if(is_dir($base)) {
+		$dh = opendir($base);
+		while (false !== ($dir = readdir($dh))) {
+			if (is_dir($base .'/'. $dir) && $dir !== '.' && $dir !== '..' && strtolower($dir) !== 'cvs' && strtolower($dir) !== '.svn') {
+				$subbase = $base .'/'. $dir;
+				$dirlist[] = $subbase;
+				$subdirlist = recursive_listdir($subbase);
+			}
+		}
+		closedir($dh);
+	}
+	return $dirlist;
+}
 ?>

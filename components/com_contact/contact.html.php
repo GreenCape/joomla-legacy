@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.html.php 2614 2006-02-25 02:26:07Z stingrey $
+* @version $Id: contact.html.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -254,7 +254,7 @@ class HTML_contact {
 		
 		$template 		= $mainframe->getTemplate();
 		$sitename 		= $mainframe->getCfg( 'sitename' );
-		$hide_js 		= mosGetParam($_REQUEST,'hide_js', 0 );
+		$hide_js 		= intval( mosGetParam($_REQUEST,'hide_js', 0 ) );
 				?>
 		<script language="JavaScript" type="text/javascript">
 		<!--
@@ -262,7 +262,7 @@ class HTML_contact {
 			if ( ( document.emailForm.text.value == "" ) || ( document.emailForm.email.value.search("@") == -1 ) || ( document.emailForm.email.value.search("[.*]" ) == -1 ) ) {
 				alert( "<?php echo _CONTACT_FORM_NC; ?>" );
 			} else if ( ( document.emailForm.email.value.search(";") != -1 ) || ( document.emailForm.email.value.search(",") != -1 ) || ( document.emailForm.email.value.search(" ") != -1 ) ) {
-				alert( "You cannot enter more than one email address" );			
+				alert( "<?php echo _CONTACT_ONE_EMAIL; ?>" );			
 			} else {
 				document.emailForm.action = "<?php echo sefRelToAbs("index.php?option=com_contact&Itemid=$Itemid"); ?>"
 				document.emailForm.submit();

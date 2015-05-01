@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.php 319 2005-10-02 14:07:10Z Jinx $
+* @version $Id: admin.admin.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -29,7 +29,7 @@ switch ($task) {
 		break;
 
 	case 'redirect':
-		$goto = trim( strtolower( mosGetParam( $_REQUEST, 'link' ) ) );
+		$goto = strval( strtolower( mosGetParam( $_REQUEST, 'link' ) ) );
 		if ($goto == 'null') {
 			$msg = 'There is no link associated with this item';
 			mosRedirect( 'index2.php?option=com_admin&task=listcomponents', $msg );

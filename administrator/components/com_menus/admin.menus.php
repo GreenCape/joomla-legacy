@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menus.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.menus.php 3876 2006-06-05 14:08:05Z stingrey $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -17,22 +17,15 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
-$id 		= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
-$type 		= mosGetParam( $_REQUEST, 'type', false );
-$menutype 	= mosGetParam( $_REQUEST, 'menutype', 'mainmenu' );
-$task 		= mosGetParam( $_REQUEST, 'task', '' );
-$access 	= mosGetParam( $_POST, 'access', '' );
-$utaccess	= mosGetParam( $_POST, 'utaccess', '' );
-$ItemName	= mosGetParam( $_POST, 'ItemName', '' );
-$menu 		= mosGetParam( $_POST, 'menu', '' );
-$cid 		= mosGetParam( $_POST, 'cid', array(0) );
-
 $path 		= $mosConfig_absolute_path .'/administrator/components/com_menus/';
 
+$menutype 	= strval( mosGetParam( $_REQUEST, 'menutype', 'mainmenu' ) );
+$type 		= strval( mosGetParam( $_REQUEST, 'type', false ) );
+$menu 		= strval( mosGetParam( $_POST, 'menu', '' ) );
+$cid 		= mosGetParam( $_POST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
 }
-
 
 switch ($task) {
 	case 'new':
@@ -55,26 +48,19 @@ switch ($task) {
 		break;
 
 	case 'save':
-	case 'apply':
+	case 'apply':	
+		// clean any existing cache files
+		mosCache::cleanCache( 'com_content' );
 		require_once( $path . $type .'/'. $type .'.menu.php' );
 		break;
 
 	case 'publish':
 	case 'unpublish':
-		if ($msg = publishMenuSection( $cid, ($task == 'publish') )) {
-			// proceed no further if the menu item can't be published
-			mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype .'&mosmsg= '.$msg );
-		} else {
-			mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype );
-		}
+		publishMenuSection( $cid, ($task == 'publish'), $menutype );
 		break;
 
 	case 'remove':
-		if ($msg = TrashMenusection( $cid )) {
-			mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype .'&mosmsg= '.$msg );
-		} else {
-			mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype );
-		}
+		TrashMenusection( $cid, $menutype );
 		break;
 
 	case 'cancel':
@@ -127,7 +113,7 @@ switch ($task) {
 		break;
 
 	default:
-		$type = mosGetParam( $_REQUEST, 'type' );
+		$type = strval( mosGetParam( $_REQUEST, 'type' ) );
 		if ($type) {
 			// adding a new item - type selection form
 			require_once( $path . $type .'/'. $type .'.menu.php' );
@@ -413,7 +399,7 @@ function saveMenu( $option, $task='save' ) {
 * @param array An array of id numbers
 * @param integer 0 if unpublishing, 1 if publishing
 */
-function publishMenuSection( $cid=null, $publish=1 ) {
+function publishMenuSection( $cid=null, $publish=1, $menutype ) {
 	global $database, $mosConfig_absolute_path;
 
 	if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -440,21 +426,48 @@ function publishMenuSection( $cid=null, $publish=1 ) {
 			require_once( $mosConfig_absolute_path . '/administrator/components/com_menus/' . $type . '/' . $type . '.menu.php' );
 		}
 	}
-	return null;
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
+
+	mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype );
 }
 
 /**
 * Trashes a menu record
 */
-function TrashMenuSection( $cid=NULL ) {
+function TrashMenuSection( $cid=NULL, $menutype='mainmenu' ) {
 	global $database;
-
-	$state = "-2";
-	//seperate contentids
-	$cids = implode( ',', $cid );
+	
+	$nullDate	= $database->getNullDate();
+	$state		= -2;
+	
+	$query = "SELECT *"
+	. "\n FROM #__menu"
+	. "\n WHERE menutype = '$menutype'"
+	. "\n AND published != $state"
+	. "\n ORDER BY menutype, parent, ordering"
+	;
+	$database->setQuery( $query );
+	$mitems = $database->loadObjectList();	
+	
+	// determine if selected item has an child items
+	$children = array();
+	foreach ( $cid as $id ) {
+		foreach ( $mitems as $item ) {
+			if ( $item->parent == $id ) {
+				$children[] = $item->id;
+			}		
+		}
+	}	
+	$list 	= josMenuChildrenRecurse( $mitems, $children, $children );
+	$list 	= array_merge( $cid, $list );
+	
+	$ids 	= implode( ',', $list );	
+	
 	$query = "UPDATE #__menu"
-	. "\n SET published = $state, ordering = 0"
-	. "\n WHERE id IN ( $cids )"
+	. "\n SET published = $state, ordering = 0, checked_out = 0, checked_out_time = '$nullDate'"
+	. "\n WHERE id IN ( $ids )"
 	;
 	$database->setQuery( $query );
 	if ( !$database->query() ) {
@@ -463,9 +476,12 @@ function TrashMenuSection( $cid=NULL ) {
 	}
 
 	$total = count( $cid );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
-	$msg = $total ." Item(s) sent to the Trash";
-	return $msg;
+	$msg = $total .' Item(s) sent to the Trash';	
+	mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype, $msg );
 }
 
 /**
@@ -476,19 +492,12 @@ function cancelMenu( $option ) {
 
 	$menu = new mosMenu( $database );
 	$menu->bind( $_POST );
-	$menuid = mosGetParam( $_POST, 'menuid', 0 );
+	$menuid = intval( mosGetParam( $_POST, 'menuid', 0 ) );
 	if ( $menuid ) {
 		$menu->id = $menuid;
 	}
 	$menu->checkin();
-/*
-	if ( $menu->type == 'content_typed' ) {
-		$contentid = mosGetParam( $_POST, 'id', 0 );
-		$content = new mosContent( $database );
-		$content->load( $contentid );
-		$content->checkin();
-	}
-*/
+
 	mosRedirect( 'index2.php?option='. $option .'&menutype='. $menu->menutype );
 }
 
@@ -502,6 +511,9 @@ function orderMenu( $uid, $inc, $option ) {
 	$row = new mosMenu( $database );
 	$row->load( $uid );
 	$row->move( $inc, "menutype = '$row->menutype' AND parent = $row->parent" );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( 'index2.php?option='. $option .'&menutype='. $row->menutype );
 }
@@ -524,6 +536,9 @@ function accessMenu( $uid, $access, $option, $menutype ) {
 	if (!$menu->store()) {
 		return $menu->getError();
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( 'index2.php?option='. $option .'&menutype='. $menutype );
 }
@@ -601,14 +616,14 @@ function addDescendants($id, &$cid) {
 * Save the item(s) to the menu selected
 */
 function moveMenuSave( $option, $cid, $menu, $menutype ) {
-	global $database, $my;
+	global $database;
 
 	// add all decendants to the list
 	foreach ($cid as $id) addDescendants($id, $cid);
 
-	$row = new mosMenu( $database );
-	$ordering = 1000000;
-	$firstroot = 0;
+	$row 		= new mosMenu( $database );
+	$ordering 	= 1000000;
+	$firstroot 	= 0;
 	foreach ($cid as $id) {
 		$row->load( $id );
 
@@ -638,6 +653,9 @@ function moveMenuSave( $option, $cid, $menu, $menutype ) {
 		$row->updateOrder( "menutype = '$row->menutype' AND parent = $row->parent" );
 	} // if
 
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
+	
 	$msg = count($cid) .' Menu Items moved to '. $menu;
 	mosRedirect( 'index2.php?option='. $option .'&menutype='. $menutype .'&mosmsg='. $msg );
 } // moveMenuSave
@@ -711,6 +729,10 @@ function copyMenuSave( $option, $cid, $menu, $menutype ) {
 		}
 		$curr->updateOrder( "menutype = '$curr->menutype' AND parent = $curr->parent" );
 	} // foreach
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
+
 	$msg = count( $cid ) .' Menu Items Copied to '. $menu;
 	mosRedirect( 'index2.php?option='. $option .'&menutype='. $menutype .'&mosmsg='. $msg );
 }
@@ -776,18 +798,48 @@ function saveOrder( &$cid, $menutype ) {
 				if ($cond[1]==$condition) {
 					$found = true;
 					break;
-				} // if
+				} 
 			if (!$found) $conditions[] = array($row->id, $condition);
-		} // for
-	} // for
+		} 
+	} 
 
 	// execute updateOrder for each group
 	foreach ( $conditions as $cond ) {
 		$row->load( $cond[0] );
 		$row->updateOrder( $cond[1] );
-	} // foreach
+	} 
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$msg 	= 'New ordering saved';
 	mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype, $msg );
-} // saveOrder
+} 
+
+/**
+* Returns list of child items for a given set of ids from menu items supplied
+*
+*/
+function josMenuChildrenRecurse( $mitems, $parents, $list, $maxlevel=20, $level=0 ) {
+	// check to reduce recursive processing
+	if ( $level <= $maxlevel && count( $parents ) ) {
+		$children = array();
+		foreach ( $parents as $id ) {			
+			foreach ( $mitems as $item ) {
+				if ( $item->parent == $id ) {
+					$children[] = $item->id;
+				}		
+			}
+		}	
+		
+		// check to reduce recursive processing
+		if ( count( $children ) ) {
+			$list = josMenuChildrenRecurse( $mitems, $children, $list, $maxlevel, $level+1 );
+			
+			$list = array_merge( $list, $children );
+		}
+	}
+	
+	return $list;
+}
 ?>

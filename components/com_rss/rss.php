@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: rss.php 2287 2006-02-11 16:03:50Z stingrey $
+* @version $Id: rss.php 3718 2006-05-29 06:48:03Z stingrey $
 * @package Joomla
 * @subpackage Syndicate
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -36,13 +36,14 @@ switch ( $task ) {
 */
 function feedFrontpage( $showFeed ) {
 	global $database, $mainframe;
-	global $mosConfig_live_site, $mosConfig_offset, $mosConfig_absolute_path, $mosConfig_cachepath;
+	global $mosConfig_live_site, $mosConfig_cachepath;
 
 	$nullDate = $database->getNullDate();
 	// pull id of syndication component
 	$query = "SELECT a.id"
 	. "\n FROM #__components AS a"
-	. "\n WHERE a.option = 'com_syndicate'"
+	. "\n WHERE ( a.admin_menu_link = 'option=com_syndicate' OR a.admin_menu_link = 'option=com_syndicate&hidemainmenu=1' )"
+	. "\n AND a.option = 'com_syndicate'"
 	;
 	$database->setQuery( $query );
 	$id = $database->loadResult();
@@ -70,7 +71,7 @@ function feedFrontpage( $showFeed ) {
 		}			
 	}
 	
-	$now 	= date( 'Y-m-d H:i:s', time() + $mosConfig_offset * 60 * 60 );
+	$now 	= _CURRENT_SERVER_TIME;
 	$iso 	= split( '=', _ISO );
 
 	// parameter intilization
@@ -91,10 +92,10 @@ function feedFrontpage( $showFeed ) {
 		$info[ 'image' ]		= $mosConfig_live_site .'/images/M_images/'. $info[ 'image_file' ];
 	}
 	$info[ 'image_alt' ] 		= $params->def( 'image_alt', 'Powered by Joomla!' );
-	$info[ 'limit_text' ] 		= $params->def( 'limit_text', 1 );
+	$info[ 'limit_text' ] 		= $params->def( 'limit_text', 0 );
 	$info[ 'text_length' ] 		= $params->def( 'text_length', 20 );
 	// get feed type from url
-	$info[ 'feed' ] 			= mosGetParam( $_GET, 'feed', 'RSS2.0' );
+	$info[ 'feed' ] 			= strval( mosGetParam( $_GET, 'feed', 'RSS2.0' ) );
 	// live bookmarks
 	$info[ 'live_bookmark' ]	= $params->def( 'live_bookmark', '' );
 	$info[ 'bookmark_file' ]	= $params->def( 'bookmark_file', '' );
@@ -113,14 +114,43 @@ function feedFrontpage( $showFeed ) {
 		$info[ 'file' ] = strtolower( str_replace( '.', '', $info[ 'feed' ] ) );
 		
 		// security check to limit arbitrary file creation.
+		// and to allow disabling/enabling of selected feed types
 		switch ( $info[ 'file' ] ) {
 			case 'rss091':			
-			case 'rss10':			
-			case 'rss20':			
-			case 'atom03':			
-			case 'opml':			
-				$filename = $info[ 'file' ] .'.xml';
+				if ( !$params->get( 'rss091', 1 ) ) {
+					echo _NOT_AUTH;
+					return;
+				}
 				break;
+
+			case 'rss10':			
+				if ( !$params->get( 'rss10', 1 ) ) {
+					echo _NOT_AUTH;
+					return;
+				}
+				break;
+			
+			case 'rss20':			
+				if ( !$params->get( 'rss20', 1 ) ) {
+					echo _NOT_AUTH;
+					return;
+				}
+				break;
+			
+			case 'atom03':			
+				if ( !$params->get( 'atom03', 1 ) ) {
+					echo _NOT_AUTH;
+					return;
+				}
+				break;
+			
+			case 'opml':			
+				if ( !$params->get( 'opml', 1 ) ) {
+					echo _NOT_AUTH;
+					return;
+				}
+				break;
+			
 			
 			default:
 				echo _NOT_AUTH;
@@ -128,6 +158,8 @@ function feedFrontpage( $showFeed ) {
 				break;			
 		}
 	}
+	$filename = $info[ 'file' ] .'.xml';
+	
 	// security check to stop server path disclosure
 	if ( strstr( $filename, '/' ) ) { 
 		echo _NOT_AUTH;
@@ -196,25 +228,24 @@ function feedFrontpage( $showFeed ) {
 			break;
 	}
 
-	$join 		= "\n INNER JOIN #__content_frontpage AS f ON f.content_id = a.id";
-	$and 		= '';
-
 	// query of frontpage content items
 	$query = "SELECT a.*, u.name AS author, u.usertype, UNIX_TIMESTAMP( a.created ) AS created_ts, cat.title AS cat_title, sec.title AS section_title"
 	. "\n FROM #__content AS a"
-	. $join
+	. "\n INNER JOIN #__content_frontpage AS f ON f.content_id = a.id"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"	
 	. "\n LEFT JOIN #__categories AS cat ON cat.id = a.catid"
 	. "\n LEFT JOIN #__sections AS sec ON sec.id = a.sectionid"
 	. "\n WHERE a.state = 1"
-	. $and
+	. "\n AND cat.published = 1"
+	. "\n AND sec.published = 1"
 	. "\n AND a.access = 0"
-	. "\n AND ( publish_up = '$nullDate' OR publish_up <= '$now' )"
-	. "\n AND ( publish_down = '$nullDate' OR publish_down >= '$now' )"
+	. "\n AND cat.access = 0"
+	. "\n AND sec.access = 0"
+	. "\n AND ( a.publish_up = '$nullDate' OR a.publish_up <= '$now' )"
+	. "\n AND ( a.publish_down = '$nullDate' OR a.publish_down >= '$now' )"
 	. "\n ORDER BY $orderby"
-	. ( $info[ 'count' ] ? "\n LIMIT ". $info[ 'count' ] : '' )
 	;
-	$database->setQuery( $query );
+	$database->setQuery( $query, 0, $info[ 'count' ] );
 	$rows = $database->loadObjectList();
 
 	foreach ( $rows as $row ) {
@@ -224,9 +255,14 @@ function feedFrontpage( $showFeed ) {
 
 		// url link to article
 		// & used instead of &amp; as this is converted by feed creator
-		$item_link = 'index.php?option=com_content&task=view&id='. $row->id .'&Itemid='. $mainframe->getItemid( $row->id );
+		$_Itemid	= '';
+		$itemid 	= $mainframe->getItemid( $row->id );
+		if ($itemid) {
+			$_Itemid = '&Itemid='. $itemid;
+		}
+		
+		$item_link = 'index.php?option=com_content&task=view&id='. $row->id . $_Itemid;
 		$item_link = sefRelToAbs( $item_link );
-
 
 		// removes all formating from the intro text for the description text
 		$item_description = $row->introtext;

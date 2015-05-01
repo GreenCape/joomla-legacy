@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_related_items.php 2483 2006-02-19 06:09:54Z stingrey $
+* @version $Id: mod_related_items.php 3710 2006-05-29 03:21:43Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -14,15 +14,12 @@
 // no direct access
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
-global $mosConfig_offset;
+global $mosConfig_offset, $option, $task;
 
-$option = mosGetParam( $_REQUEST, 'option' );
-$task 	= mosGetParam( $_REQUEST, 'task' );
-$id 	= intval( mosGetParam( $_REQUEST, 'id', null ) );
+$id 		= mosGetParam( $_REQUEST, 'id', null );
 
-$now 	= date( 'Y-m-d H:i:s', time() );
-
-$nullDate = $database->getNullDate();
+$now 		= _CURRENT_SERVER_TIME;
+$nullDate 	= $database->getNullDate();
 
 if ($option == 'com_content' && $task == 'view' && $id) {
 	// select the meta keywords from the item

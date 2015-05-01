@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.modules.html.php 185 2005-09-19 08:39:45Z stingrey $
+* @version $Id: admin.modules.html.php 3037 2006-04-05 14:03:52Z stingrey $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -202,7 +202,7 @@ class HTML_modules {
 	* @param object Parameters
 	*/
 	function editModule( &$row, &$orders2, &$lists, &$params, $option ) {
-		global $mosConfig_live_site;
+		global $mosConfig_live_site, $mosConfig_cachepath, $my;
 
 		$row->titleA = '';
 		if ( $row->id ) {
@@ -219,7 +219,6 @@ class HTML_modules {
 				<?php if ($row->module == "") {
 					getEditorContents( 'editor1', 'content' );
 				}?>
-				submitform(pressbutton);
 			}
 			submitform(pressbutton);
 		}
@@ -259,7 +258,7 @@ class HTML_modules {
 					<th colspan="2">
 					Details
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td width="100" align="left">
 					Title:
@@ -340,13 +339,36 @@ class HTML_modules {
 					<th >
 					Parameters
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td>
 					<?php echo $params->render();?>
 					</td>
 				</tr>
 				</table>
+				
+				<?php
+				if ($row->module == "") {
+					?>
+					<table class="adminform">
+					<tr>
+						<td>
+							<table align="center">
+							<?php
+							$visible = 0;
+							// check to hide certain paths if not super admin
+							if ( $my->gid == 25 ) {
+								$visible = 1;
+							}
+							mosHTML::writableCell( $mosConfig_cachepath, 0, '<strong>Cache Directory</strong> ', $visible );
+							?>
+							</table>
+						</td>
+					</tr>
+					</table>
+					<?php
+				}
+				?>				
 			</td>
 			<td width="40%" >
 				<table width="100%" class="adminform">
@@ -354,7 +376,7 @@ class HTML_modules {
 					<th>
 					Pages / Items
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td>
 					Menu Item Link(s):
@@ -375,7 +397,7 @@ class HTML_modules {
 							<th colspan="2">
 							Custom Output
 							</th>
-						<tr>
+						</tr>
 						<tr>
 							<td valign="top" align="left">
 							Content:

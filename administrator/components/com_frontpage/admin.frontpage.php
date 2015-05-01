@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.frontpage.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.frontpage.php 3674 2006-05-26 16:13:50Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -16,8 +16,7 @@
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 // ensure user has access to this function
-if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'components', 'all' )
-		| $acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'components', 'com_frontpage' ))) {
+if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'components', 'all' ) | $acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'components', 'com_frontpage' ))) {
 	mosRedirect( 'index2.php', _NOT_AUTH );
 }
 
@@ -25,7 +24,6 @@ if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'compon
 require_once( $mainframe->getPath( 'admin_html' ) );
 require_once( $mainframe->getPath( 'class' ) );
 
-$task 	= mosGetParam( $_REQUEST, 'task', array(0) );
 $cid 	= mosGetParam( $_POST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
@@ -210,6 +208,9 @@ function changeFrontPage( $cid=null, $state=0, $option ) {
 		$row = new mosContent( $database );
 		$row->checkin( $cid[0] );
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( "index2.php?option=$option" );
 }
@@ -236,6 +237,9 @@ function removeFrontPage( &$cid, $option ) {
 		}
 	}
 	$fp->updateOrder();
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( "index2.php?option=$option" );
 }
@@ -250,6 +254,9 @@ function orderFrontPage( $uid, $inc, $option ) {
 	$fp = new mosFrontPage( $database );
 	$fp->load( $uid );
 	$fp->move( $inc );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( "index2.php?option=$option" );
 }
@@ -272,6 +279,9 @@ function accessMenu( $uid, $access ) {
 	if ( !$row->store() ) {
 		return $row->getError();
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( 'index2.php?option=com_frontpage' );
 }
@@ -297,6 +307,9 @@ function saveOrder( &$cid ) {
 		$row->load( $cid[$i] );
 		$row->updateOrder();
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$msg 	= 'New ordering saved';
 	mosRedirect( 'index2.php?option=com_frontpage', $msg );

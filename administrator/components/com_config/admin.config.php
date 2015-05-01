@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.php 2266 2006-02-10 19:01:22Z stingrey $
+* @version $Id: admin.config.php 3754 2006-05-31 12:08:37Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -127,6 +127,8 @@ function showconfig( $option) {
 
 	$lists['list_limit'] = mosHTML::selectList( $listLimit, 'config_list_limit', 'class="inputbox" size="1"', 'value', 'text', ( $row->config_list_limit ? $row->config_list_limit : 50 ) );
 
+	$lists['frontend_login'] = mosHTML::yesnoRadioList( 'config_frontend_login', 'class="inputbox"', $row->config_frontend_login );
+	
 // DEBUG
 
 	$lists['debug'] = mosHTML::yesnoRadioList( 'config_debug', 'class="inputbox"', $row->config_debug );
@@ -154,7 +156,8 @@ function showconfig( $option) {
 	);
 
 	$lists['error_reporting'] = mosHTML::selectList( $errors, 'config_error_reporting', 'class="inputbox" size="1"', 'value', 'text', $row->config_error_reporting );
-
+	
+	$lists['admin_expired'] = mosHTML::yesnoRadioList( 'config_admin_expired', 'class="inputbox"', $row->config_admin_expired );
 
 // LOCALE SETTINGS
 
@@ -230,7 +233,8 @@ function showconfig( $option) {
 	$lists['uniquemail'] 			= mosHTML::yesnoRadioList( 'config_uniquemail', 'class="inputbox"',	$row->config_uniquemail );
 
 	$lists['shownoauth'] 			= mosHTML::yesnoRadioList( 'config_shownoauth', 'class="inputbox"', $row->config_shownoauth );
-
+	
+	$lists['frontend_userparams']	= mosHTML::yesnoRadioList( 'config_frontend_userparams', 'class="inputbox"', $row->config_frontend_userparams );
 
 // META SETTINGS
 
@@ -329,6 +333,23 @@ function saveconfig( $task ) {
 	//override any possible database password change
 	$row->config_password 	= $mosConfig_password;
 	
+	// handling of special characters
+	$row->config_sitename			= htmlspecialchars( $row->config_sitename, ENT_QUOTES );	
+	$row->config_MetaDesc			= htmlspecialchars( $row->config_MetaDesc, ENT_QUOTES );	
+	$row->config_MetaKeys			= htmlspecialchars( $row->config_MetaKeys, ENT_QUOTES );	
+
+	// handling of quotes (double and single) and amp characters
+	// htmlspecialchars not used to preserve ability to insert other html characters
+	$row->config_offline_message	= ampReplace( $row->config_offline_message );	
+	$row->config_offline_message	= str_replace( '"', '&quot;', $row->config_offline_message );	
+	$row->config_offline_message	= str_replace( "'", '&#039;', $row->config_offline_message );	
+	
+	// handling of quotes (double and single) and amp characters
+	// htmlspecialchars not used to preserve ability to insert other html characters
+	$row->config_error_message		= ampReplace( $row->config_error_message );	
+	$row->config_error_message		= str_replace( '"', '&quot;', $row->config_error_message );	
+	$row->config_error_message		= str_replace( "'", '&#039;', $row->config_error_message );	
+
 	$config = "<?php \n";
 	$config .= $row->getVarText();
 	$config .= "setlocale (LC_TIME, \$mosConfig_locale);\n";
@@ -336,7 +357,7 @@ function saveconfig( $task ) {
 
 	$fname = $mosConfig_absolute_path . '/configuration.php';
 
-	$enable_write 	= mosGetParam($_POST,'enable_write',0);
+	$enable_write 	= intval( mosGetParam( $_POST, 'enable_write', 0 ) );
 	$oldperms 		= fileperms($fname);
 	if ( $enable_write ) {
 		@chmod( $fname, $oldperms | 0222);

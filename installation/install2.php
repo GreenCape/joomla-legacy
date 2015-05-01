@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install2.php 2510 2006-02-21 04:59:41Z stingrey $
+* @version $Id: install2.php 3832 2006-06-03 16:47:58Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -35,9 +35,13 @@ $database = null;
 $errors = array();
 if (!$DBcreated){
 	if (!$DBhostname || !$DBuserName || !$DBname) {
-		db_err ("stepBack3","The database details provided are incorrect and/or empty.");
+		db_err ('stepBack3','The database details provided are incorrect and/or empty.');
 	}
 
+	if($DBPrefix == '') {
+		db_err ('stepBack','You have not entered a database prefix.');
+	}
+	
 	$database = new database( $DBhostname, $DBuserName, $DBpassword, '', '', false );
 	$test = $database->getErrorMsg();
 
@@ -45,14 +49,6 @@ if (!$DBcreated){
 		db_err ('stepBack2','The password and username provided are incorrect.');
 	}
 
-	if($DBname == '') {
-		db_err ('stepBack','The database name provided is empty.');
-	}
-
-	if($DBPrefix == '') {
-		db_err ('stepBack','You have not entered a database prefix.');
-	}
-	
 	// Does this code actually do anything???
 	$configArray['DBhostname'] = $DBhostname;
 	$configArray['DBuserName'] = $DBuserName;

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install4.php 2622 2006-02-26 04:16:09Z stingrey $
+* @version $Id: install4.php 3773 2006-06-01 09:49:10Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -208,6 +208,9 @@ if ($siteUrl) {
 	$config .= "\$mosConfig_helpurl = 'http://help.joomla.org';\n";
 	$config .= "\$mosConfig_mbf_content = '0';\n";
 	$config .= "\$mosConfig_editor = 'tinymce';\n";
+	$config .= "\$mosConfig_admin_expired = '1';\n";
+	$config .= "\$mosConfig_frontend_login = '1';\n";
+	$config .= "\$mosConfig_frontend_userparams = '1';\n";
 	$config .= "setlocale (LC_TIME, \$mosConfig_locale);\n";
 	$config .= "?>";
 

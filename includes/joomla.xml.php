@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.xml.php 2512 2006-02-21 05:55:33Z eddieajau $
+* @version $Id: joomla.xml.php 3549 2006-05-18 08:24:53Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -279,9 +279,9 @@ class mosParameters {
 		$result[0] = $label ? $label : $name;
 
 		if ($result[0] == '@spacer') {
-			$result[0] = '';
+			$result[0] = '&nbsp;';
 		} else {
-			$result[0] = mosToolTip( addslashes( $description ), $result[0], '', '', $result[0], '#', 0 );
+			$result[0] = mosToolTip( addslashes( $description ), addslashes( $result[0] ), '', '', $result[0], '#', 0 );
 		}
 		$type = $param->getAttribute( 'type' );
 
@@ -310,7 +310,7 @@ class mosParameters {
 	function _form_text( $name, $value, &$node, $control_name ) {
 		$size = $node->getAttribute( 'size' );
 
-		return '<input type="text" name="'. $control_name .'['. $name .']" value="'. $value .'" class="text_area" size="'. $size .'"/>';
+		return '<input type="text" name="'. $control_name .'['. $name .']" value="'. $value .'" class="text_area" size="'. $size .'" />';
 	}
 	/**
 	* @param string The name of the form element

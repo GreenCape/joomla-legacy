@@ -1394,7 +1394,7 @@ class DOMIT_Lite_Element extends DOMIT_Lite_ChildNodes_Interface {
 		require_once(DOMIT_INCLUDE_PATH . 'xml_domit_getelementsbypath.php');
 
 		$gebp = new DOMIT_GetElementsByPath();
-		$myResponse =& $gebp->parsePattern($this, $pattern, $nodeIndex);
+		$myResponse = $gebp->parsePattern($this, $pattern, $nodeIndex);
 
 		return $myResponse;
 	} //getElementsByPath
@@ -1721,9 +1721,14 @@ class DOMIT_Lite_Parser {
 		//create instance of expat parser (should be included in php distro)
 		if (version_compare(phpversion(), '5.0', '<=')) {
 			$parser = xml_parser_create('');
-		}
-		else {
-			$parser = xml_parser_create();
+		} else {
+			// special handling for encoding support
+			if (defined( '_ISO' )) {
+				$iso = explode( '=', _ISO );
+				$parser = xml_parser_create($iso[1]);
+			} else {
+				$parser = xml_parser_create();
+			}
 		}
 
 		//set handlers for SAX events

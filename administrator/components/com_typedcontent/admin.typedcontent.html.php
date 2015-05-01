@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.typedcontent.html.php 2385 2006-02-15 21:43:20Z stingrey $
+* @version $Id: admin.typedcontent.html.php 3723 2006-05-29 16:14:03Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -97,34 +97,42 @@ class HTML_typedcontent {
 		for ($i=0, $n=count( $rows ); $i < $n; $i++) {
 			$row = &$rows[$i];
 
-			$now = date( 'Y-m-d H:i:s' );
-			if ( $now <= $row->publish_up && $row->state == "1" ) {
+			$now = _CURRENT_SERVER_TIME;
+			if ( $now <= $row->publish_up && $row->state == 1 ) {
+			// Published
 				$img = 'publish_y.png';
 				$alt = 'Published';
-			} else if ( ( $now <= $row->publish_down || $row->publish_down == $nullDate ) && $row->state == "1" ) {
+			} else if ( ( $now <= $row->publish_down || $row->publish_down == $nullDate ) && $row->state == 1 ) {
+			// Pending
 				$img = 'publish_g.png';
 				$alt = 'Published';
-			} else if ( $now > $row->publish_down && $row->state == "1" ) {
+			} else if ( $now > $row->publish_down && $row->state == 1 ) {
+			// Expired
 				$img = 'publish_r.png';
 				$alt = 'Expired';
-			} elseif ( $row->state == "0" ) {
-				$img = "publish_x.png";
+			} elseif ( $row->state == 0 ) {
+			// Unpublished
+				$img = 'publish_x.png';
 				$alt = 'Unpublished';
 			}
-			$times = '';
-			if (isset($row->publish_up)) {
-				if ($row->publish_up == $nullDate) {
-					$times .= "<tr><td>Start: Always</td></tr>";
-				} else {
-					$times .= "<tr><td>Start: $row->publish_up</td></tr>";
-				}
+			
+			// correct times to include server offset info
+			$row->publish_up 	= mosFormatDate( $row->publish_up, _CURRENT_SERVER_TIME_FORMAT );			
+			if (trim( $row->publish_down ) == $nullDate || trim( $row->publish_down ) == '' || trim( $row->publish_down ) == '-' ) {
+				$row->publish_down = 'Never';
 			}
-			if (isset($row->publish_down)) {
-				if ($row->publish_down == $nullDate) {
-					$times .= "<tr><td>Finish: No Expiry</td></tr>";
-				} else {
-					$times .= "<tr><td>Finish: $row->publish_down</td></tr>";
-				}
+			$row->publish_down 	= mosFormatDate( $row->publish_down, _CURRENT_SERVER_TIME_FORMAT );		
+			
+			$times = '';
+			if ($row->publish_up == $nullDate) {
+				$times .= "<tr><td>Start: Always</td></tr>";
+			} else {
+				$times .= "<tr><td>Start: $row->publish_up</td></tr>";
+			}
+			if ($row->publish_down == $nullDate || $row->publish_down = 'Never') {
+				$times .= "<tr><td>Finish: No Expiry</td></tr>";
+			} else {
+				$times .= "<tr><td>Finish: $row->publish_down</td></tr>";
 			}
 
 			if ( !$row->access ) {
@@ -138,13 +146,9 @@ class HTML_typedcontent {
 				$task_access = 'accesspublic';
 			}
 
-			$link = 'index2.php?option=com_typedcontent&task=edit&hidemainmenu=1&id='. $row->id;
+			$link 		= 'index2.php?option=com_typedcontent&task=edit&hidemainmenu=1&id='. $row->id;
 
-			if ( $row->checked_out ) {
-				$checked	 		= mosCommonHTML::checkedOut( $row );
-			} else {
-				$checked	 		= mosHTML::idBox( $i, $row->id, ($row->checked_out && $row->checked_out != $my->id ) );
-			}
+			$checked 	= mosCommonHTML::CheckedOutProcessing( $row, $i );
 
 			if ( $acl->acl_check( 'administration', 'manage', 'users', $my->usertype, 'components', 'com_users' ) ) {
 				if ( $row->created_by_alias ) {
@@ -241,13 +245,18 @@ class HTML_typedcontent {
 	}
 
 	function edit( &$row, &$images, &$lists, &$params, $option, &$menus ) {
-		//mosMakeHtmlSafe( $row );
-		$create_date = null;
-		if ( $row->created != '0000-00-00 00:00:00' ) {
+		global $database;
+		
+		mosMakeHtmlSafe( $row );
+		
+		$create_date 	= null;
+		$mod_date 		= null;
+		$nullDate 		= $database->getNullDate();
+		
+		if ( $row->created != $nullDate ) {
 			$create_date 	= mosFormatDate( $row->created, '%A, %d %B %Y %H:%M', '0' );
 		}
-		$mod_date = null;
-		if ( $row->modified != '0000-00-00 00:00:00' ) {
+		if ( $row->modified != $nullDate ) {
 			$mod_date 		= mosFormatDate( $row->modified, '%A, %d %B %Y %H:%M', '0' );
 		}
 		
@@ -268,7 +277,7 @@ class HTML_typedcontent {
 		$i = 0;
 		foreach ($images as $k=>$items) {
 			foreach ($items as $v) {
-				echo "\n	folderimages[".$i++."] = new Array( '$k','".addslashes( $v->value )."','".addslashes( $v->text )."' );";
+				echo "folderimages[".$i++."] = new Array( '$k','".addslashes( $v->value )."','".addslashes( $v->text )."' );\t";
 			}
 		}
 		?>
@@ -344,7 +353,7 @@ class HTML_typedcontent {
 					<th colspan="3">
 					Item Details
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td align="left">
 					Title:
@@ -382,7 +391,7 @@ class HTML_typedcontent {
 					<th colspan="2">
 					Publishing Info
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td valign="top" align="right" width="120">
 					State:
@@ -553,13 +562,11 @@ class HTML_typedcontent {
 					<td colspan="2">
 						<table width="100%">
 						<tr>
-							<td width="48%">
+							<td width="48%" valign="top">
 								<div align="center">
 									Gallery Images:
 									<br />
 									<?php echo $lists['imagefiles'];?>
-									<br />
-									Sub-folder: <?php echo $lists['folders'];?>
 								</div>
 							</td>
 							<td width="2%">
@@ -579,6 +586,7 @@ class HTML_typedcontent {
 							</td>
 						</tr>
 						</table>
+						Sub-folder: <?php echo $lists['folders'];?>
 					</td>
 				</tr>
 				<tr valign="top">
@@ -681,7 +689,7 @@ class HTML_typedcontent {
 					<th colspan="2">
 					Parameter Control
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td>
 					<?php echo $params->render();?>
@@ -697,7 +705,7 @@ class HTML_typedcontent {
 					<th colspan="2">
 					Meta Data
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td align="left">
 					Description:<br />
@@ -720,13 +728,13 @@ class HTML_typedcontent {
 					<th colspan="2">
 					Link to Menu
 					</th>
-				<tr>
+				</tr>
 				<tr>
 					<td colspan="2">
 					This will create a 'Link - Static Content' in the menu you select
 					<br /><br />
 					</td>
-				<tr>
+				</tr>
 				<tr>
 					<td valign="top" width="90px">
 					Select a Menu
@@ -734,7 +742,7 @@ class HTML_typedcontent {
 					<td>
 					<?php echo $lists['menuselect']; ?>
 					</td>
-				<tr>
+				</tr>
 				<tr>
 					<td valign="top" width="90px">
 					Menu Item Name
@@ -742,14 +750,14 @@ class HTML_typedcontent {
 					<td>
 					<input type="text" name="link_name" class="inputbox" value="" size="30" />
 					</td>
-				<tr>
+				</tr>
 				<tr>
 					<td>
 					</td>
 					<td>
 					<input name="menu_link" type="button" class="button" value="Link to Menu" onClick="submitbutton('menulink');" />
 					</td>
-				<tr>
+				</tr>
 				<tr>
 					<th colspan="2">
 					Existing Menu Links

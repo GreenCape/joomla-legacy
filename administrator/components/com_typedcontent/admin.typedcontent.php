@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.typedcontent.php 2447 2006-02-17 20:51:51Z stingrey $
+* @version $Id: admin.typedcontent.php 3876 2006-06-05 14:08:05Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -17,12 +17,10 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
-$id 	= intval( mosGetParam( $_REQUEST, 'id', '' ) );
 $cid 	= mosGetParam( $_POST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
 }
-
 
 switch ( $task ) {
 	case 'cancel':
@@ -201,7 +199,8 @@ function edit( $uid, $option ) {
 	$row = new mosContent( $database );
 	$row->load( $uid );
 
-	$lists = array();
+	$lists 		= array();
+	$nullDate 	= $database->getNullDate();
 
 	if ($uid) {
 		// fail if checked out not by 'me'
@@ -217,14 +216,14 @@ function edit( $uid, $option ) {
 			$row->images = array();
 		}
 		
-		$row->created 		= mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S' );
-		$row->modified 		= $row->modified == '0000-00-00 00:00:00' ? '' : mosFormatDate( $row->modified, '%Y-%m-%d %H:%M:%S' );
-		$row->publish_up 	= mosFormatDate( $row->publish_up, '%Y-%m-%d %H:%M:%S' );
+		$row->created 		= mosFormatDate( $row->created, _CURRENT_SERVER_TIME_FORMAT );
+		$row->modified 		= $row->modified == $nullDate ? '' : mosFormatDate( $row->modified, _CURRENT_SERVER_TIME_FORMAT );
+		$row->publish_up 	= mosFormatDate( $row->publish_up, _CURRENT_SERVER_TIME_FORMAT );
 		
-		$nullDate = $database->getNullDate();
-		if (trim( $row->publish_down ) == $nullDate) {
-			$row->publish_down = "Never";
+		if (trim( $row->publish_down ) == $nullDate || trim( $row->publish_down ) == '' || trim( $row->publish_down ) == '-' ) {
+			$row->publish_down = 'Never';
 		}
+		$row->publish_down 	= mosFormatDate( $row->publish_down, _CURRENT_SERVER_TIME_FORMAT );		
 
 		$query = "SELECT name"
 		. "\n FROM #__users"
@@ -258,7 +257,7 @@ function edit( $uid, $option ) {
 		$row->sectionid 	= 0;
 		$row->catid 		= 0;
 		$row->creator 		= '';
-		$row->modified 		= '0000-00-00 00:00:00';
+		$row->modified 		= $nullDate;
 		$row->modifier 		= '';
 		$row->ordering 		= 0;
 		$menus = array();
@@ -306,9 +305,9 @@ function edit( $uid, $option ) {
 function save( $option, $task ) {
 	global $database, $my, $mosConfig_offset;
 
-	$nullDate = $database->getNullDate();
-	$menu 		= mosGetParam( $_POST, 'menu', 'mainmenu' );
-	$menuid		= mosGetParam( $_POST, 'menuid', 0 );
+	$nullDate 	= $database->getNullDate();
+	$menu 		= strval( mosGetParam( $_POST, 'menu', 'mainmenu' ) );
+	$menuid		= intval( mosGetParam( $_POST, 'menuid', 0 ) );
 
 	$row = new mosContent( $database );
 	if (!$row->bind( $_POST )) {
@@ -319,24 +318,30 @@ function save( $option, $task ) {
 	if ($row->id) {
 		$row->modified 		= date( 'Y-m-d H:i:s' );
 		$row->modified_by 	= $my->id;
-		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
-		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
-	} else {
-		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
-		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	}
+	
+	$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
+	
+	if ($row->created && strlen(trim( $row->created )) <= 10) {
+		$row->created 	.= ' 00:00:00';
+	}
+	$row->created 		= $row->created ? mosFormatDate( $row->created, _CURRENT_SERVER_TIME_FORMAT, -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
 	
 	if (strlen(trim( $row->publish_up )) <= 10) {
 		$row->publish_up .= ' 00:00:00';
 	}
-	$row->publish_up = mosFormatDate($row->publish_up, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset );
+	$row->publish_up = mosFormatDate($row->publish_up, _CURRENT_SERVER_TIME_FORMAT, -$mosConfig_offset );
 	
-	$nullDate = $database->getNullDate();
-	if (trim( $row->publish_down ) == "Never") {
+	if (trim( $row->publish_down ) == 'Never' || trim( $row->publish_down ) == '') {
 		$row->publish_down = $nullDate;
+	} else {
+		if (strlen(trim( $row->publish_down )) <= 10) {
+			$row->publish_down .= ' 00:00:00';
+		}
+		$row->publish_down = mosFormatDate( $row->publish_down, _CURRENT_SERVER_TIME_FORMAT, -$mosConfig_offset );
 	}
 	
-	$row->state = mosGetParam( $_REQUEST, 'published', 0 );
+	$row->state = intval( mosGetParam( $_REQUEST, 'published', 0 ) );
 
 	// Save Parameters
 	$params = mosGetParam( $_POST, 'params', '' );
@@ -362,6 +367,9 @@ function save( $option, $task ) {
 		exit();
 	}
 	$row->checkin();
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	switch ( $task ) {
 		case 'go2menu':
@@ -418,6 +426,9 @@ function trash( &$cid, $option ) {
 		echo "<script> alert('".$database->getErrorMsg()."'); window.history.go(-1); </script>\n";
 		exit();
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$msg = $total ." Item(s) sent to the Trash";
 	mosRedirect( 'index2.php?option='. $option, $msg );
@@ -458,6 +469,9 @@ function changeState( $cid=null, $state=0, $option ) {
 		$row = new mosContent( $database );
 		$row->checkin( $cid[0] );
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	if ( $state == "1" ) {
 		$msg = $total ." Item(s) successfully Published";
@@ -484,6 +498,9 @@ function changeAccess( $id, $access, $option  ) {
 	if ( !$row->store() ) {
 		return $row->getError();
 	}
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	mosRedirect( 'index2.php?option='. $option );
 }
@@ -521,9 +538,11 @@ function cancel( $option ) {
 function menuLink( $option, $id ) {
 	global $database;
 
-	$menu 	= mosGetParam( $_POST, 'menuselect', '' );
-	$link 	= mosGetParam( $_POST, 'link_name', '' );
+	$menu 	= strval( mosGetParam( $_POST, 'menuselect', '' ) );
+	$link 	= strval( mosGetParam( $_POST, 'link_name', '' ) );
 
+	$link	= stripslashes( ampReplace($link) );
+	
 	$row 				= new mosMenu( $database );
 	$row->menutype 		= $menu;
 	$row->name 			= $link;
@@ -543,6 +562,9 @@ function menuLink( $option, $id ) {
 	}
 	$row->checkin();
 	$row->updateOrder( "menutype='$row->menutype' AND parent='$row->parent'" );
+	
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$msg = $link .' (Link - Static Content) in menu: '. $menu .' successfully created';
 	mosRedirect( 'index2.php?option='. $option .'&task=edit&hidemainmenu=1&id='. $id, $msg );
@@ -556,7 +578,7 @@ function go2menu() {
 	$row->bind( $_POST );
 	$row->checkin();
 
-	$menu = mosGetParam( $_POST, 'menu', 'mainmenu' );
+	$menu = strval( mosGetParam( $_POST, 'menu', 'mainmenu' ) );
 
 	mosRedirect( 'index2.php?option=com_menus&menutype='. $menu );
 }
@@ -569,8 +591,8 @@ function go2menuitem() {
 	$row->bind( $_POST );
 	$row->checkin();
 
-	$menu 	= mosGetParam( $_POST, 'menu', 'mainmenu' );
-	$id		= mosGetParam( $_POST, 'menuid', 0 );
+	$menu 	= strval( mosGetParam( $_POST, 'menu', 'mainmenu' ) );
+	$id		= intval( mosGetParam( $_POST, 'menuid', 0 ) );
 
 	mosRedirect( 'index2.php?option=com_menus&menutype='. $menu .'&task=edit&hidemainmenu=1&id='. $id );
 }
@@ -609,6 +631,9 @@ function saveOrder( &$cid ) {
 		$row->load( $cond[0] );
 		$row->updateOrder( $cond[1] );
 	} // foreach
+
+	// clean any existing cache files
+	mosCache::cleanCache( 'com_content' );
 
 	$msg 	= 'New ordering saved';
 	mosRedirect( 'index2.php?option=com_typedcontent', $msg );

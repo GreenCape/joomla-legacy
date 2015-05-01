@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_latestnews.php 2483 2006-02-19 06:09:54Z stingrey $
+* @version $Id: mod_latestnews.php 2711 2006-03-08 15:07:22Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -21,10 +21,11 @@ $count 		= intval( $params->get( 'count', 5 ) );
 $catid 		= trim( $params->get( 'catid' ) );
 $secid 		= trim( $params->get( 'secid' ) );
 $show_front	= $params->get( 'show_front', 1 );
-$now 		= date( 'Y-m-d H:i:s', time() );
-$access 	= !$mainframe->getCfg( 'shownoauth' );
 
-$nullDate = $database->getNullDate();
+$now 		= _CURRENT_SERVER_TIME;
+$access 	= !$mainframe->getCfg( 'shownoauth' );
+$nullDate 	= $database->getNullDate();
+
 // select between Content Items, Static Content or both
 switch ( $type ) {
 	case 2: 

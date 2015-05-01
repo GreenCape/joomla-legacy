@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.trash.html.php 212 2005-09-21 07:50:23Z stingrey $
+* @version $Id: admin.trash.html.php 3310 2006-04-26 19:22:43Z stingrey $
 * @package Joomla
 * @subpackage Trash
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -53,7 +53,7 @@ class HTML_trash {
 			}
 		}
 		</script>
-		<form action="index2.php" method="post" name="adminForm">
+		<form action="index2.php?option=com_trash" method="post" name="adminForm">
 		<table class="adminheading">
 		<tr>
 			<th class="trash">Trash Manager</th>
@@ -207,7 +207,7 @@ class HTML_trash {
 		$tabs->endPane();
 		?>
 
-		<input type="hidden" name="option" value="<?php echo $option;?>" />
+		<input type="hidden" name="option" value="com_trash" />
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
 		</form>

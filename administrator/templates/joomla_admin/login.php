@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: login.php 119 2005-09-16 20:05:35Z stingrey $
+* @version $Id: login.php 3551 2006-05-18 20:23:01Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -40,6 +40,10 @@ $tstart = mosProfiler::getmicrotime();
 	</div>
 </div>
 <div id="ctr" align="center">
+	<?php
+	// handling of mosmsg text in url
+	include_once( $mosConfig_absolute_path .'/administrator/modules/mod_mosmsg.php' ); 
+	?>
 	<div class="login">
 		<div class="login-form">
 			<img src="templates/joomla_admin/images/login.gif" alt="Login" />

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.banners.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.banners.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -186,7 +186,7 @@ function saveBanner( $task ) {
 	}
 	
 	// Sets impressions to unlimited when `unlimited` checkbox ticked
-	$unlimited = mosGetParam( $_POST, 'unlimited', 0 );
+	$unlimited = intval( mosGetParam( $_POST, 'unlimited', 0 ) );
 	if ( $unlimited ) {
 		$row->imptotal = 0;
 	}

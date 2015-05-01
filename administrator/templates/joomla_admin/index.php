@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 280 2005-09-30 21:56:34Z rhuk $
+* @version $Id: index.php 3549 2006-05-18 08:24:53Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -91,7 +91,7 @@ initEditor();
 			</div>
 			<div align="center" class="smallgrey">
 				<?php echo $version; ?>
-				<br/>
+				<br />
 				<a href="http://www.joomla.org/content/blogcategory/32/66/" target="_blank">Check for latest Version</a>
 			</div>			
 			<?php

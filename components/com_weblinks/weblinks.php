@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: weblinks.php 2573 2006-02-23 18:42:32Z stingrey $
+* @version $Id: weblinks.php 3594 2006-05-22 17:29:07Z stingrey $
 * @package Joomla
 * @subpackage Weblinks
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -106,8 +106,7 @@ function listWeblinks( $catid ) {
 	$categories = $database->loadObjectList();
 	
 	// Parameters
-	$menu = new mosMenu( $database );
-	$menu->load( $Itemid );
+	$menu = $mainframe->get( 'menu' );
 	$params = new mosParameters( $menu->params );
 	$params->def( 'page_title', 1 );
 	$params->def( 'header', $menu->name );
@@ -225,7 +224,21 @@ function editWebLink( $id, $option ) {
 		mosNotAuth();
 		return;
 	}
-
+		
+	// security check to see if link exists in a menu
+	$link = 'index.php?option=com_weblinks&task=new';
+	$query = "SELECT id"
+	. "\n FROM #__menu"
+	. "\n WHERE link LIKE '%$link%'"
+	. "\n AND published = 1"
+	;
+	$database->setQuery( $query );
+	$exists = $database->loadResult();
+	if ( !$exists ) {						
+		mosNotAuth();
+		return;
+	}		
+	
 	$row = new mosWeblink( $database );
 	// load the row from the db table
 	$row->load( $id );
@@ -261,9 +274,8 @@ function cancelWebLink( $option ) {
 	$row = new mosWeblink( $database );
 	$row->id = intval( mosGetParam( $_POST, 'id', 0 ) );
 	$row->checkin();
-	$Itemid = mosGetParam( $_POST, 'Returnid', '' );
 
-	$referer = mosGetParam( $_POST, 'referer', '' );
+	$referer = strval( mosGetParam( $_POST, 'referer', '' ) );
 	mosRedirect( $referer );
 }
 

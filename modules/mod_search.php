@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_search.php 2302 2006-02-12 11:07:00Z stingrey $
+* @version $Id: mod_search.php 3112 2006-04-14 03:47:46Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -57,6 +57,7 @@ if ( $set_Itemid ) {
 	$query = "SELECT id"
 	. "\n FROM #__menu"
 	. "\n WHERE link = 'index.php?option=com_search'"
+	. "\n AND published = 1"
 	;
 	$database->setQuery( $query );
 	$rows = $database->loadObjectList();

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.html.php 310 2005-10-02 11:17:00Z stingrey $
+* @version $Id: admin.admin.html.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -60,10 +60,10 @@ class HTML_admin_misc {
 	}
 
 	function system_info( $version ) {
-		global $mosConfig_absolute_path, $database;
-		//$tab = mosGetParam( $_REQUEST, 'tab', 'tab1' );
-		$width = 400;	// width of 100%
-		$tabs = new mosTabs(0);
+		global $mosConfig_absolute_path, $database, $mosConfig_cachepath, $my;
+
+		$width 	= 400;	// width of 100%
+		$tabs 	= new mosTabs(0);
 		?>
 
 		<table class="adminheading">
@@ -334,11 +334,12 @@ class HTML_admin_misc {
 				<td>
 					<strong>For all Joomla! functions and features to work ALL of the following directories should be writeable:</strong>
 					<?php
+					$sp = ini_get('session.save_path');
+										
 					mosHTML::writableCell( 'administrator/backups' );
 					mosHTML::writableCell( 'administrator/components' );
 					mosHTML::writableCell( 'administrator/modules' );
 					mosHTML::writableCell( 'administrator/templates' );
-					mosHTML::writableCell( 'cache' );
 					mosHTML::writableCell( 'components' );
 					mosHTML::writableCell( 'images' );
 					mosHTML::writableCell( 'images/banners' );
@@ -351,8 +352,10 @@ class HTML_admin_misc {
 					mosHTML::writableCell( 'mambots/search' );
 					mosHTML::writableCell( 'media' );
 					mosHTML::writableCell( 'modules' );
-					mosHTML::writableCell( 'templates' );				
-					?>
+					mosHTML::writableCell( 'templates' );
+					mosHTML::writableCell( $mosConfig_cachepath, 0, '<strong>Cache Directory</strong> ' );
+					mosHTML::writableCell( $sp, 0, '<strong>Session Directory</strong> ' );
+					?>					
 				</td>
 			</tr>
 			</table>
@@ -382,7 +385,7 @@ class HTML_admin_misc {
 	 */
 	function help() {
 		global $mosConfig_live_site;
-		$helpurl 	= mosGetParam( $GLOBALS, 'mosConfig_helpurl', '' );
+		$helpurl 	= strval( mosGetParam( $GLOBALS, 'mosConfig_helpurl', '' ) );
 		
 		if ( $helpurl == 'http://help.mamboserver.com' ) {
 			$helpurl = 'http://help.joomla.org';
@@ -390,8 +393,8 @@ class HTML_admin_misc {
 		
 		$fullhelpurl = $helpurl . '/index2.php?option=com_content&amp;task=findkey&pop=1&keyref=';
 
-		$helpsearch = mosGetParam( $_REQUEST, 'helpsearch', '' );
-		$page 		= mosGetParam( $_REQUEST, 'page', 'joomla.whatsnew100.html' );
+		$helpsearch = strval( mosGetParam( $_REQUEST, 'helpsearch', '' ) );
+		$page 		= strval( mosGetParam( $_REQUEST, 'page', 'joomla.whatsnew100.html' ) );
 		$toc 		= getHelpToc( $helpsearch );
 		if (!eregi( '\.html$', $page )) {
 			$page .= '.xml';
@@ -560,7 +563,7 @@ class HTML_admin_misc {
  */
 function getHelpTOC( $helpsearch ) {
 	global $mosConfig_absolute_path;
-	$helpurl = mosGetParam( $GLOBALS, 'mosConfig_helpurl', '' );
+	$helpurl = strval( mosGetParam( $GLOBALS, 'mosConfig_helpurl', '' ) );
 
 	$files = mosReadDirectory( $mosConfig_absolute_path . '/help/', '\.xml$|\.html$' );
 

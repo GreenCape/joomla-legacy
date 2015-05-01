@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.newsfeeds.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.newsfeeds.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Newsfeeds
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -24,9 +24,7 @@ if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'compon
 require_once( $mainframe->getPath( 'admin_html' ) );
 require_once( $mainframe->getPath( 'class' ) );
 
-$task 	= mosGetParam( $_REQUEST, 'task', array(0) );
 $cid 	= mosGetParam( $_POST, 'cid', array(0) );
-$id 	= intval( mosGetParam( $_GET, 'id', 0 ) );
 if (!is_array( $cid )) {
 	$cid = array(0);
 }
@@ -279,8 +277,8 @@ function cancelNewsFeed( $option ) {
 function orderNewsFeed( $id, $inc, $option ) {
 	global $database;
 
-	$limit 		= mosGetParam( $_REQUEST, 'limit', 0 );
-	$limitstart = mosGetParam( $_REQUEST, 'limitstart', 0 );
+	$limit 		= intval( mosGetParam( $_REQUEST, 'limit', 0 ) );
+	$limitstart = intval( mosGetParam( $_REQUEST, 'limitstart', 0 ) );
 	$catid 		= intval( mosGetParam( $_REQUEST, 'catid', 0 ) );
 
 	$row = new mosNewsFeed( $database );

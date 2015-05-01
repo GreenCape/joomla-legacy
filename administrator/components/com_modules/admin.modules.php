@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.modules.php 2612 2006-02-25 01:31:16Z stingrey $
+* @version $Id: admin.modules.php 3876 2006-06-05 14:08:05Z stingrey $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -22,10 +22,9 @@ if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'module
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
-$client 	= mosGetParam( $_REQUEST, 'client', '' );
-$cid 		= mosGetParam( $_POST, 'cid', array(0) );
-$id 		= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
+$client 	= strval( mosGetParam( $_REQUEST, 'client', '' ) );
 $moduleid 	= mosGetParam( $_REQUEST, 'moduleid', null );
+$cid 		= mosGetParam( $_POST, 'cid', array(0) );
 if ($cid[0] == 0 && isset($moduleid) ) {
 	$cid[0] = $moduleid;
 }
@@ -49,7 +48,6 @@ switch ( $task ) {
 
 	case 'save':
 	case 'apply':
-		mosCache::cleanCache( 'com_content' );
 		saveModule( $option, $client, $task );
 		break;
 
@@ -63,7 +61,6 @@ switch ( $task ) {
 
 	case 'publish':
 	case 'unpublish':
-		mosCache::cleanCache( 'com_content' );
 		publishModule( $cid, ($task == 'publish'), $option, $client );
 		break;
 
@@ -222,6 +219,8 @@ function copyModule( $option, $uid, $client ) {
 		$database->query();
 	}
 
+	mosCache::cleanCache( 'com_content' );
+	
 	$msg = 'Module Copied ['. $row->title .']';
 	mosRedirect( 'index2.php?option='. $option .'&client='. $client, $msg );
 }
@@ -254,6 +253,7 @@ function saveModule( $option, $client, $task ) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
 	}
+	
 	$row->checkin();
 	if ($client == 'admin') {
 		$where = "client_id=1";
@@ -294,6 +294,8 @@ function saveModule( $option, $client, $task ) {
 		}				
 	}
 
+	mosCache::cleanCache( 'com_content' );
+	
 	switch ( $task ) {
 		case 'apply':
 			$msg = 'Successfully Saved changes to Module: '. $row->title;
@@ -517,6 +519,8 @@ function removeModule( &$cid, $option, $client ) {
 		echo "<script>alert('Module(s): \'$cids\' cannot be deleted they can only be un-installed as they are Joomla! modules.');</script>\n";
 	}
 
+	mosCache::cleanCache( 'com_content' );
+	
 	mosRedirect( 'index2.php?option='. $option .'&client='. $client );
 }
 
@@ -552,6 +556,8 @@ function publishModule( $cid=null, $publish=1, $option, $client ) {
 		$row->checkin( $cid[0] );
 	}
 
+	mosCache::cleanCache( 'com_content' );
+	
 	mosRedirect( 'index2.php?option='. $option .'&client='. $client );
 }
 
@@ -577,7 +583,7 @@ function cancelModule( $option, $client ) {
 function orderModule( $uid, $inc, $option ) {
 	global $database;
 
-	$client = mosGetParam( $_POST, 'client', '' );
+	$client = strval( mosGetParam( $_POST, 'client', '' ) );
 
 	$row = new mosModule( $database );
 	$row->load( $uid );
@@ -594,6 +600,8 @@ function orderModule( $uid, $inc, $option ) {
 		$client = '';
 	}
 
+	mosCache::cleanCache( 'com_content' );
+	
 	mosRedirect( 'index2.php?option='. $option .'&client='. $client );
 }
 
@@ -629,6 +637,8 @@ function accessMenu( $uid, $access, $option, $client ) {
 		return $row->getError();
 	}
 
+	mosCache::cleanCache( 'com_content' );
+	
 	mosRedirect( 'index2.php?option='. $option .'&client='. $client );
 }
 
@@ -667,6 +677,8 @@ function saveOrder( &$cid, $client ) {
 		$row->updateOrder( $cond[1] );
 	} // foreach
 
+	mosCache::cleanCache( 'com_content' );
+	
 	$msg 	= 'New ordering saved';
 	mosRedirect( 'index2.php?option=com_modules&client='. $client, $msg );
 } // saveOrder

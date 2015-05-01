@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.media.html.php 1758 2006-01-12 13:58:21Z stingrey $
+* @version $Id: admin.media.html.php 3440 2006-05-11 15:00:59Z stingrey $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -200,10 +200,7 @@ class HTML_Media {
 	}
 
 	function show_image($img, $file, $info, $size, $listdir) {
-		global $mosConfig_live_site;
-
 		$img_file 		= basename($img);
-		$img_url 		= COM_MEDIA_BASEURL . $listdir . '/' . $img_file;
 		$img_url_link 	= COM_MEDIA_BASEURL . $listdir . '/' . rawurlencode( $img_file );
 
 		$filesize 		= HTML_Media::parse_size( $size );
@@ -214,28 +211,52 @@ class HTML_Media {
 			$img_dimensions = 'width="'. $info[0] .'" height="'. $info[1] .'"';
 		}
 		
-		$overlib = 'Width: '. $info[0].'px<br/>Height: '.$info[1] .'px';
-		$overlib .= '<br/>Filesize: '. $filesize;
-		$overlib .= '<br/><br/> *Click to Enlarge*';
+		$overlib = '<table>';
+		$overlib .= '<tr>';
+		$overlib .= '<td>';
+		$overlib .= 'Width:';
+		$overlib .= '</td>';
+		$overlib .= '<td>';
+		$overlib .= $info[0].' px';
+		$overlib .= '</td>';
+		$overlib .= '</tr>';
+		$overlib .= '<tr>';
+		$overlib .= '<td>';
+		$overlib .= 'Height:';
+		$overlib .= '</td>';
+		$overlib .= '<td>';
+		$overlib .= $info[1] .' px';
+		$overlib .= '</td>';
+		$overlib .= '</tr>';
+		$overlib .= '<tr>';
+		$overlib .= '<td>';
+		$overlib .= 'Filesize:';
+		$overlib .= '</td>';
+		$overlib .= '<td>';
+		$overlib .= $filesize;
+		$overlib .= '</td>';
+		$overlib .= '</tr>';
+		$overlib .= '</table>';
+		$overlib .= '<br/> *Click to Enlarge*';
 		$overlib .= '<br/> *Click for Image Code*';
 		?>
 		<div style="float:left; padding: 5px">
-			<div class="imgTotal"  onmouseover="return overlib( '<?php echo $overlib; ?>', CAPTION, '<?php echo $file; ?>', BELOW, LEFT, WIDTH, 150 );" onmouseout="return nd();">
+			<div class="imgTotal"  onmouseover="return overlib( '<?php echo $overlib; ?>', CAPTION, '<?php echo addslashes( $file ); ?>', BELOW, LEFT, WIDTH, 150 );" onmouseout="return nd();">
 				<div align="center" class="imgBorder">
 					<a href="#" onclick="javascript: window.open( '<?php echo $img_url_link; ?>', 'win1', 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=<?php echo $info[0] * 1.5;?>,height=<?php echo $info[1] * 1.5;?>,directories=no,location=no,left=120,top=80'); window.top.document.forms[0].imagecode.value = '<img src=&quot;<?php echo $img_url_link;?>&quot; align=&quot;left&quot; hspace=&quot;6&quot; alt=&quot;Image&quot; />';" style="display: block; width: 100%; height: 100%">
 						<div class="image">
-							<img src="<?php echo $img_url; ?>" <?php echo $img_dimensions; ?> alt="<?php echo $file; ?> - <?php echo $filesize; ?>" border="0" />
+							<img src="<?php echo $img_url_link; ?>" <?php echo $img_dimensions; ?> border="0" />
 						</div></a>
 				</div>
 			</div>
 			<div class="imginfoBorder">
 				<small>
-					<?php echo $file; ?>
+					<?php echo htmlspecialchars( substr( $file, 0, 10 ) . ( strlen( $file ) > 10 ? '...' : ''), ENT_QUOTES ); ?>
 				</small>
 				<div class="buttonOut">
 					<a href="index2.php?option=com_media&amp;task=delete&amp;delFile=<?php echo $file; ?>&amp;listdir=<?php echo $listdir; ?>" target="_top" onclick="return deleteImage('<?php echo $file; ?>');" title="Delete Item">
 						<img src="components/com_media/images/edit_trash.gif" width="15" height="15" border="0" alt="Delete" /></a>
-					<a href="#" onclick="javascript:window.top.document.forms[0].imagecode.value = '<img src=&quot;<?php echo $img_url;?>&quot; align=&quot;left&quot; hspace=&quot;6&quot; alt=&quot;Image&quot; />';" title="Image Code">
+					<a href="#" onclick="javascript:window.top.document.forms[0].imagecode.value = '<img src=&quot;<?php echo $img_url_link;?>&quot; align=&quot;left&quot; hspace=&quot;6&quot; alt=&quot;Image&quot; />';" title="Image Code">
 						<img src="components/com_media/images/edit_pencil.gif" width="15" height="15" border="0" alt="Code" /></a>
 				</div>					
 			</div>
@@ -244,28 +265,47 @@ class HTML_Media {
 	}
 
 	function show_dir( $path, $dir, $listdir ) {
-		$num_files = HTML_Media::num_files( COM_MEDIA_BASE . $listdir . $path );
+		$count = HTML_Media::num_files( COM_MEDIA_BASE . $listdir . $path );
+		
+		$num_files 	= $count[0];
+		$num_dir 	= $count[1];
 
-		// Fix for Bug [0000577]
-		if ($listdir=='/') {
-			$listdir='';
+		if ($listdir == '/') {
+			$listdir = '';
 		}
 
 		$link = 'index3.php?option=com_media&amp;task=list&amp;listdir='. $listdir . $path;
 		
-		$overlib = 'Files '. $num_files;
-		$overlib .= '<br/><br/> *Click to Open*';
+		$overlib = '<table>';
+		$overlib .= '<tr>';
+		$overlib .= '<td>';
+		$overlib .= 'Files:';
+		$overlib .= '</td>';
+		$overlib .= '<td>';
+		$overlib .= $num_files;
+		$overlib .= '</td>';
+		$overlib .= '</tr>';
+		$overlib .= '<tr>';
+		$overlib .= '<td>';
+		$overlib .= 'Folders:';
+		$overlib .= '</td>';
+		$overlib .= '<td>';
+		$overlib .= $num_dir;
+		$overlib .= '</td>';
+		$overlib .= '</tr>';
+		$overlib .= '</table>';
+		$overlib .= '<br/> *Click to Open*';
 		?>
 		<div style="float:left; padding: 5px">
 			<div class="imgTotal" onmouseover="return overlib( '<?php echo $overlib; ?>', CAPTION, '<?php echo $dir; ?>', BELOW, RIGHT, WIDTH, 150 );" onmouseout="return nd();">
 				<div align="center" class="imgBorder">
 					<a href="<?php echo $link; ?>" target="imgManager" onclick="javascript:updateDir();">
-						<img src="components/com_media/images/folder.gif" width="80" height="80" border="0" alt="<?php echo $dir; ?>" /></a>
+						<img src="components/com_media/images/folder.gif" width="80" height="80" border="0" /></a>
 				</div>
 			</div>
 			<div class="imginfoBorder">
 				<small>
-					<?php echo $dir; ?>
+					<?php echo substr( $dir, 0, 10 ) . ( strlen( $dir ) > 10 ? '...' : ''); ?>
 				</small>
 				<div class="buttonOut">
 					<a href="index2.php?option=com_media&amp;task=deletefolder&amp;delFolder=<?php echo $path; ?>&amp;listdir=<?php echo $listdir; ?>" target="_top" onclick="return deleteFolder('<?php echo $dir; ?>', <?php echo $num_files; ?>);">
@@ -314,7 +354,6 @@ class HTML_Media {
 	}
 
 	function imageResize($width, $height, $target) {
-
 		//takes the larger size of the width and height and applies the
 		//formula accordingly...this is so this script will work
 		//dynamically with any size image
@@ -337,21 +376,25 @@ class HTML_Media {
 	}
 
 	function num_files($dir) {
-		$total = 0;
+		$total_file 	= 0;
+		$total_dir 		= 0;
 
 		if(is_dir($dir)) {
-
 			$d = dir($dir);
-			while (false !== ($entry = $d->read())) {
-				
-				if(substr($entry,0,1) != '.') {
-					$total++;
+			
+			while ( false !== ($entry = $d->read()) ) {
+				if ( substr($entry,0,1) != '.' && is_file($dir . DIRECTORY_SEPARATOR . $entry) && strpos( $entry, '.html' ) === false && strpos( $entry, '.php' ) === false ) {
+					$total_file++;
+				}
+				if ( substr($entry,0,1) != '.' && is_dir($dir . DIRECTORY_SEPARATOR . $entry) ) {
+					$total_dir++;
 				}
 			}
+			
 			$d->close();
 		}
 		
-		return $total - 1;
+		return array( $total_file, $total_dir );
 	}
 
 

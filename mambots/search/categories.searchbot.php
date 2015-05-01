@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: categories.searchbot.php 2444 2006-02-17 18:59:08Z stingrey $
+* @version $Id: categories.searchbot.php 2762 2006-03-12 19:09:43Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -26,17 +26,26 @@ $_MAMBOTS->registerFunction( 'onSearch', 'botSearchCategories' );
 * @param string ordering option, newest|oldest|popular|alpha|category
 */
 function botSearchCategories( $text, $phrase='', $ordering='' ) {
-	global $database, $my;
+	global $database, $my, $_MAMBOTS;
 
-	// load mambot params info
-	$query = "SELECT params"
-	. "\n FROM #__mambots"
-	. "\n WHERE element = 'categories.searchbot'"
-	. "\n AND folder = 'search'"
-	;
-	$database->setQuery( $query );
-	$database->loadObject($mambot);
+	// check if param query has previously been processed
+	if ( !isset($_MAMBOTS->_search_mambot_params['categories']) ) {
+		// load mambot params info
+		$query = "SELECT params"
+		. "\n FROM #__mambots"
+		. "\n WHERE element = 'categories.searchbot'"
+		. "\n AND folder = 'search'"
+		;
+		$database->setQuery( $query );
+		$database->loadObject($mambot);
+		
+		// save query to class variable
+		$_MAMBOTS->_search_mambot_params['categories'] = $mambot;
+	}
 	
+	// pull query data from class variable
+	$mambot = $_MAMBOTS->_search_mambot_params['categories'];	
+
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit = $botParams->def( 'search_limit', 50 );

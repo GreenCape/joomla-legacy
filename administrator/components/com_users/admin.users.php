@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.users.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.users.php 3513 2006-05-15 20:52:25Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -22,9 +22,7 @@ if (!$acl->acl_check( 'administration', 'manage', 'users', $my->usertype, 'compo
 require_once( $mainframe->getPath( 'admin_html' ) );
 require_once( $mainframe->getPath( 'class' ) );
 
-$task 	= mosGetParam( $_REQUEST, 'task' );
 $cid 	= mosGetParam( $_REQUEST, 'cid', array( 0 ) );
-$id 	= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 if (!is_array( $cid )) {
 	$cid = array ( 0 );
 }
@@ -44,7 +42,12 @@ switch ($task) {
 
 	case 'save':
 	case 'apply':
- 		saveUser( $option, $task );
+		// check to see if functionality restricted for use as demo site
+		if ( $_VERSION->RESTRICT == 1 ) {
+			mosRedirect( 'index2.php?mosmsg=Functionality Restricted' );
+		} else {
+			saveUser( $task );
+		}
 		break;
 
 	case 'remove':
@@ -52,7 +55,12 @@ switch ($task) {
 		break;
 
 	case 'block':
-		changeUserBlock( $cid, 1, $option );
+		// check to see if functionality restricted for use as demo site
+		if ( $_VERSION->RESTRICT == 1 ) {
+			mosRedirect( 'index2.php?mosmsg=Functionality Restricted' );
+		} else {
+			changeUserBlock( $cid, 1, $option );
+		}
 		break;
 
 	case 'unblock':
@@ -213,7 +221,7 @@ function editUser( $uid='0', $option='users' ) {
 	}
 
 	$my_group = strtolower( $acl->get_group_name( $row->gid, 'ARO' ) );
-	if ( $my_group == 'super administrator' ) {
+	if ( $my_group == 'super administrator' && $my->gid != 25 ) {
 		$lists['gid'] = '<input type="hidden" name="gid" value="'. $my->gid .'" /><strong>Super Administrator</strong>';
 	} else if ( $my->gid == 24 && $row->gid == 24 ) {
 		$lists['gid'] = '<input type="hidden" name="gid" value="'. $my->gid .'" /><strong>Administrator</strong>';
@@ -252,11 +260,12 @@ function editUser( $uid='0', $option='users' ) {
 	HTML_users::edituser( $row, $contact, $lists, $option, $uid, $params );
 }
 
-function saveUser( $option, $task ) {
+function saveUser( $task ) {
 	global $database, $my;
 	global $mosConfig_live_site, $mosConfig_mailfrom, $mosConfig_fromname, $mosConfig_sitename;
 
 	$row = new mosUser( $database );
+	
 	if (!$row->bind( $_POST )) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
@@ -277,6 +286,9 @@ function saveUser( $option, $task ) {
 		}
 		$row->registerDate = date( 'Y-m-d H:i:s' );
 	} else {
+		$original = new mosUser( $database );
+		$original->load( $row->id );
+		
 		// existing user stuff
 		if ($row->password == '') {
 			// password set to null if empty
@@ -284,8 +296,33 @@ function saveUser( $option, $task ) {
 		} else {
 			$row->password = md5( $row->password );
 		}
+		
+		// if group has been changed and where original group was a Super Admin
+		if ( $row->gid != $original->gid && $original->gid == 25 ) {						
+			// count number of active super admins
+			$query = "SELECT COUNT( id )"
+			. "\n FROM #__users"
+			. "\n WHERE gid = 25"
+			. "\n AND block = 0"
+			;
+			$database->setQuery( $query );
+			$count = $database->loadResult();
+			
+			if ( $count <= 1 ) {
+				// disallow change if only one Super Admin exists
+				echo "<script> alert('You cannot change this users Group as it is the only active Super Administrator for your site'); window.history.go(-1); </script>\n";
+				exit();
+			}
+		}
 	}
 
+	// if user is made a Super Admin group and user is NOT a Super Admin		
+	if ( $row->gid == 25 && $my->gid != 25 ) {
+		// disallow creation of Super Admin by non Super Admin users
+		echo "<script> alert('You cannot create a user with this user Group level, only Super Administrators have this ability'); window.history.go(-1); </script>\n";
+		exit();
+	}
+	
 	// save usertype to usetype column
 	$query = "SELECT name"
 	. "\n FROM #__core_acl_aro_groups"
@@ -366,9 +403,18 @@ function saveUser( $option, $task ) {
 			$adminName 	= $admin->name;
 			$adminEmail = $admin->email;
 		}
+		
 		mosMail( $adminEmail, $adminName, $row->email, $subject, $message );
 	}
 
+	if (!$isNew) {
+		// if group has been changed
+		if ( $original->gid != $row->gid ) {
+			// delete user acounts active sessions
+			logoutUser( $row->id, 'com_users', 'change' );
+		}
+	}
+	
 	switch ( $task ) {
 		case 'apply':
 			$msg = 'Successfully Saved changes to User: '. $row->name;
@@ -405,15 +451,37 @@ function removeUsers( $cid, $option ) {
 			// check for a super admin ... can't delete them
 			$groups 	= $acl->get_object_groups( 'users', $id, 'ARO' );
 			$this_group = strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
-			if ( $this_group == 'super administrator' ) {
+			if ( $this_group == 'super administrator' && $my->gid != 25 ) {
 				$msg = "You cannot delete a Super Administrator";
  			} else if ( $id == $my->id ){
  				$msg = "You cannot delete Yourself!";
  			} else if ( ( $this_group == 'administrator' ) && ( $my->gid == 24 ) ){
  				$msg = "You cannot delete another `Administrator` only `Super Administrators` have this power";
 			} else {
-				$obj->delete( $id );
-				$msg = $obj->getError();
+				$obj->load( $id );
+				$count = 2;
+				if ( $obj->gid == 25 ) {
+					// count number of active super admins
+					$query = "SELECT COUNT( id )"
+					. "\n FROM #__users"
+					. "\n WHERE gid = 25"
+					. "\n AND block = 0"
+					;
+					$database->setQuery( $query );
+					$count = $database->loadResult();
+				}
+				
+				if ( $count <= 1 && $obj->gid == 25 ) {
+				// cannot delete Super Admin where it is the only one that exists
+					$msg = "You cannot delete this Super Administrator as it is the only active Super Administrator for your site";
+				} else {
+					// delete user
+					$obj->delete( $id );
+					$msg = $obj->getError();
+					
+					// delete user acounts active sessions
+					logoutUser( $id, 'com_users', 'remove' );
+				}
 			}
 		}
 	}
@@ -446,6 +514,14 @@ function changeUserBlock( $cid=null, $block=1, $option ) {
 	if (!$database->query()) {
 		echo "<script> alert('".$database->getErrorMsg()."'); window.history.go(-1); </script>\n";
 		exit();
+	}
+	
+	// if action is to block a user
+	if ( $block == 1 ) {
+		foreach( $cid as $id ) {
+		// delete user acounts active sessions
+			logoutUser( $id, 'com_users', 'block' );
+		}
 	}
 
 	mosRedirect( 'index2.php?option='. $option );
@@ -496,6 +572,12 @@ function logoutUser( $cid=null, $option, $task ) {
 			mosRedirect( 'index2.php', $database->getErrorMsg() );
 			break;
 
+		case 'remove':
+		case 'block':
+		case 'change':
+			return;
+			break;
+		
 		default:
 			mosRedirect( 'index2.php?option='. $option, $database->getErrorMsg() );
 			break;

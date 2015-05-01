@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.html.php 2429 2006-02-17 02:02:41Z stingrey $
+* @version $Id: admin.config.html.php 3754 2006-05-31 12:08:37Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -23,7 +23,8 @@ class HTML_config {
 
 	function showconfig( &$row, &$lists, $option) {
 		global $mosConfig_absolute_path, $mosConfig_live_site, $mosConfig_session_type;
-		$tabs = new mosTabs(1);
+		
+		$tabs = new mosTabs(0);
 		?>
 		<script type="text/javascript">
 		<!--
@@ -99,7 +100,7 @@ class HTML_config {
 			var form = document.adminForm;
 			
 			// do field validation
-			if (form.config_session_type.value != <?php echo $mosConfig_session_type; ?> ){
+			if (form.config_session_type.value != <?php echo $row->config_session_type; ?> ){
 				if ( confirm('Are you sure you wish to change the `Session Authentication Method`? \n\n This will cause all existing frontend sessions to be deleted \n\n') ) {
 					submitform( pressbutton );
 				} else {
@@ -153,14 +154,14 @@ class HTML_config {
 			</tr>
 			<tr>
 				<td valign="top">Offline Message:</td>
-				<td><textarea class="text_area" cols="60" rows="2" style="width:500px; height:40px" name="config_offline_message"><?php echo htmlspecialchars( stripslashes( $row->config_offline_message ), ENT_QUOTES); ?></textarea><?php
+				<td><textarea class="text_area" cols="60" rows="2" style="width:500px; height:40px" name="config_offline_message"><?php echo $row->config_offline_message; ?></textarea><?php
 					$tip = 'A message that displays if your site is offline';
 					echo mosToolTip( $tip );
 				?></td>
 			</tr>
 			<tr>
 				<td valign="top">System Error Message:</td>
-				<td><textarea class="text_area" cols="60" rows="2" style="width:500px; height:40px" name="config_error_message"><?php echo htmlspecialchars( stripslashes( $row->config_error_message ), ENT_QUOTES); ?></textarea><?php
+				<td><textarea class="text_area" cols="60" rows="2" style="width:500px; height:40px" name="config_error_message"><?php echo $row->config_error_message; ?></textarea><?php
 					$tip = 'A message that displays if Joomla! could not connect to the database';
 					echo mosToolTip( $tip );
 				?></td>
@@ -199,11 +200,34 @@ class HTML_config {
 				?></td>
 			</tr>
 			<tr>
+				<td>Frontend Login:</td>
+				<td>
+					<?php echo $lists['frontend_login']; ?>
+					<?php
+					$tip = 'If `No`, disables the Frontend login page even when not associated with a menu item. Will also disable Registration functionality';
+					echo mosToolTip( $tip );
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td>Frontend User Params:</td>
+				<td>
+					<?php echo $lists['frontend_userparams']; ?>
+					<?php
+					$tip = 'If `No`, disables the frontend User params functionality';
+					echo mosToolTip( $tip );
+					?>
+				</td>
+			</tr>
+			<tr>
 				<td>Debug Site:</td>
-				<td><?php echo $lists['debug']; ?><?php
+				<td>
+					<?php echo $lists['debug']; ?>
+					<?php
 					$tip = 'If yes, displays diagnostic information and SQL errors if present';
 					echo mosToolTip( $tip );
-				?></td>
+					?>
+				</td>
 			</tr>
 			<tr>
 				<td>Default WYSIWYG Editor:</td>
@@ -211,10 +235,13 @@ class HTML_config {
 			</tr>
 			<tr>
 				<td>List Length:</td>
-				<td><?php echo $lists['list_limit']; ?><?php
+				<td>
+					<?php echo $lists['list_limit']; ?>
+					<?php
 					$tip = 'Sets the default length of lists in the administrator for all users';
 					echo mosToolTip( $tip );
-				?></td>
+					?>
+				</td>
 			</tr>
 			<tr>
 				<td>Favourites Site Icon:</td>
@@ -442,6 +469,14 @@ class HTML_config {
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
+				<td>Remember Expired Admin page:</td>
+				<td>
+				<?php echo $lists['admin_expired']; ?>
+				<?php echo mosToolTip('If session expires, when you log back in within 10 minutes of logout, you will be redirected on login to the page you were trying to access when you were logged out'); ?>
+				</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
 				<td>Session Authentication Method:</td>
 				<td>
 				<?php echo $lists['session_type']; ?>
@@ -625,11 +660,11 @@ class HTML_config {
 			<table class="adminform">
 			<tr>
 				<td width="185" valign="top">Global Site Meta Description:</td>
-				<td><textarea class="text_area" cols="50" rows="3" style="width:500px; height:50px" name="config_MetaDesc"><?php echo htmlspecialchars($row->config_MetaDesc, ENT_QUOTES); ?></textarea></td>
+				<td><textarea class="text_area" cols="50" rows="3" style="width:500px; height:50px" name="config_MetaDesc"><?php echo $row->config_MetaDesc; ?></textarea></td>
 			</tr>
 			<tr>
 				<td valign="top">Global Site Meta Keywords:</td>
-				<td><textarea class="text_area" cols="50" rows="3" style="width:500px; height:50px" name="config_MetaKeys"><?php echo htmlspecialchars($row->config_MetaKeys, ENT_QUOTES); ?></textarea></td>
+				<td><textarea class="text_area" cols="50" rows="3" style="width:500px; height:50px" name="config_MetaKeys"><?php echo $row->config_MetaKeys; ?></textarea></td>
 			</tr>
 			<tr>
 				<td valign="top">Show Title Meta Tag:</td>

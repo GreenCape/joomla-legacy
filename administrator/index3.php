@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index3.php 2509 2006-02-21 04:37:29Z stingrey $
+* @version $Id: index3.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -29,20 +29,21 @@ require_once( $mosConfig_absolute_path . '/administrator/includes/admin.php' );
 session_name( md5( $mosConfig_live_site ) );
 session_start();
 
-$option 	= trim( strtolower( mosGetParam( $_REQUEST, 'option', '' ) ) );
+$option 	= strval( strtolower( mosGetParam( $_REQUEST, 'option', '' ) ) );
+$task		= strval( mosGetParam( $_REQUEST, 'task', '' ) );
 
 // mainframe is an API workhorse, lots of 'core' interaction routines
 $mainframe 	= new mosMainFrame( $database, $option, '..', true );
 
 // admin session handling
-$my 		= $mainframe->initSessionAdmin( $option );
+$my 		= $mainframe->initSessionAdmin( $option, $task );
 
 // initialise some common request directives
-$task		= mosGetParam( $_REQUEST, 'task', '' );
 $act		= strtolower( mosGetParam( $_REQUEST, 'act', '' ) );
 $section	= mosGetParam( $_REQUEST, 'section', '' );
-$mosmsg		= strip_tags( mosGetParam( $_REQUEST, 'mosmsg', '' ) );
-$no_html	= strtolower( mosGetParam( $_REQUEST, 'no_html', '' ) );
+$mosmsg		= strval( strip_tags( mosGetParam( $_REQUEST, 'mosmsg', '' ) ) );
+$no_html	= mosGetParam( $_REQUEST, 'no_html', '' );
+$id         = intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 
 // start the html output
 if ($no_html) {
@@ -95,4 +96,6 @@ if ($path = $mainframe->getPath( 'admin' )) {
 </html>
 <?php
 doGzip();
+
+
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 2510 2006-02-21 04:59:41Z stingrey $
+* @version $Id: index.php 3478 2006-05-13 20:31:22Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -32,6 +32,8 @@ function writableCell( $folder ) {
 	echo is_writable( "../$folder" ) ? '<b><font color="green">Writeable</font></b>' : '<b><font color="red">Unwriteable</font></b>' . '</td>';
 	echo '</tr>';
 }
+
+$sp = ini_get( 'session.save_path' );
 
 echo "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?".">";
 ?>
@@ -138,9 +140,13 @@ correctly.
 	<td class="item">
 	Session save path
 	</td>
-	<td align="left">
-	<b><?php echo (($sp=ini_get('session.save_path'))?$sp:'Not set'); ?></b>,
+	<td align="left" valign="top">
 	<?php echo is_writable( $sp ) ? '<b><font color="green">Writeable</font></b>' : '<b><font color="red">Unwriteable</font></b>';?>
+	</td>
+</tr>
+<tr>
+	<td class="item" colspan="2">
+	<b><?php echo $sp ? $sp : 'Not set'; ?></b>
 	</td>
 </tr>
 </table>
@@ -243,6 +249,7 @@ writableCell( 'mambots/content' );
 writableCell( 'mambots/editors' );
 writableCell( 'mambots/editors-xtd' );
 writableCell( 'mambots/search' );
+writableCell( 'mambots/system' );
 writableCell( 'media' );
 writableCell( 'modules' );
 writableCell( 'templates' );

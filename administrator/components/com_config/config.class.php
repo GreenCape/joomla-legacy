@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: config.class.php 2622 2006-02-26 04:16:09Z stingrey $
+* @version $Id: config.class.php 3754 2006-05-31 12:08:37Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -30,11 +30,13 @@ class mosConfig {
 	/** @var string */
 	var $config_sitename		= null;
 	/** @var string */
-	var $config_editor			='tinymce';
+	var $config_editor			= 'tinymce';
 	/** @var int */
 	var $config_list_limit		= 30;
 	/** @var string */
 	var $config_favicon			= null;
+	/** @var string */
+	var $config_frontend_login	= 1;
 
 // Debug
 	/** @var int */
@@ -65,6 +67,8 @@ class mosConfig {
 	var $config_lifetime			= 900;
 	/** @var int */
 	var $config_session_life_admin	= 1800;
+	/** @var int */
+	var $config_admin_expired		= '1';
 	/** @var int */
 	var $config_session_type		= 0;
 	/** @var int */
@@ -121,6 +125,8 @@ class mosConfig {
 	var $config_uniquemail				= null;
 	/** @var int */
 	var $config_shownoauth				= 0;
+	/** @var int */
+	var $config_frontend_userparams		= 1;
 
 // Meta Settings
 	/** @var string */

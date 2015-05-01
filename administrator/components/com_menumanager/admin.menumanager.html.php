@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menumanager.html.php 315 2005-10-02 13:18:46Z stingrey $
+* @version $Id: admin.menumanager.html.php 2752 2006-03-12 00:40:47Z stingrey $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -158,6 +158,12 @@ class HTML_menumanager {
 			if (pressbutton == 'savemenu') {
 				if ( form.menutype.value == '' ) {
 					alert( 'Please enter a menu name' );
+					form.menutype.focus();
+					return;
+				}
+				var r = new RegExp("[\']", "i");
+				if ( r.exec(form.menutype.value) ) {
+					alert( 'The menu name cannot contain a \'' );
 					form.menutype.focus();
 					return;
 				}

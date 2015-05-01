@@ -1,6 +1,6 @@
 <?php
 /** module to display newsfeeds
-* version $Id: newsfeeds.php 2573 2006-02-23 18:42:32Z stingrey $
+* version $Id: newsfeeds.php 3594 2006-05-22 17:29:07Z stingrey $
 * @package Joomla
 * @subpackage Newsfeeds
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -66,7 +66,7 @@ function listFeeds( $catid ) {
 		$rows = $database->loadObjectList();
 
 		// current category info
-		$query = "SELECT name, description, image, image_position"
+		$query = "SELECT id, name, description, image, image_position"
 		. "\n FROM #__categories"
 		. "\n WHERE id = $catid"
 		. "\n AND published = 1"
@@ -85,8 +85,7 @@ function listFeeds( $catid ) {
 	}
 
 	// Parameters
-	$menu = new mosMenu( $database );
-	$menu->load( $Itemid );
+	$menu = $mainframe->get( 'menu' );
 	$params = new mosParameters( $menu->params );
 
 	$params->def( 'page_title', 		1 );
@@ -201,8 +200,7 @@ function showFeed( $feedid ) {
 	$LitePath = $mosConfig_absolute_path . '/includes/Cache/Lite.php';
 
 	// Adds parameter handling
-	$menu = new mosMenu( $database );
-	$menu->load( $Itemid );
+	$menu = $mainframe->get( 'menu' );
 	$params = new mosParameters( $menu->params );
 	$params->def( 'page_title', 	1 );
 	$params->def( 'header', 		$menu->name );

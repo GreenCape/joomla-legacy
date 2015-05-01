@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.mambots.php 2308 2006-02-12 15:58:25Z stingrey $
+* @version $Id: admin.mambots.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Mambots
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -23,9 +23,8 @@ if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'mambot
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
-$client = mosGetParam( $_REQUEST, 'client', '' );
+$client = strval( mosGetParam( $_REQUEST, 'client', '' ) );
 $cid 	= mosGetParam( $_POST, 'cid', array(0) );
-$id 	= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 if (!is_array( $cid )) {
 	$cid = array(0);
 }

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: logout.php 2595 2006-02-24 03:13:47Z stingrey $
+* @version $Id: logout.php 3280 2006-04-25 21:41:34Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -18,7 +18,7 @@ global $database, $_VERSION;
 
 // check to see if site is a production site
 // allows multiple logins with same user for a demo site
-if ( $_VERSION->SITE ) {
+if ( $_VERSION->SITE == 1 ) {
 	// update db user last visit record corresponding to currently logged in user
 	if ( isset( $_SESSION['session_user_id'] ) && $_SESSION['session_user_id'] != '' ) {
 		$currentDate = date( "Y-m-d\TH:i:s" );

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.sections.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.sections.html.php 3585 2006-05-22 07:28:29Z stingrey $
 * @package Joomla
 * @subpackage Sections
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -173,6 +173,7 @@ class sections_html {
 	*/
 	function edit( &$row, $option, &$lists, &$menus ) {
 		global $mosConfig_live_site;
+		
 		if ( $row->name != '' ) {
 			$name = $row->name;
 		} else {
@@ -181,6 +182,8 @@ class sections_html {
 		if ($row->image == "") {
 			$row->image = 'blank.png';
 		}
+		
+		mosMakeHtmlSafe( $row, ENT_QUOTES, 'description' );
 		?>
 		<script language="javascript" type="text/javascript">
 		function submitbutton(pressbutton) {
@@ -239,7 +242,7 @@ class sections_html {
 					</th>
 				<tr>
 				<tr>
-					<td width="150">
+					<td width="100">
 					Scope:
 					</td>
 					<td width="85%" colspan="2">
@@ -266,19 +269,27 @@ class sections_html {
 				</tr>
 				<tr>
 					<td>
+					Ordering:
+					</td>
+					<td colspan="2">
+					<?php echo $lists['ordering']; ?>
+					</td>
+				</tr>
+				<tr>
+					<td>
 					Image:
 					</td>
 					<td>
 					<?php echo $lists['image']; ?>
 					</td>
-					<td rowspan="4" width="50%">
+					<td rowspan="5" width="50%">
 					<?php
 						$path = $mosConfig_live_site . "/images/";
 						if ($row->image != "blank.png") {
 							$path.= "stories/";
 						}
 					?>
-					<img src="<?php echo $path;?><?php echo $row->image;?>" name="imagelib" width="80" height="80" border="2" alt="Preview" />
+					<img src="<?php echo $path . $row->image;?>" name="imagelib" width="80" height="80" border="2" alt="Preview" />
 					</td>
 				</tr>
 				<tr>
@@ -287,14 +298,6 @@ class sections_html {
 					</td>
 					<td>
 					<?php echo $lists['image_position']; ?>
-					</td>
-				</tr>
-				<tr>
-					<td>
-					Ordering:
-					</td>
-					<td>
-					<?php echo $lists['ordering']; ?>
 					</td>
 				</tr>
 				<tr>
@@ -314,10 +317,12 @@ class sections_html {
 					</td>
 				</tr>
 				<tr>
-					<td valign="top">
+					<td valign="top" colspan="2">
 					Description:
 					</td>
-					<td colspan="2">
+				</tr>
+				<tr>
+					<td colspan="3">
 					<?php
 					// parameters : areaname, content, hidden field, width, height, rows, cols
 					editorArea( 'editor1',  $row->description , 'description', '100%;', '300', '60', '20' ) ; ?>
@@ -326,85 +331,106 @@ class sections_html {
 				</table>
 			</td>
 			<td valign="top">
-			<?php
-			if ( $row->id > 0 ) {
-					?>
-				<table class="adminform">
-				<tr>
-					<th colspan="2">
-					Link to Menu
-					</th>
-				<tr>
-				<tr>
-					<td colspan="2">
-					This will create a new menu item in the menu you select
-					<br /><br />
-					</td>
-				<tr>
-				<tr>
-					<td valign="top" width="100px">
-					Select a Menu
-					</td>
-					<td>
-					<?php echo $lists['menuselect']; ?>
-					</td>
-				<tr>
-				<tr>
-					<td valign="top" width="100px">
-					Select Menu Type
-					</td>
-					<td>
-					<?php echo $lists['link_type']; ?>
-					</td>
-				<tr>
-				<tr>
-					<td valign="top" width="100px">
-					Menu Item Name
-					</td>
-					<td>
-					<input type="text" name="link_name" class="inputbox" value="" size="25" />
-					</td>
-				<tr>
-				<tr>
-					<td>
-					</td>
-					<td>
-					<input name="menu_link" type="button" class="button" value="Link to Menu" onClick="submitbutton('menulink');" />
-					</td>
-				<tr>
-				<tr>
-					<th colspan="2">
-					Existing Menu Links
-					</th>
-				</tr>
 				<?php
-				if ( $menus == NULL ) {
+				if ( $row->id > 0 ) {
+					?>
+					<table class="adminform">
+					<tr>
+						<th colspan="2">
+						Link to Menu
+						</th>
+					<tr>
+					<tr>
+						<td colspan="2">
+						This will create a new menu item in the menu you select
+						<br /><br />
+						</td>
+					<tr>
+					<tr>
+						<td valign="top" width="100px">
+						Select a Menu
+						</td>
+						<td>
+						<?php echo $lists['menuselect']; ?>
+						</td>
+					<tr>
+					<tr>
+						<td valign="top" width="100px">
+						Select Menu Type
+						</td>
+						<td>
+						<?php echo $lists['link_type']; ?>
+						</td>
+					<tr>
+					<tr>
+						<td valign="top" width="100px">
+						Menu Item Name
+						</td>
+						<td>
+						<input type="text" name="link_name" class="inputbox" value="" size="25" />
+						</td>
+					<tr>
+					<tr>
+						<td>
+						</td>
+						<td>
+						<input name="menu_link" type="button" class="button" value="Link to Menu" onClick="submitbutton('menulink');" />
+						</td>
+					<tr>
+					<tr>
+						<th colspan="2">
+						Existing Menu Links
+						</th>
+					</tr>
+					<?php
+					if ( $menus == NULL ) {
+						?>
+						<tr>
+							<td colspan="2">
+							None
+							</td>
+						</tr>
+						<?php
+					} else {
+						mosCommonHTML::menuLinksSecCat( $menus );
+					}
 					?>
 					<tr>
 						<td colspan="2">
-						None
 						</td>
 					</tr>
+					</table>
 					<?php
 				} else {
-					mosCommonHTML::menuLinksSecCat( $menus );
+					?>
+					<table class="adminform" width="40%">
+					<tr>
+						<th>
+						&nbsp;
+						</th>
+					</tr>
+					<tr>
+						<td>
+						Menu links available when saved
+						</td>
+					</tr>
+					</table>
+					<?php
 				}
 				?>
+				<br />
+				<table class="adminform">
 				<tr>
+					<th colspan="2">
+					MOSImage Directories
+					</th>
+					<tr>
+					<tr>
 					<td colspan="2">
+					<?php echo $lists['folders']; ?>
 					</td>
-				</tr>
-				</table>
-			<?php
-			} else {
-			?>
-			<table class="adminform" width="40%">
-				<tr><th>&nbsp;</th></tr>
-				<tr><td>Menu links available when saved</td></tr>
-			</table>
-			<?php
-			}
-			?>
+				<tr>	
+				</table>		
 			</td>
 		</tr>
 		</table>

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.weblinks.php 2301 2006-02-12 10:46:38Z stingrey $
+* @version $Id: admin.weblinks.php 3495 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Weblinks
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -25,7 +25,6 @@ require_once( $mainframe->getPath( 'admin_html' ) );
 require_once( $mainframe->getPath( 'class' ) );
 
 $cid 	= mosGetParam( $_POST, 'cid', array(0) );
-$id 	= intval( mosGetParam( $_GET, 'id', 0 ) );
 
 switch ($task) {
 	case 'new':
@@ -137,7 +136,7 @@ function showWeblinks( $option ) {
 * @param integer The unique id of the record to edit (0 if new)
 */
 function editWeblink( $option, $id ) {
-	global $database, $my, $mosConfig_absolute_path, $mosConfig_live_site;
+	global $database, $my, $mosConfig_absolute_path;
 
 	$lists = array();
 
@@ -157,7 +156,7 @@ function editWeblink( $option, $id ) {
 		$row->published = 1;
 		$row->approved 	= 1;
 		$row->order 	= 0;
-		$row->catid 	= mosGetParam( $_POST, 'catid', 0 );
+		$row->catid 	= intval( mosGetParam( $_POST, 'catid', 0 ) );
 	}
 
 	// build the html select list for ordering
@@ -286,7 +285,9 @@ function orderWeblinks( $uid, $inc, $option ) {
 	global $database;
 	$row = new mosWeblink( $database );
 	$row->load( $uid );
+	$row->updateOrder();
 	$row->move( $inc, "published >= 0" );
+	$row->updateOrder();
 
 	mosRedirect( "index2.php?option=$option" );
 }

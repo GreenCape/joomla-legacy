@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: tinymce.php 2444 2006-02-17 18:59:08Z stingrey $
+* @version $Id: tinymce.php 3549 2006-05-18 08:24:53Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -79,6 +79,10 @@ function botTinymceEditorInit() {
 	$fullscreen			=  $params->def( 'fullscreen', 1 );
 	// autosave
 	$autosave			= $params->def( 'autosave', 0 );
+	// layer
+	$layer				= $params->def( 'layer', 1 );
+	// style
+	$style				= $params->def( 'style', 1 );
 
 	if ( $relative_urls ) {
 		$relative_urls = 'true';
@@ -197,6 +201,19 @@ function botTinymceEditorInit() {
 	if ( $autosave ) {
 		$plugins[]	= 'autosave';
 	}
+	// layer
+	if ( $layer ) {
+		$plugins[]	= 'layer';
+		$buttons2[]	= 'insertlayer';
+		$buttons2[]	= 'moveforward';
+		$buttons2[]	= 'movebackward';
+		$buttons2[]	= 'absolute';
+	}
+	// style
+	if ( $style ) {
+		$plugins[]	= 'style';
+		$buttons3[]	= 'styleprops';
+	}
 
 	$buttons2 	= implode( ', ', $buttons2 );
 	$buttons3 	= implode( ', ', $buttons3 );
@@ -282,7 +299,7 @@ function botTinymceEditorEditorArea( $name, $content, $hiddenField, $width, $hei
 	$buttons = array();
 	foreach ($results as $result) {
 		if ( $result[0] ) {
-			$buttons[] = '<img src="'.$mosConfig_live_site.'/mambots/editors-xtd/'.$result[0].'" onclick="tinyMCE.execCommand(\'mceInsertContent\',false,\''.$result[1].'\')" alt="'.$result[1].'"/>';
+			$buttons[] = '<img src="'.$mosConfig_live_site.'/mambots/editors-xtd/'.$result[0].'" onclick="tinyMCE.execCommand(\'mceInsertContent\',false,\''.$result[1].'\')" alt="'.$result[1].'" />';
 		}
 	}
 	$buttons = implode( "", $buttons );

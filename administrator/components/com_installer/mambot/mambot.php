@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mambot.php 328 2005-10-02 15:39:51Z Jinx $
+* @version $Id: mambot.php 2924 2006-03-27 06:58:11Z akede $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -31,7 +31,7 @@ writableCell( 'language' );
 writableCell( 'mambots' );
 writableCell( 'mambots/content' );
 writableCell( 'mambots/search' );
-?>
+writableCell( 'mambots/system' );?>
 </table>
 <?php
 showInstalledMambots( $option );

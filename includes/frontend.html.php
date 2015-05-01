@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: frontend.html.php 2488 2006-02-19 08:42:36Z stingrey $
+* @version $Id: frontend.html.php 3830 2006-06-03 15:53:37Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -122,6 +122,7 @@ class modules_html {
 		$rssitemdesc		= $params->get( 'rssitemdesc', 1 );
 		$words 				= $params->def( 'word_count', 0 );
 		$rsstitle			= $params->get( 'rsstitle', 1 );
+		$rsscache			= $params->get( 'rsscache', 3600 );
 
 		$contentBuffer	= '';
 		
@@ -129,14 +130,10 @@ class modules_html {
 		require_once( $mosConfig_absolute_path .'/includes/domit/xml_domit_rss.php' );
 		
 		$rssDoc = new xml_domit_rss_document();
-		$rssDoc->useCacheLite(true, $LitePath, $cacheDir, 3600);
-		$rssDoc->useHTTPClient(true); 
+		$rssDoc->useCacheLite(true, $LitePath, $cacheDir, $rsscache);
 		$success = $rssDoc->loadRSS( $rssurl );
 
 		if ( $success )	{		
-			// special handling for feed encoding
-			$encoding = mosCommonHTML::newsfeedEncoding( $rssDoc );
-			
 			$content_buffer = '';
 			$totalChannels 	= $rssDoc->getChannelCount();
 	
@@ -158,9 +155,7 @@ class modules_html {
 							
 				if ( $currChannel->getTitle() && $rsstitle ) {
 					$feed_title 	= $currChannel->getTitle();
-					$feed_title 	= $encoding( $feed_title );
-					$feed_title 	= html_entity_decode($feed_title);
-					$feed_title 	= str_replace('&apos;', "'", $feed_title);
+					$feed_title 	= mosCommonHTML::newsfeedEncoding( $rssDoc, $feed_title );
 
 					$content_buffer .= "<tr>\n";
 					$content_buffer .= "	<td>\n";
@@ -176,9 +171,7 @@ class modules_html {
 				// feed description
 				if ( $rssdesc ) {
 					$feed_descrip 	= $currChannel->getDescription();
-					$feed_descrip 	= $encoding( $feed_descrip );
-					$feed_descrip 	= html_entity_decode($feed_descrip);
-					$feed_descrip 	= str_replace('&apos;', "'", $feed_descrip);
+					$feed_descrip 	= mosCommonHTML::newsfeedEncoding( $rssDoc, $feed_descrip );
 					
 					$content_buffer .= "<tr>\n";
 					$content_buffer .= "	<td>\n";
@@ -196,8 +189,8 @@ class modules_html {
 					$content_buffer .= "</tr>\n";
 				}
 	
-				$actualItems = $currChannel->getItemCount();
-				$setItems = $rssitems;
+				$actualItems 	= $currChannel->getItemCount();
+				$setItems 		= $rssitems;
 	
 				if ($setItems > $actualItems) {
 					$totalItems = $actualItems;
@@ -215,9 +208,7 @@ class modules_html {
 							// item title
 							
 							$item_title = $currItem->getTitle();
-							$item_title = $encoding( $item_title );
-							$item_title = html_entity_decode($item_title);
-							$item_title = str_replace('&apos;', "'", $item_title);
+							$item_title = mosCommonHTML::newsfeedEncoding( $rssDoc, $item_title );
 	
 							// START fix for RSS enclosure tag url not showing
 							$content_buffer .= "<li class=\"newsfeed" . $moduleclass_sfx . "\">\n";
@@ -244,9 +235,7 @@ class modules_html {
 								if ( $rssitemdesc ) {
 									// item description
 									$text = $currItem->getDescription();
-									$text = $encoding( $text );
-									$text = html_entity_decode($text);
-									$text = str_replace('&apos;', "'", $text);
+									$text = mosCommonHTML::newsfeedEncoding( $rssDoc, $text );
 
 									// word limit check
 									if ( $words ) {
