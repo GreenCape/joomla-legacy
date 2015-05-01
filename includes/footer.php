@@ -1,9 +1,9 @@
 <?php
 /**
-* @version $Id: footer.php 3713 2006-05-29 03:25:07Z stingrey $
-* @package Joomla
-* @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
+* @version		$Id: footer.php 9764 2007-12-30 07:48:11Z ircmaxell $
+* @package		Joomla
+* @copyright	Copyright (C) 2005 - 2008 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
 * Joomla! is free software. This version may have been modified pursuant
 * to the GNU General Public License, and as distributed it includes or
 * is derivative of works licensed under the GNU General Public License or
@@ -12,16 +12,16 @@
 */
 
 // no direct access
-defined( '_VALID_MOS' ) or die( 'Restricted access' );
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
-global $_VERSION;
+$version = new JVersion();
 
 // NOTE - You may change this file to suit your site needs
 ?>
 <div align="center">
-	&copy; <?php echo mosCurrentDate( '%Y' ) . ' ' . $GLOBALS['mosConfig_sitename'];?>
+	&copy; <?php echo JHTML::_('date',  'now', '%Y' ) . ' ' . $mainframe->getCfg('sitename'); ?>
 </div>
 
 <div align="center">
-	<?php echo $_VERSION->URL; ?>
+	<?php echo $version->URL; ?>
 </div>

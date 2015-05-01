@@ -1,10 +1,10 @@
 <?php
 /**
-* @version $Id: admin.massmail.php 10002 2008-02-08 10:56:57Z willebil $
-* @package Joomla
-* @subpackage Massmail
-* @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
+* @version		$Id: admin.massmail.php 9815 2008-01-03 00:48:12Z eddieajau $
+* @package		Joomla
+* @subpackage	Massmail
+* @copyright	Copyright (C) 2005 - 2008 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
 * Joomla! is free software. This version may have been modified pursuant
 * to the GNU General Public License, and as distributed it includes or
 * is derivative of works licensed under the GNU General Public License or
@@ -13,22 +13,26 @@
 */
 
 // no direct access
-defined( '_VALID_MOS' ) or die( 'Restricted access' );
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// ensure user has access to this function
-if (!$acl->acl_check( 'administration', 'manage', 'users', $my->usertype, 'components', 'com_massmail' )) {
-	mosRedirect( 'index2.php', _NOT_AUTH );
+/*
+ * Make sure the user is authorized to view this page
+ */
+$user = & JFactory::getUser();
+if (!$user->authorize( 'com_massmail', 'manage' )) {
+	$mainframe->redirect( 'index.php', JText::_('ALERTNOTAUTH') );
 }
 
-require_once( $mainframe->getPath( 'admin_html' ) );
+require_once( JApplicationHelper::getPath( 'admin_html' ) );
 
-switch ($task) {
+switch ($task)
+{
 	case 'send':
 		sendMail();
 		break;
 
 	case 'cancel':
-		mosRedirect( 'index2.php' );
+		$mainframe->redirect( 'index.php' );
 		break;
 
 	default:
@@ -36,82 +40,106 @@ switch ($task) {
 		break;
 }
 
-function messageForm( $option ) {
-	global $acl;
+function messageForm( $option )
+{
+	$acl =& JFactory::getACL();
 
 	$gtree = array(
-	mosHTML::makeOption( 0, '- All User Groups -' )
+		JHTML::_('select.option',  0, '- '. JText::_( 'All User Groups' ) .' -' )
 	);
 
 	// get list of groups
 	$lists = array();
-	$gtree = array_merge( $gtree, $acl->get_group_children_tree( null, 'USERS', false ) );
-	$lists['gid'] = mosHTML::selectList( $gtree, 'mm_group', 'size="10"', 'value', 'text', 0 );
+	$gtree = array_merge( $gtree, $acl->get_group_children_tree( null, 'users', false ) );
+	$lists['gid'] = JHTML::_('select.genericlist',   $gtree, 'mm_group', 'size="10"', 'value', 'text', 0 );
 
 	HTML_massmail::messageForm( $lists, $option );
 }
 
-function sendMail() {
-	global $database, $my, $acl;
-	global $mosConfig_sitename;
-	global $mosConfig_mailfrom, $mosConfig_fromname;
-	
-	josSpoofCheck();
+function sendMail()
+{
+	global $mainframe;
 
-	$mode				= intval( mosGetParam( $_POST, 'mm_mode', 0 ) );
-	$subject			= strval( mosGetParam( $_POST, 'mm_subject', '' ) );
-	$gou				= mosGetParam( $_POST, 'mm_group', NULL );
-	$recurse			= strval( mosGetParam( $_POST, 'mm_recurse', 'NO_RECURSE' ) );
+	// Check for request forgeries
+	JRequest::checkToken() or die( 'Invalid Token' );
+
+	$db					=& JFactory::getDBO();
+	$user 				=& JFactory::getUser();
+	$acl 				=& JFactory::getACL();
+
+	$mode				= JRequest::getVar( 'mm_mode', 0, 'post', 'int' );
+	$subject			= JRequest::getVar( 'mm_subject', '', 'post', 'string' );
+	$gou				= JRequest::getVar( 'mm_group', '0', 'post', 'int' );
+	$recurse			= JRequest::getVar( 'mm_recurse', 'NO_RECURSE', 'post', 'word' );
+
 	// pulls message inoformation either in text or html format
 	if ( $mode ) {
-		$message_body	= $_POST['mm_message'];
+		$message_body	= JRequest::getVar( 'mm_message', '', 'post', 'string', JREQUEST_ALLOWRAW );
 	} else {
 		// automatically removes html formatting
-		$message_body	= strval( mosGetParam( $_POST, 'mm_message', '' ) );
+		$message_body	= JRequest::getVar( 'mm_message', '', 'post', 'string' );
 	}
-	$message_body 		= stripslashes( $message_body );
 
-	if (!$message_body || !$subject || $gou === null) {
-		mosRedirect( 'index2.php?option=com_massmail&mosmsg=Please fill in the form correctly' );
+	// Check for a message body and subject
+	if (!$message_body || !$subject) {
+		$mainframe->redirect( 'index.php?option=com_massmail', JText::_( 'Please fill in the form correctly' ) );
 	}
 
 	// get users in the group out of the acl
 	$to = $acl->get_group_objects( $gou, 'ARO', $recurse );
+	JArrayHelper::toInteger($to['users']);
 
-	$rows = array();
-	if ( count( $to['users'] ) || $gou === '0' ) {
-		// Get sending email address
-		$query = "SELECT email"
-		. "\n FROM #__users"
-		. "\n WHERE id = " . (int) $my->id
-		;
-		$database->setQuery( $query );
-		$my->email = $database->loadResult();
+	// Get sending email address
+	/*
+	$query = 'SELECT email'
+	. ' FROM #__users'
+	. ' WHERE id = '.(int) $user->get('id')
+	;
+	$db->setQuery( $query );
+	$user->set( 'email', $db->loadResult() );
+	*/
 
-		mosArrayToInts( $to['users'] );
-		$user_ids = 'id=' . implode( ' OR id=', $to['users'] );
+	// Get all users email and group except for senders
+	$query = 'SELECT email'
+	. ' FROM #__users'
+	. ' WHERE id != '.(int) $user->get('id')
+	. ( $gou !== 0 ? ' AND id IN (' . implode( ',', $to['users'] ) . ')' : '' )
+	;
 
-		// Get all users email and group except for senders
-		$query = "SELECT email"
-		. "\n FROM #__users"
-		. "\n WHERE id != " . (int) $my->id
-		. ( $gou !== '0' ? " AND ( $user_ids )" : '' )
-		;
-		$database->setQuery( $query );
-		$rows = $database->loadObjectList();
+	$db->setQuery( $query );
+	$rows = $db->loadObjectList();
 
-		// Build e-mail message format
-		$message_header 	= sprintf( _MASSMAIL_MESSAGE, html_entity_decode($mosConfig_sitename, ENT_QUOTES) );
-		$message 			= $message_header . $message_body;
-		$subject 	= html_entity_decode($mosConfig_sitename, ENT_QUOTES) . ' / '. stripslashes( $subject);
-
-		//Send email
-		foreach ($rows as $row) {
-			mosMail( $mosConfig_mailfrom, $mosConfig_fromname, $row->email, $subject, $message, $mode );
-		}
+	// Check to see if there are any users in this group before we continue
+	if ( ! count($rows) ) {
+		$msg	= JText::_('No users could be found in this group.');
+		$mainframe->redirect( 'index.php?option=com_massmail', $msg );
 	}
 
-	$msg = 'E-mail sent to '. count( $rows ) .' users';
-	mosRedirect( 'index2.php?option=com_massmail', $msg );
+	$mailer =& JFactory::getMailer();
+	$params =& JComponentHelper::getParams( 'com_massmail' );
+
+	// Build e-mail message format
+	$mailer->setSender(array($mainframe->getCfg('mailfrom'), $mainframe->getCfg('fromname')));
+	$mailer->setSubject($params->get('mailSubjectPrefix') . stripslashes( $subject));
+	$mailer->setBody($message_body . $params->get('mailBodySuffix'));
+	$mailer->IsHTML($mode);
+
+	// Add recipients
+	foreach ($rows as $row) {
+		$mailer->addRecipient($row->email);
+	}
+
+	// Send the Mail
+	$rs	= $mailer->Send();
+
+	// Check for an error
+	if ( JError::isError($rs) ) {
+		$msg	= $rs->getError();
+	} else {
+		$msg = $rs ? JText::sprintf( 'E-mail sent to', count( $rows ) ) : JText::_('The mail could not be sent');
+	}
+
+	// Redirect with the message
+	$mainframe->redirect( 'index.php?option=com_massmail', $msg );
+
 }
-?>

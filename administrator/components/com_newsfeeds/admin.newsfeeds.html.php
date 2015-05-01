@@ -1,10 +1,10 @@
 <?php
 /**
-* @version $Id: admin.newsfeeds.html.php 10002 2008-02-08 10:56:57Z willebil $
-* @package Joomla
-* @subpackage Newsfeeds
-* @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
+* @version		$Id: admin.newsfeeds.html.php 9819 2008-01-03 00:52:01Z eddieajau $
+* @package		Joomla
+* @subpackage	Newsfeeds
+* @copyright	Copyright (C) 2005 - 2008 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
 * Joomla! is free software. This version may have been modified pursuant
 * to the GNU General Public License, and as distributed it includes or
 * is derivative of works licensed under the GNU General Public License or
@@ -13,155 +13,179 @@
 */
 
 // no direct access
-defined( '_VALID_MOS' ) or die( 'Restricted access' );
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
 /**
-* @package Joomla
-* @subpackage Newsfeeds
+* @package		Joomla
+* @subpackage	Newsfeeds
 */
-class HTML_newsfeeds {
+class HTML_newsfeeds
+{
+	function showNewsFeeds( &$rows, &$lists, &$pageNav, $option )
+	{
+		global $mainframe;
 
-	function showNewsFeeds( &$rows, &$lists, $pageNav, $option ) {
-		global $my, $mosConfig_cachepath;
+		$user =& JFactory::getUser();
 
-		mosCommonHTML::loadOverlib();
+		//Ordering allowed ?
+		$ordering = ($lists['order'] == 'a.ordering');
+
+		JHTML::_('behavior.tooltip');
 		?>
-		<form action="index2.php" method="post" name="adminForm">
-		<table class="adminheading">
+		<form action="index.php?option=com_newsfeeds" method="post" name="adminForm">
+
+		<table>
 		<tr>
-			<th>
-			News Feed Manager
-			</th>
-			<td width="right">
-			<?php echo $lists['category'];?>
+			<td align="left" width="100%">
+				<?php echo JText::_( 'Filter' ); ?>:
+				<input type="text" name="search" id="search" value="<?php echo $lists['search'];?>" class="text_area" onchange="document.adminForm.submit();" />
+				<button onclick="this.form.submit();"><?php echo JText::_( 'Go' ); ?></button>
+				<button onclick="document.getElementById('search').value='';this.form.getElementById('filter_catid').value='0';this.form.getElementById('filter_state').value='';this.form.submit();"><?php echo JText::_( 'Reset' ); ?></button>
+			</td>
+			<td nowrap="nowrap">
+				<?php
+				echo $lists['catid'];
+				echo $lists['state'];
+				?>
 			</td>
 		</tr>
 		</table>
 
-		<table class="adminlist">
-		<tr>
-			<th width="20">
-			#
-			</th>
-			<th width="20">
-			<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count( $rows ); ?>);" />
-			</th>
-			<th class="title">
-			News Feed
-			</th>
-			<th width="5%">
-			Published
-			</th>
-			<th colspan="2" width="5%">
-			Reorder
-			</th>
-			<th class="title" width="20%">
-			Category
-			</th>
-			<th width="5%" nowrap="nowrap">
-			# Articles
-			</th>
-			<th width="10%">
-			Cache time
-			</th>
-		</tr>
-		<?php
-		$k = 0;
-		for ($i=0, $n=count( $rows ); $i < $n; $i++) {
-			$row = &$rows[$i];
-			mosMakeHtmlSafe($row);
-			$link 	= 'index2.php?option=com_newsfeeds&task=editA&hidemainmenu=1&id='. $row->id;
+			<table class="adminlist">
+			<thead>
+				<tr>
+					<th width="10">
+						<?php echo JText::_( 'NUM' ); ?>
+					</th>
+					<th width="10">
+						<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count( $rows ); ?>);" />
+					</th>
+					<th class="title">
+						<?php echo JHTML::_('grid.sort',   'News Feed', 'a.name', @$lists['order_Dir'], @$lists['order'] ); ?>
+					</th>
+					<th width="5%">
+						<?php echo JHTML::_('grid.sort',   'Published', 'a.published', @$lists['order_Dir'], @$lists['order'] ); ?>
+					</th>
+					<th width="8%" nowrap="nowrap">
+						<?php echo JHTML::_('grid.sort',   'Order', 'a.ordering', @$lists['order_Dir'], @$lists['order'] ); ?>
+						<?php echo JHTML::_('grid.order',  $rows ); ?>
+					</th>
+					<th class="title" width="10%">
+						<?php echo JHTML::_('grid.sort',   'Category', 'catname', @$lists['order_Dir'], @$lists['order'] ); ?>
+					</th>
+					<th width="5%" nowrap="nowrap">
+						<?php echo JHTML::_('grid.sort',   'Num Articles', 'a.numarticles', @$lists['order_Dir'], @$lists['order'] ); ?>
+					</th>
+					<th width="5%">
+						<?php echo JHTML::_('grid.sort',   'Cache time', 'a.cache_time', @$lists['order_Dir'], @$lists['order'] ); ?>
+					</th>
+					<th width="1%" nowrap="nowrap">
+						<?php echo JHTML::_('grid.sort',   'ID', 'a.id', @$lists['order_Dir'], @$lists['order'] ); ?>
+					</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<td colspan="10">
+						<?php echo $pageNav->getListFooter(); ?>
+					</td>
+				</tr>
+			</tfoot>
+			<tbody>
+			<?php
+			$k = 0;
+			for ($i=0, $n=count( $rows ); $i < $n; $i++) {
+				$row = &$rows[$i];
 
-			$img 	= $row->published ? 'tick.png' : 'publish_x.png';
-			$task 	= $row->published ? 'unpublish' : 'publish';
-			$alt 	= $row->published ? 'Published' : 'Unpublished';
+				$link 		= JRoute::_( 'index.php?option=com_newsfeeds&task=edit&cid[]='. $row->id );
 
-			$checked 	= mosCommonHTML::CheckedOutProcessing( $row, $i );
+				$checked 	= JHTML::_('grid.checkedout',   $row, $i );
+				$published 	= JHTML::_('grid.published', $row, $i );
 
-			$row->cat_link 	= 'index2.php?option=com_categories&section=com_newsfeeds&task=editA&hidemainmenu=1&id='. $row->catid;
-			?>
-			<tr class="<?php echo 'row'. $k; ?>">
-				<td align="center">
-				<?php echo $pageNav->rowNumber( $i ); ?>
-				</td>
-				<td>
-				<?php echo $checked; ?>
-				</td>
-				<td>
-				<?php
-				if ( $row->checked_out && ( $row->checked_out != $my->id ) ) {
-					?>
-					<?php echo $row->name; ?>
-					&nbsp;[ <i>Checked Out</i> ]
-					<?php
-				} else {
-					?>
-					<a href="<?php echo $link; ?>" title="Edit News Feed">
-					<?php echo $row->name; ?>
-					</a>
-					<?php
-				}
+				$row->cat_link 	= JRoute::_( 'index.php?option=com_categories&section=com_newsfeeds&task=edit&cid[]='. $row->catid );
 				?>
-				</td>
-				<td width="10%" align="center">
-				<a href="javascript: void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $task;?>')">
-				<img src="images/<?php echo $img;?>" border="0" alt="<?php echo $alt; ?>" />
-				</a>
-				</td>
-				<td align="center">
-				<?php echo $pageNav->orderUpIcon( $i ); ?>
-				</td>
-				<td align="center">
-				<?php echo $pageNav->orderDownIcon( $i, $n ); ?>
-				</td>
+				<tr class="<?php echo 'row'. $k; ?>">
+					<td align="center">
+						<?php echo $pageNav->getRowOffset( $i ); ?>
+					</td>
+					<td>
+						<?php echo $checked; ?>
+					</td>
+					<td>
+						<?php
+						if (  JTable::isCheckedOut($user->get ('id'), $row->checked_out ) ) {
+							echo $row->name;
+						} else {
+							?>
+								<span class="editlinktip hasTip" title="<?php echo JText::_( 'Edit Newsfeed' );?>::<?php echo $row->name; ?>">
+							<a href="<?php echo $link; ?>">
+								<?php echo $row->name; ?></a></span>
+							<?php
+						}
+						?>
+					</td>
+					<td align="center">
+						<?php echo $published;?>
+					</td>
+					<td class="order">
+						<span><?php echo $pageNav->orderUpIcon($i, ($row->catid == @$rows[$i-1]->catid), 'orderup', 'Move Up', $ordering ); ?></span>
+						<span><?php echo $pageNav->orderDownIcon($i, $n, ($row->catid == @$rows[$i+1]->catid), 'orderdown', 'Move Down', $ordering ); ?></span>
+						<?php $disabled = $ordering ?  '' : 'disabled="disabled"'; ?>
+						<input type="text" name="order[]" size="5" value="<?php echo $row->ordering;?>" <?php echo $disabled ?> class="text_area" style="text-align: center" />
+					</td>
+					<td>
+						<a href="<?php echo $row->cat_link; ?>" title="<?php echo JText::_( 'Edit Category' ); ?>">
+							<?php echo $row->catname;?></a>
+					</td>
+					<td align="center">
+						<?php echo $row->numarticles;?>
+					</td>
+					<td align="center">
+						<?php echo $row->cache_time;?>
+					</td>
+					<td align="center">
+						<?php echo $row->id; ?>
+					</td>
+				</tr>
+				<?php
+				$k = 1 - $k;
+			}
+			?>
+			</tbody>
+			</table>
+
+			<table class="adminform">
+			<tr>
 				<td>
-				<a href="<?php echo $row->cat_link; ?>" title="Edit Category">
-				<?php echo $row->catname;?>
-				</a>
-				</td>
-				<td align="center">
-				<?php echo $row->numarticles;?>
-				</td>
-				<td align="center">
-				<?php echo $row->cache_time;?>
+					<table align="center">
+					<?php
+					$visible = 0;
+					// check to hide certain paths if not super admin
+					if ( $user->get('gid') == 25 ) {
+						$visible = 1;
+					}
+					HTML_newsfeeds::writableCell( JPATH_SITE.DS.'cache', 0, '<strong>'. JText::_('Cache Directory') .'</strong> ', $visible );
+					?>
+					</table>
 				</td>
 			</tr>
-			<?php
-			$k = 1 - $k;
-		}
-		?>
-		</table>
-		<?php echo $pageNav->getListFooter(); ?>
-
-		<table class="adminform">
-		<tr>
-			<td>
-				<table align="center">
-				<?php
-				$visible = 0;
-				// check to hide certain paths if not super admin
-				if ( $my->gid == 25 ) {
-					$visible = 1;
-				}
-				mosHTML::writableCell( $mosConfig_cachepath, 0, '<strong>Cache Directory</strong> ', $visible );
-				?>
-				</table>
-			</td>
-		</tr>
-		</table>
+			</table>
 
 		<input type="hidden" name="option" value="<?php echo $option;?>" />
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
-		<input type="hidden" name="hidemainmenu" value="0">
-		<input type="hidden" name="<?php echo josSpoofValue(); ?>" value="1" />
+		<input type="hidden" name="filter_order" value="<?php echo $lists['order']; ?>" />
+		<input type="hidden" name="filter_order_Dir" value="<?php echo $lists['order_Dir']; ?>" />
+		<?php echo JHTML::_( 'form.token' ); ?>
 		</form>
 		<?php
 	}
 
+	function editNewsFeed( &$row, &$lists, $option )
+	{
+		JRequest::setVar( 'hidemainmenu', 1 );
 
-	function editNewsFeed( &$row, &$lists, $option ) {
-		mosMakeHtmlSafe( $row, ENT_QUOTES );
+		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 		?>
 		<script language="javascript" type="text/javascript">
 		function submitbutton(pressbutton) {
@@ -173,106 +197,161 @@ class HTML_newsfeeds {
 
 			// do field validation
 			if (form.name.value == '') {
-				alert( "Please fill in the newsfeed name." );
+				alert( "<?php echo JText::_( 'Please fill in the newsfeed name.', true ); ?>" );
 			} else if (form.catid.value == 0) {
-				alert( "Please select a Category." );
+				alert( "<?php echo JText::_( 'Please select a Category.', true ); ?>" );
 			} else if (form.link.value == '') {
-				alert( "Please fill in the newsfeed link." );
+				alert( "<?php echo JText::_( 'Please fill in the newsfeed link.', true ); ?>" );
 			} else if (getSelectedValue('adminForm','catid') < 0) {
-				alert( "Please select a category." );
+				alert( "<?php echo JText::_( 'Please select a category.', true ); ?>" );
 			} else if (form.numarticles.value == "" || form.numarticles.value == 0) {
-				alert( "Please fill in the number of articles to display." );
+				alert( "<?php echo JText::_( 'VALIDARTICLESDISPLAY', true ); ?>" );
 			} else if (form.cache_time.value == "" || form.cache_time.value == 0) {
-				alert( "Please fill in the cache refresh time." );
+				alert( "<?php echo JText::_( 'Please fill in the cache refresh time.', true ); ?>" );
 			} else {
 				submitform( pressbutton );
 			}
 		}
 		</script>
 
-		<form action="index2.php" method="post" name="adminForm">
-		<table class="adminheading">
-		<tr>
-			<th class="edit">
-			News Feed: <small><?php echo $row->id ? 'Edit' : 'New';?></small> <small><small>[ <?php echo $row->name;?> ]</small></small>
-			</th>
-		</tr>
-		</table>
+		<form action="index.php" method="post" name="adminForm">
 
-		<table class="adminform">
-		<tr>
-			<th colspan="2">
-			Details
-			</th>
-		</tr>
-		<tr>
-			<td>
-			Name
-			</td>
-			<td>
-			<input class="inputbox" type="text" size="40" name="name" value="<?php echo $row->name; ?>">
-			</td>
-		</tr>
-		<tr>
-			<td>
-			Category
-			</td>
-			<td>
-			<?php echo $lists['category']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-			Link
-			</td>
-			<td>
-			<input class="inputbox" type="text" size="60" name="link" value="<?php echo $row->link; ?>">
-			</td>
-		</tr>
-		<tr>
-			<td>
-			Number of Articles
-			</td>
-			<td>
-			<input class="inputbox" type="text" size="2" name="numarticles" value="<?php echo $row->numarticles; ?>">
-			</td>
-		</tr>
-		<tr>
-			<td>
-			Cache time (in seconds)
-			</td>
-			<td>
-			<input class="inputbox" type="text" size="4" name="cache_time" value="<?php echo $row->cache_time; ?>">
-			</td>
-		</tr>
-		<tr>
-			<td>
-			Ordering
-			</td>
-			<td>
-			<?php echo $lists['ordering']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top" align="right">
-			Published:
-			</td>
-			<td>
-			<?php echo $lists['published']; ?>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" align="center">
-			</td>
-		</tr>
-		</table>
+		<div class="col100">
+			<fieldset class="adminform">
+				<legend><?php echo JText::_( 'Details' ); ?></legend>
 
-		<input type="hidden" name="id" value="<?php echo $row->id; ?>">
-		<input type="hidden" name="option" value="<?php echo $option; ?>">
-		<input type="hidden" name="task" value="">
-		<input type="hidden" name="<?php echo josSpoofValue(); ?>" value="1" />
+				<table class="admintable">
+				<tr>
+					<td width="170" class="key">
+						<label for="name">
+							<?php echo JText::_( 'Name' ); ?>
+						</label>
+					</td>
+					<td>
+						<input class="inputbox" type="text" size="40" name="name" id="name" value="<?php echo $row->name; ?>" />
+					</td>
+				</tr>
+				<tr>
+					<td width="170" class="key">
+						<label for="name">
+							<?php echo JText::_( 'Alias' ); ?>
+						</label>
+					</td>
+					<td>
+						<input class="inputbox" type="text" size="40" name="alias" id="alias" value="<?php echo $row->alias; ?>" />
+					</td>
+				</tr>
+				<tr>
+					<td valign="top" align="right" class="key">
+						<?php echo JText::_( 'Published' ); ?>:
+					</td>
+					<td>
+						<?php echo $lists['published']; ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<label for="catid">
+							<?php echo JText::_( 'Category' ); ?>
+						</label>
+					</td>
+					<td>
+						<?php echo $lists['category']; ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<label for="link">
+							<?php echo JText::_( 'Link' ); ?>
+						</label>
+					</td>
+					<td>
+						<input class="inputbox" type="text" size="60" name="link" id="link" value="<?php echo $row->link; ?>" />
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<label for="numarticles">
+							<?php echo JText::_( 'Number of Articles' ); ?>
+						</label>
+					</td>
+					<td>
+						<input class="inputbox" type="text" size="2" name="numarticles" id="numarticles" value="<?php echo $row->numarticles; ?>" />
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<span class="editlinktip hasTip" title="<?php echo JText::_( 'TIPCACHETIME' ); ?>">
+					<?php echo JText::_( 'Cache time' ); ?>
+				</span>
+					</td>
+					<td>
+						<input class="inputbox" type="text" size="4" name="cache_time" id="cache_time" value="<?php echo $row->cache_time; ?>" />
+					</td>
+				</tr>
+				<tr>
+					<td class="key">
+						<label for="ordering">
+							<?php echo JText::_( 'Ordering' ); ?>
+						</label>
+					</td>
+					<td>
+						<?php echo $lists['ordering']; ?>
+					</td>
+				</tr>
+				<?php
+					$isRtl = '';
+					if ($row->rtl == 1) {
+						$isRtl = 'checked="checked"';
+					}
+				?>
+				<tr>
+					<td class="key">
+						<label for="rtl">
+							<?php echo JText::_( 'RTL feed' ); ?>
+						</label>
+					</td>
+					<td>
+						<input class="inputbox" type="checkbox" name="rtl" id="rtl" <?php echo $isRtl; ?>  />
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" align="center">
+					</td>
+				</tr>
+				</table>
+			</fieldset>
+		</div>
+		<div class="clr"></div>
+
+		<input type="hidden" name="id" value="<?php echo $row->id; ?>" />
+		<input type="hidden" name="cid[]" value="<?php echo $row->id; ?>" />
+		<input type="hidden" name="option" value="<?php echo $option; ?>" />
+		<input type="hidden" name="task" value="" />
+		<?php echo JHTML::_( 'form.token' ); ?>
 		</form>
 	<?php
 	}
+
+	function writableCell( $folder, $relative=1, $text='', $visible=1 )
+	{
+		$writeable 		= '<b><font color="green">'. JText::_( 'Writable' ) .'</font></b>';
+		$unwriteable 	= '<b><font color="red">'. JText::_( 'Unwritable' ) .'</font></b>';
+
+		echo '<tr>';
+		echo '<td class="item">';
+		echo $text;
+		if ( $visible ) {
+			echo $folder . '/';
+		}
+		echo '</td>';
+		echo '<td >';
+		if ( $relative ) {
+			echo is_writable( "../$folder" ) 	? $writeable : $unwriteable;
+		} else {
+			echo is_writable( "$folder" ) 		? $writeable : $unwriteable;
+		}
+		echo '</td>';
+		echo '</tr>';
+	}
 }
-?>

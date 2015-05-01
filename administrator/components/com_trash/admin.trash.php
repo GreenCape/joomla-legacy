@@ -1,10 +1,10 @@
 <?php
 /**
-* @version $Id: admin.trash.php 10002 2008-02-08 10:56:57Z willebil $
-* @package Joomla
-* @subpackage Trash
-* @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
+* @version		$Id: admin.trash.php 9872 2008-01-05 11:14:10Z eddieajau $
+* @package		Joomla
+* @subpackage	Trash
+* @copyright	Copyright (C) 2005 - 2008 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
 * Joomla! is free software. This version may have been modified pursuant
 * to the GNU General Public License, and as distributed it includes or
 * is derivative of works licensed under the GNU General Public License or
@@ -13,20 +13,26 @@
 */
 
 // no direct access
-defined( '_VALID_MOS' ) or die( 'Restricted access' );
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
-// ensure user has access to this function
-if (!($acl->acl_check( 'administration', 'manage', 'users', $my->usertype, 'components', 'com_trash' ))) {
-	mosRedirect( 'index2.php', _NOT_AUTH );
+/*
+ * Make sure the user is authorized to view this page
+ */
+$user = & JFactory::getUser();
+if (!$user->authorize( 'com_trash', 'manage' )) {
+	$mainframe->redirect( 'index.php', JText::_('ALERTNOTAUTH') );
 }
 
-require_once( $mainframe->getPath( 'admin_html' ) );
-require_once( $mainframe->getPath( 'class', 'com_frontpage' ) );
+require_once( JApplicationHelper::getPath( 'admin_html' ) );
 
-$mid = josGetArrayInts( 'mid' );
-$cid = josGetArrayInts( 'cid' );
+$cid = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+$mid = JRequest::getVar( 'mid', array(0), 'post', 'array' );
 
-switch ($task) {
+JArrayHelper::toInteger($cid, array(0));
+JArrayHelper::toInteger($mid, array(0));
+
+switch ($task)
+{
 	case 'deleteconfirm':
 		viewdeleteTrash( $cid, $mid, $option );
 		break;
@@ -43,8 +49,21 @@ switch ($task) {
 		restoreTrash( $cid, $option );
 		break;
 
+	case 'viewMenu':
+		viewTrashMenu( $option );
+		break;
+
+	case 'viewContent':
+		viewTrashContent( $option );
+		break;
+
 	default:
-		viewTrash( $option );
+		$return = JRequest::getCmd( 'return', 'viewContent', 'post' );
+		if ( $return == 'viewMenu' ) {
+			viewTrashMenu( $option );
+		} else {
+			viewTrashContent( $option );
+		}
 		break;
 }
 
@@ -52,152 +71,211 @@ switch ($task) {
 /**
 * Compiles a list of trash items
 */
-function viewTrash( $option ) {
-	global $database, $mainframe, $mosConfig_list_limit;
+function viewTrashContent( $option )
+{
+	global $mainframe;
 
-	$catid 		= $mainframe->getUserStateFromRequest( "catid{$option}", 'catid', 'content' );
-	$limit 		= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
-	$limitstart = intval( $mainframe->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 ) );
+	$db					=& JFactory::getDBO();
+	$filter_order		= $mainframe->getUserStateFromRequest( "$option.viewContent.filter_order",		'filter_order',		'sectname', 'cmd' );
+	$filter_order_Dir	= $mainframe->getUserStateFromRequest( "$option.viewContent.filter_order_Dir",	'filter_order_Dir',	'',			'word' );
+	$search				= $mainframe->getUserStateFromRequest( "$option.search",						'search', 			'',			'string' );
+	$search				= JString::strtolower( $search );
 
-	require_once( $GLOBALS['mosConfig_absolute_path'] . '/administrator/includes/pageNavigation.php' );
+	$limit		= $mainframe->getUserStateFromRequest( 'global.list.limit', 'limit', $mainframe->getCfg('list_limit'), 'int' );
+	$limitstart = $mainframe->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
 
-	if ($catid=="content") {
-		// get the total number of content
-		$query = "SELECT count(*)"
-		. "\n FROM #__content AS c"
-		. "\n LEFT JOIN #__categories AS cc ON cc.id = c.catid"
-		. "\n LEFT JOIN #__sections AS s ON s.id = cc.section AND s.scope = 'content'"
-		. "\n WHERE c.state = -2"
-		;
-		$database->setQuery( $query );
-		$total 		= $database->loadResult();
-		$pageNav 	= new mosPageNav( $total, $limitstart, $limit );
+	$where[] = 'c.state = -2';
 
-		// Query content items
-		$query = 	"SELECT c.*, g.name AS groupname, cc.name AS catname, s.name AS sectname"
-		. "\n FROM #__content AS c"
-		. "\n LEFT JOIN #__categories AS cc ON cc.id = c.catid"
-		. "\n LEFT JOIN #__sections AS s ON s.id = cc.section AND s.scope='content'"
-		. "\n INNER JOIN #__groups AS g ON g.id = c.access"
-		. "\n LEFT JOIN #__users AS u ON u.id = c.checked_out"
-		. "\n WHERE c.state = -2"
-		. "\n ORDER BY s.name, cc.name, c.title"
-		;
-		$database->setQuery( $query, $pageNav->limitstart, $pageNav->limit );
-		$content = $database->loadObjectList();
-
-		$num = $total;
-		if ( $limit < $total ) {
-			$num = $limit;
-		}
-		for ( $i = 0; $i < $num-1; $i++ ) {
-			if ( ( $content[$i]->sectionid == 0 ) && ( $content[$i]->catid == 0 ) ) {
-				$content[$i]->sectname = 'Static Content';
-			}
-		}
-	} else {
-		// get the total number of menu
-		$query = "SELECT count(*)"
-		. "\n FROM #__menu AS m"
-		. "\n LEFT JOIN #__users AS u ON u.id = m.checked_out"
-		. "\n WHERE m.published = -2"
-		;
-		$database->setQuery( $query );
-		$total 	= $database->loadResult();
-
-		$pageNav 	= new mosPageNav( $total, $limitstart, $limit );
-
-		// Query menu items
-		$query = 	"SELECT m.name AS title, m.menutype AS sectname, m.type AS catname, m.id AS id"
-		. "\n FROM #__menu AS m"
-		. "\n LEFT JOIN #__users AS u ON u.id = m.checked_out"
-		. "\n WHERE m.published = -2"
-		. "\n ORDER BY m.menutype, m.ordering, m.ordering, m.name"
-		;
-		$database->setQuery( $query, $pageNav->limitstart, $pageNav->limit );
-		$content = $database->loadObjectList();
+	if ($search) {
+		$where[] = 'LOWER(c.title) LIKE '.$db->Quote( '%'.$db->getEscaped( $search, true ).'%', false );
 	}
 
-	// Build the select list
-	$listselect = array();
-	$listselect[] = mosHTML::makeOption( 'content', 'Content Items' );
-	$listselect[] = mosHTML::makeOption( 'menu', 'Menu Items' );
-	$selected = "all";
+	$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+	$orderby = ' ORDER BY '. $filter_order .' '. $filter_order_Dir .', s.name, cc.name, c.title';
 
-	$list = mosHTML::selectList( $listselect, 'catid', 'class="inputbox" size="1" ' . 'onchange="document.adminForm.submit();"', 'value', 'text', $catid );
+	// get the total number of content
+	$query = 'SELECT count(c.id)'
+	. ' FROM #__content AS c'
+	. ' LEFT JOIN #__categories AS cc ON cc.id = c.catid'
+	. ' LEFT JOIN #__sections AS s ON s.id = cc.section AND s.scope = "content"'
+	. ' LEFT JOIN #__groups AS g ON g.id = c.access'
+	. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
+	. $where
+	;
+	$db->setQuery( $query );
+	$total = $db->loadResult();
 
-	HTML_trash::showList( $option, $content, $pageNav, $list, $catid );
+	jimport('joomla.html.pagination');
+	$pageNav = new JPagination( $total, $limitstart, $limit );
+
+	// Query articles
+	$query = 'SELECT c.title, c.id, c.sectionid, c.catid, g.name AS groupname, cc.title AS catname, s.title AS sectname'
+	. ' FROM #__content AS c'
+	. ' LEFT JOIN #__categories AS cc ON cc.id = c.catid'
+	. ' LEFT JOIN #__sections AS s ON s.id = cc.section AND s.scope="content"'
+	. ' LEFT JOIN #__groups AS g ON g.id = c.access'
+	. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
+	. $where
+	. $orderby
+	;
+	$db->setQuery( $query, $pageNav->limitstart, $pageNav->limit );
+	$contents = $db->loadObjectList();
+
+	for ( $i = 0; $i < count($contents); $i++ ) {
+		if ( ( $contents[$i]->sectionid == 0 ) && ( $contents[$i]->catid == 0 ) ) {
+			$contents[$i]->sectname = JText::_('UNCATEGORIZED');
+		}
+	}
+
+	// table ordering
+	$lists['order_Dir']	= $filter_order_Dir;
+	$lists['order']		= $filter_order;
+
+	// search filter
+	$lists['search']= $search;
+
+	HTML_trash::showListContent( $option, $contents, $pageNav, $lists );
+}
+
+/**
+* Compiles a list of trash items
+*/
+function viewTrashMenu( $option )
+{
+	global $mainframe;
+
+	$db					=& JFactory::getDBO();
+	$filter_order		= $mainframe->getUserStateFromRequest( "$option.viewMenu.filter_order",		'filter_order',		'm.menutype',	'cmd' );
+	$filter_order_Dir	= $mainframe->getUserStateFromRequest( "$option.viewMenu.filter_order_Dir",	'filter_order_Dir',	'',				'word' );
+	$limit				= $mainframe->getUserStateFromRequest( "limit",								'limit',			$mainframe->getCfg('list_limit'), 'int' );
+	$limitstart 		= $mainframe->getUserStateFromRequest( "$option.viewMenu.limitstart",		'limitstart', 		0,				'int' );
+	$search				= $mainframe->getUserStateFromRequest( "$option.search",					'search',			'',				'string' );
+	$search				= JString::strtolower( $search );
+
+	$where[] = 'm.published = -2';
+
+	if ($search) {
+		$where[] = 'LOWER(m.name) LIKE '.$db->Quote( '%'.$db->getEscaped( $search, true ).'%', false );
+	}
+
+	$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+	$orderby 	= ' ORDER BY '. $filter_order . ' ' . $filter_order_Dir .', m.menutype, m.ordering, m.ordering,  m.name';
+
+	$query = 'SELECT count(*)'
+	. ' FROM #__menu AS m'
+	. ' LEFT JOIN #__users AS u ON u.id = m.checked_out'
+	. $where
+	;
+	$db->setQuery( $query );
+	$total = $db->loadResult();
+
+	jimport('joomla.html.pagination');
+	$pageNav = new JPagination( $total, $limitstart, $limit );
+
+	// Query menu items
+	$query = 'SELECT m.name, m.id, m.menutype, m.type, com.name AS com_name'
+	. ' FROM #__menu AS m'
+	. ' LEFT JOIN #__users AS u ON u.id = m.checked_out'
+	. ' LEFT JOIN #__components AS com ON com.id = m.componentid AND m.type = "components"'
+	. $where
+	. $orderby
+	;
+	$db->setQuery( $query, $pageNav->limitstart, $pageNav->limit );
+	$menus = $db->loadObjectList();
+
+	// table ordering
+	$lists['order_Dir']	= $filter_order_Dir;
+	$lists['order']		= $filter_order;
+
+	// search filter
+	$lists['search']= $search;
+
+	HTML_trash::showListMenu( $option, $menus, $pageNav, $lists );
 }
 
 
 /**
 * Compiles a list of the items you have selected to permanently delte
 */
-function viewdeleteTrash( $cid, $mid, $option ) {
-	global $database;
+function viewdeleteTrash( $cid, $mid, $option )
+{
+	global $mainframe;
 
-	if (!in_array( 0, $cid )) {
-		// Content Items query
-		mosArrayToInts( $cid );
-		$cids = 'a.id=' . implode( ' OR a.id=', $cid );
-		$query = 	"SELECT a.title AS name"
-		. "\n FROM #__content AS a"
-		. "\n WHERE ( $cids )"
-		. "\n ORDER BY a.title"
+	$db =& JFactory::getDBO();
+	$return = JRequest::getCmd( 'return', 'viewContent', 'post' );
+
+	JArrayHelper::toInteger($cid, array(0));
+	JArrayHelper::toInteger($mid, array(0));
+
+	// seperate contentids
+	$cids = implode( ',', $cid );
+	$mids = implode( ',', $mid );
+
+	if ( $cids ) {
+		// Articles query
+		$query = 	'SELECT a.title AS name'
+		. ' FROM #__content AS a'
+		. ' WHERE ( a.id IN ( '.$cids.' ) )'
+		. ' ORDER BY a.title'
 		;
-		$database->setQuery( $query );
-		$items 	= $database->loadObjectList();
-		$id 	= $cid;
-		$type 	= 'content';
-	} else if (!in_array( 0, $mid )) {
-		// Content Items query
-		mosArrayToInts( $mid );
-		$mids = 'a.id=' . implode( ' OR a.id=', $mid );
-		$query = 	"SELECT a.name"
-		. "\n FROM #__menu AS a"
-		. "\n WHERE ( $mids )"
-		. "\n ORDER BY a.name"
+		$db->setQuery( $query );
+		$items = $db->loadObjectList();
+		$id = $cid;
+		$type = "content";
+	} else if ( $mids ) {
+		// Articles query
+		$query = 	'SELECT a.name'
+		. ' FROM #__menu AS a'
+		. ' WHERE ( a.id IN ( '.$mids.' ) )'
+		. ' ORDER BY a.name'
 		;
-		$database->setQuery( $query );
-		$items 	= $database->loadObjectList();
-		$id 	= $mid;
-		$type 	= 'menu';
+		$db->setQuery( $query );
+		$items = $db->loadObjectList();
+		$id = $mid;
+		$type = "menu";
 	}
 
-	HTML_trash::showDelete( $option, $id, $items, $type );
+	HTML_trash::showDelete( $option, $id, $items, $type, $return );
 }
 
 
 /**
 * Permanently deletes the selected list of trash items
 */
-function deleteTrash( $cid, $option ) {
-	global $database;
-	
-	josSpoofCheck();
+function deleteTrash( $cid, $option )
+{
+	global $mainframe;
 
-	$type 	= mosGetParam( $_POST, 'type', array(0) );
+	// Check for request forgeries
+	JRequest::checkToken() or die( 'Invalid Token' );
 
-	$total 	= count( $cid );
+	$db		=& JFactory::getDBO();
+	$return	= JRequest::getCmd( 'return', 'viewContent', 'post' );
+	$type	= JRequest::getCmd( 'type', '', 'post' );
 
-	if ( $type == 'content' ) {
-		$obj = new mosContent( $database );
-		$fp = new mosFrontPage( $database );
+	$total = count( $cid );
+
+	if ( $type == 'content' )
+	{
+		$obj =& JTable::getInstance('content');
+
+		require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_frontpage'.DS.'tables'.DS.'frontpage.php');
+		$fp = new TableFrontPage( $db );
 		foreach ( $cid as $id ) {
 			$id = intval( $id );
 			$obj->delete( $id );
 			$fp->delete( $id );
 		}
-	} else if ( $type == 'menu' ) {
-		$obj = new mosMenu( $database );
+	} else if ( $type == "menu" ) {
+		$obj =& JTable::getInstance('menu');
 		foreach ( $cid as $id ) {
 			$id = intval( $id );
 			$obj->delete( $id );
 		}
 	}
 
-	$msg = $total. " Item(s) successfully Deleted";
-	mosRedirect( "index2.php?option=$option&mosmsg=". $msg ."" );
+	$msg = JText::sprintf( 'Item(s) successfully Deleted', $total );
+	$mainframe->redirect( 'index.php?option='.$option.'&task='.$return, $msg );
 }
 
 
@@ -205,49 +283,58 @@ function deleteTrash( $cid, $option ) {
 * Compiles a list of the items you have selected to permanently delte
 */
 function viewrestoreTrash( $cid, $mid, $option ) {
-	global $database;
+	global $mainframe;
 
-	if (!in_array( 0, $cid )) {
-		// Content Items query
-		mosArrayToInts( $cid );
-		$cids = 'a.id=' . implode( ' OR a.id=', $cid );
-		$query = "SELECT a.title AS name"
-		. "\n FROM #__content AS a"
-		. "\n WHERE ( $cids )"
-		. "\n ORDER BY a.title"
+	$db		=& JFactory::getDBO();
+	$return = JRequest::getCmd( 'return', 'viewContent', 'post' );
+
+	JArrayHelper::toInteger($cid, array(0));
+	JArrayHelper::toInteger($mid, array(0));
+
+	// seperate contentids
+	$cids = implode( ',', $cid );
+	$mids = implode( ',', $mid );
+
+	if ( $cids ) {
+		// Articles query
+		$query = 'SELECT a.title AS name'
+		. ' FROM #__content AS a'
+		. ' WHERE ( a.id IN ( '.$cids.' ) )'
+		. ' ORDER BY a.title'
 		;
-		$database->setQuery( $query );
-		$items = $database->loadObjectList();
+		$db->setQuery( $query );
+		$items = $db->loadObjectList();
 		$id = $cid;
 		$type = "content";
-	} else if (!in_array( 0, $mid )) {
-		// Content Items query
-		mosArrayToInts( $mid );
-		$mids = 'a.id=' . implode( ' OR a.id=', $mid );
-		$query = "SELECT a.name"
-		. "\n FROM #__menu AS a"
-		. "\n WHERE ( $mids )"
-		. "\n ORDER BY a.name"
+	} else if ( $mids ) {
+		// Articles query
+		$query = 'SELECT a.name'
+		. ' FROM #__menu AS a'
+		. ' WHERE ( a.id IN ( '.$mids.' ) )'
+		. ' ORDER BY a.name'
 		;
-		$database->setQuery( $query );
-		$items = $database->loadObjectList();
+		$db->setQuery( $query );
+		$items = $db->loadObjectList();
 		$id = $mid;
 		$type = "menu";
 	}
 
-	HTML_trash::showRestore( $option, $id, $items, $type );
+	HTML_trash::showRestore( $option, $id, $items, $type, $return );
 }
 
 
 /**
 * Restores items selected to normal - restores to an unpublished state
 */
-function restoreTrash( $cid, $option ) {
-	global $database;
-	
-	josSpoofCheck();
+function restoreTrash( $cid, $option )
+{
+	global $mainframe;
 
-	$type = mosGetParam( $_POST, 'type', array(0) );
+	// Check for request forgeries
+	JRequest::checkToken() or die( 'Invalid Token' );
+
+	$db		= & JFactory::getDBO();
+	$type	= JRequest::getCmd( 'type', '', 'post' );
 
 	$total = count( $cid );
 
@@ -256,62 +343,53 @@ function restoreTrash( $cid, $option ) {
 	$ordering 	= 9999;
 
 	if ( $type == 'content' ) {
-	// query to restore content items
-		mosArrayToInts( $cid );
-		$cids = 'id=' . implode( ' OR id=', $cid );
-		$query = "UPDATE #__content"
-		. "\n SET state = " . (int) $state . ", ordering = " . (int) $ordering
-		. "\n WHERE ( $cids )"
+		$return = 'viewContent';
+
+		//seperate contentids
+		JArrayHelper::toInteger($cid, array(0));
+		$cids = implode( ',', $cid );
+
+		// query to restore article
+		$query = 'UPDATE #__content'
+		. ' SET state = '.(int) $state.', ordering = '.(int) $ordering
+		. ' WHERE id IN ( '.$cids.' )'
 		;
-		$database->setQuery( $query );
-		if ( !$database->query() ) {
-			echo "<script> alert('".$database->getErrorMsg()."'); window.history.go(-1); </script>\n";
-			exit();
+		$db->setQuery( $query );
+		if ( !$db->query() ) {
+			JError::raiseError(500, $db->getErrorMsg() );
 		}
 	} else if ( $type == 'menu' ) {
-		sort( $cid );
+		$return = 'viewMenu';
 
-		foreach ( $cid as $id ) {
-			$check = 1;
-			$row = new mosMenu( $database );
-			$row->load( $id );
+		jimport('joomla.application.component.model');
+		JModel::addIncludePath(JPATH_BASE.DS.'components'.DS.'com_menus'.DS.'models');
+		$model =& JModel::getInstance('List', 'MenusModel');
+		$total = $model->fromTrash($cid);
 
-			// check if menu item is a child item
-			if ( $row->parent != 0 ) {
-				$query = "SELECT id"
-				. "\n FROM #__menu"
-				. "\n WHERE id = " . (int) $row->parent
-				. "\n AND ( published = 0 OR published = 1 )"
-				;
-				$database->setQuery( $query );
-				$check = $database->loadResult();
-
-				if ( !$check ) {
-				// if menu items parent is not found that are published/unpublished make it a root menu item
-					$query  = "UPDATE #__menu"
-					. "\n SET parent = 0, published = " . (int) $state . ", ordering = 9999"
-					. "\n WHERE id = " . (int) $id
-					;
-				}
-			}
-
-			if ( $check ) {
-			// query to restore menu items
-				$query  = "UPDATE #__menu"
-				. "\n SET published = " . (int) $state . ", ordering = 9999"
-				. "\n WHERE id = " . (int) $id
-				;
-			}
-
-			$database->setQuery( $query );
-			if ( !$database->query() ) {
-				echo "<script> alert('".$database->getErrorMsg()."'); window.history.go(-1); </script>\n";
-				exit();
-			}
+		if (!$total) {
+			JError::raiseError(500, $db->getErrorMsg() );
 		}
 	}
 
-	$msg = $total. " Item(s) successfully Restored";
-	mosRedirect( "index2.php?option=$option&mosmsg=". $msg ."" );
+	$msg = JText::sprintf( 'Item(s) successfully Restored', $total );
+	$mainframe->redirect( 'index.php?option='.$option.'&task='.$return, $msg );
 }
-?>
+
+function ReadMenuXML( $type, $component=-1 )
+{
+	// xml file for module
+	$xmlfile = JPATH_ADMINISTRATOR .'/components/com_menus/'. $type .'/'. $type .'.xml';
+
+	$data = JApplicationHelper::parseXMLInstallFile($xmlfile);
+
+	if ( $data['type'] == 'component' || $data['type'] == 'menu' )
+	{
+		if ( ( $component <> -1 ) && ( $data['name'] == 'Component') ) {
+			$data['name'] .= ' - '. $component;
+		}
+
+		$row[0]	= $data['name'];
+	}
+
+	return $row;
+}

@@ -1,10 +1,10 @@
 <?php
 /**
-* @version $Id: toolbar.newsfeeds.php 10002 2008-02-08 10:56:57Z willebil $
-* @package Joomla
-* @subpackage Newsfeeds
-* @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
+* @version		$Id: toolbar.newsfeeds.php 9764 2007-12-30 07:48:11Z ircmaxell $
+* @package		Joomla
+* @subpackage	Newsfeeds
+* @copyright	Copyright (C) 2005 - 2008 Open Source Matters. All rights reserved.
+* @license		GNU/GPL, see LICENSE.php
 * Joomla! is free software. This version may have been modified pursuant
 * to the GNU General Public License, and as distributed it includes or
 * is derivative of works licensed under the GNU General Public License or
@@ -13,22 +13,20 @@
 */
 
 // no direct access
-defined( '_VALID_MOS' ) or die( 'Restricted access' );
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
-require_once( $mainframe->getPath( 'toolbar_html' ) );
+require_once( JApplicationHelper::getPath( 'toolbar_html' ) );
 
-switch ($task) {
-	case 'new':
-		TOOLBAR_newsfeeds::_NEW();
+switch ($task)
+{
+	case 'add' :
+		TOOLBAR_newsfeeds::_EDIT(false);
 		break;
-
 	case 'edit':
-	case 'editA':
-		TOOLBAR_newsfeeds::_EDIT();
+		TOOLBAR_newsfeeds::_EDIT(true);
 		break;
 
 	default:
 		TOOLBAR_newsfeeds::_DEFAULT();
 		break;
 }
-?>
