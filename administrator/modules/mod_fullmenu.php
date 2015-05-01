@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_fullmenu.php 6072 2006-12-20 02:09:09Z robs $
+* @version $Id: mod_fullmenu.php 9998 2008-02-07 11:36:41Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -163,7 +163,7 @@ if (!defined( '_JOS_FULLMENU_MODULE' )) {
 				],
 	<?php
 		// Components Sub-Menu
-		if ($installComponents) {
+		if ($installComponents | $editAllComponents) {
 	?>			_cmSplit,
 				[null,'Components',null,null,'Component Management',
 	<?php
@@ -358,7 +358,7 @@ if (!defined( '_JOS_FULLMENU_MODULE' )) {
 				],
 			<?php
 		/* Components Sub-Menu */
-				if ( $installComponents) {
+				if ( $installComponents | $editAllComponents) {
 					?>
 					_cmSplit,
 					[null,'<?php echo 'Components'; ?>',null,null,'<?php echo $text; ?>'

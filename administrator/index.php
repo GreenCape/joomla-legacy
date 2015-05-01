@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 8078 2007-07-19 06:45:54Z robs $
+* @version $Id: index.php 8388 2007-08-11 22:05:59Z robs $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -107,13 +107,13 @@ if (isset( $_POST['submit'] )) {
 			mosErrorAlert("Incorrect Username, Password, or Access Level.  Please try again", "document.location.href='index.php'");
 		}
 
-		session_name( md5( $mosConfig_live_site ) );
-		session_start();
-
 		// construct Session ID
 		$logintime	= time();
 		$session_id = md5( $my->id . $my->username . $my->usertype . $logintime );
 
+		session_name( md5( $mosConfig_live_site ) );
+		session_id( $session_id );
+		session_start();
 
 		// add Session ID entry to DB
 		$query = "INSERT INTO #__session"

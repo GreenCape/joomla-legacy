@@ -5,7 +5,7 @@
 	<author>Joomla! Project</author>
 	<creationDate>July 2004</creationDate>
 	<copyright>(C) 2005 Open Source Matters. All rights reserved.</copyright>
-	<license>http://www.gnu.org/copyleft/gpl.html GNU/GPL</license>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>admin@joomla.org</authorEmail>
 	<authorUrl>www.joomla.org</authorUrl>
 	<version>1.0.0</version>
@@ -24,7 +24,7 @@
 		</param>
 		<param name="header" type="text" size="30" default="" label="Page Title" description="Text to display at the top of the page. If left blank, the Menu name will be used instead" />
 		<param name="@spacer" type="spacer" default="" label="" description="" />
-		<param name="scrolling" type="radio" default="auto" label="Scroll Bars" description="Show/Hide Horizontal & Vertical scroll bars.">
+		<param name="scrolling" type="radio" default="auto" label="Scroll Bars" description="Show/Hide Horizontal and Vertical scroll bars.">
 			<option value="no">No</option>
 			<option value="yes">Yes</option>
 			<option value="auto">Auto</option>

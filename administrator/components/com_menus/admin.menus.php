@@ -1,10 +1,10 @@
 <?php
 /**
-* @version $Id: admin.menus.php 5047 2006-09-14 13:49:01Z friesengeist $
+* @version $Id: admin.menus.php 10004 2008-02-08 16:09:12Z hackwar $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
+* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
 * Joomla! is free software. This version may have been modified pursuant
 * to the GNU General Public License, and as distributed it includes or
 * is derivative of works licensed under the GNU General Public License or
@@ -46,7 +46,7 @@ switch ($task) {
 		break;
 
 	case 'save':
-	case 'apply':	
+	case 'apply':
 		// clean any existing cache files
 		mosCache::cleanCache( 'com_content' );
 		require_once( $path . $type .'/'. $type .'.menu.php' );
@@ -262,6 +262,8 @@ function viewMenuItems( $menutype, $option ) {
 function addMenuItem( &$cid, $menutype, $option, $task ) {
 	global $mosConfig_absolute_path;
 
+	josSpoofCheck(null, null, 'request');
+
 	$types 	= array();
 
 	// list of directories
@@ -350,6 +352,8 @@ function addMenuItem( &$cid, $menutype, $option, $task ) {
 function saveMenu( $option, $task='save' ) {
 	global $database;
 
+	josSpoofCheck();
+
 	$params = mosGetParam( $_POST, 'params', '' );
 	if (is_array( $params )) {
 		$txt = array();
@@ -367,7 +371,7 @@ function saveMenu( $option, $task='save' ) {
 	}
 
 	$row->name = ampReplace( $row->name );
-	
+
 	if (!$row->check()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
@@ -426,7 +430,7 @@ function publishMenuSection( $cid=null, $publish=1, $menutype ) {
 			require_once( $mosConfig_absolute_path . '/administrator/components/com_menus/' . $type . '/' . $type . '.menu.php' );
 		}
 	}
-	
+
 	// clean any existing cache files
 	mosCache::cleanCache( 'com_content' );
 
@@ -438,10 +442,10 @@ function publishMenuSection( $cid=null, $publish=1, $menutype ) {
 */
 function TrashMenuSection( $cid=NULL, $menutype='mainmenu' ) {
 	global $database;
-	
+
 	$nullDate	= $database->getNullDate();
 	$state		= -2;
-	
+
 	$query = "SELECT *"
 	. "\n FROM #__menu"
 	. "\n WHERE menutype = " . $database->Quote( $menutype )
@@ -449,23 +453,23 @@ function TrashMenuSection( $cid=NULL, $menutype='mainmenu' ) {
 	. "\n ORDER BY menutype, parent, ordering"
 	;
 	$database->setQuery( $query );
-	$mitems = $database->loadObjectList();	
-	
+	$mitems = $database->loadObjectList();
+
 	// determine if selected item has an child items
 	$children = array();
 	foreach ( $cid as $id ) {
 		foreach ( $mitems as $item ) {
 			if ( $item->parent == $id ) {
 				$children[] = $item->id;
-			}		
+			}
 		}
-	}	
+	}
 	$list 	= josMenuChildrenRecurse( $mitems, $children, $children );
 	$list 	= array_merge( $cid, $list );
 
 	mosArrayToInts( $list );
 	$ids = 'id=' . implode( ' OR id=', $list );
-	
+
 	$query = "UPDATE #__menu"
 	. "\n SET published = " . (int) $state . ", ordering = 0, checked_out = 0, checked_out_time = " . $database->Quote( $nullDate )
 	. "\n WHERE ( $ids )"
@@ -477,11 +481,11 @@ function TrashMenuSection( $cid=NULL, $menutype='mainmenu' ) {
 	}
 
 	$total = count( $cid );
-	
+
 	// clean any existing cache files
 	mosCache::cleanCache( 'com_content' );
 
-	$msg = $total .' Item(s) sent to the Trash';	
+	$msg = $total .' Item(s) sent to the Trash';
 	mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype, $msg );
 }
 
@@ -490,6 +494,8 @@ function TrashMenuSection( $cid=NULL, $menutype='mainmenu' ) {
 */
 function cancelMenu( $option ) {
 	global $database;
+
+	josSpoofCheck();
 
 	$menu = new mosMenu( $database );
 	$menu->bind( $_POST );
@@ -512,7 +518,7 @@ function orderMenu( $uid, $inc, $option ) {
 	$row = new mosMenu( $database );
 	$row->load( $uid );
 	$row->move( $inc, "menutype = " . $database->Quote( $row->menutype ) . " AND parent = " . (int) $row->parent );
-	
+
 	// clean any existing cache files
 	mosCache::cleanCache( 'com_content' );
 
@@ -537,7 +543,7 @@ function accessMenu( $uid, $access, $option, $menutype ) {
 	if (!$menu->store()) {
 		return $menu->getError();
 	}
-	
+
 	// clean any existing cache files
 	mosCache::cleanCache( 'com_content' );
 
@@ -657,7 +663,7 @@ function moveMenuSave( $option, $cid, $menu, $menutype ) {
 
 	// clean any existing cache files
 	mosCache::cleanCache( 'com_content' );
-	
+
 	$msg = count($cid) .' Menu Items moved to '. $menu;
 	mosRedirect( 'index2.php?option='. $option .'&menutype='. $menutype .'&mosmsg='. $msg );
 } // moveMenuSave
@@ -706,7 +712,7 @@ function copyMenuSave( $option, $cid, $menu, $menutype ) {
 		$curr->load( $id );
 		$curr->id = NULL;
 		if ( !$curr->store() ) {
-			echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
+			mosErrorAlert( $curr->getError() );
 			exit();
 		}
 		$cidref[] = array($id, $curr->id);
@@ -727,12 +733,12 @@ function copyMenuSave( $option, $cid, $menu, $menutype ) {
 		$curr->menutype = $menu;
 		$curr->ordering = '9999';
 		if ( !$curr->store() ) {
-			echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
+			mosErrorAlert( $curr->getError() );
 			exit();
 		}
 		$curr->updateOrder( 'menutype = ' . $database->Quote( $curr->menutype ) . ' AND parent = ' . (int) $curr->parent );
 	} // foreach
-	
+
 	// clean any existing cache files
 	mosCache::cleanCache( 'com_content' );
 
@@ -780,9 +786,11 @@ function ReadMenuXML( $type, $component=-1 ) {
 function saveOrder( &$cid, $menutype ) {
 	global $database;
 
+	josSpoofCheck();
+
 	$total		= count( $cid );
 	$order 		= josGetArrayInts( 'order' );
-	
+
 	$row		= new mosMenu( $database );
 	$conditions = array();
 
@@ -802,23 +810,23 @@ function saveOrder( &$cid, $menutype ) {
 				if ($cond[1]==$condition) {
 					$found = true;
 					break;
-				} 
+				}
 			if (!$found) $conditions[] = array($row->id, $condition);
-		} 
-	} 
+		}
+	}
 
 	// execute updateOrder for each group
 	foreach ( $conditions as $cond ) {
 		$row->load( $cond[0] );
 		$row->updateOrder( $cond[1] );
-	} 
-	
+	}
+
 	// clean any existing cache files
 	mosCache::cleanCache( 'com_content' );
 
 	$msg 	= 'New ordering saved';
 	mosRedirect( 'index2.php?option=com_menus&menutype='. $menutype, $msg );
-} 
+}
 
 /**
 * Returns list of child items for a given set of ids from menu items supplied
@@ -828,22 +836,22 @@ function josMenuChildrenRecurse( $mitems, $parents, $list, $maxlevel=20, $level=
 	// check to reduce recursive processing
 	if ( $level <= $maxlevel && count( $parents ) ) {
 		$children = array();
-		foreach ( $parents as $id ) {			
+		foreach ( $parents as $id ) {
 			foreach ( $mitems as $item ) {
 				if ( $item->parent == $id ) {
 					$children[] = $item->id;
-				}		
+				}
 			}
-		}	
-		
+		}
+
 		// check to reduce recursive processing
 		if ( count( $children ) ) {
 			$list = josMenuChildrenRecurse( $mitems, $children, $list, $maxlevel, $level+1 );
-			
+
 			$list = array_merge( $list, $children );
 		}
 	}
-	
+
 	return $list;
 }
 ?>

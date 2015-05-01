@@ -1,10 +1,10 @@
 <?php
 /**
-* @version $Id: admin.banners.html.php 6072 2006-12-20 02:09:09Z robs $
+* @version $Id: admin.banners.html.php 10002 2008-02-08 10:56:57Z willebil $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
-* @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
+* @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL, see LICENSE.php
 * Joomla! is free software. This version may have been modified pursuant
 * to the GNU General Public License, and as distributed it includes or
 * is derivative of works licensed under the GNU General Public License or
@@ -136,6 +136,7 @@ class HTML_banners {
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
 		<input type="hidden" name="hidemainmenu" value="0" />
+		<input type="hidden" name="<?php echo josSpoofValue(); ?>" value="1" />
 		</form>
 		<?php
 	}
@@ -299,6 +300,7 @@ class HTML_banners {
 		<input type="hidden" name="clicks" value="<?php echo $_row->clicks; ?>" />
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="impmade" value="<?php echo $_row->impmade; ?>" />
+		<input type="hidden" name="<?php echo josSpoofValue(); ?>" value="1" />
 		</form>
 		<?php
 	}
@@ -396,6 +398,7 @@ class HTML_bannerClient {
 		<input type="hidden" name="task" value="listclients" />
 		<input type="hidden" name="boxchecked" value="0" />
 		<input type="hidden" name="hidemainmenu" value="0" />
+		<input type="hidden" name="<?php echo josSpoofValue(); ?>" value="1" />
 		</form>
 		<?php
 	}
@@ -483,6 +486,7 @@ class HTML_bannerClient {
 		<input type="hidden" name="option" value="<?php echo $option; ?>" />
 		<input type="hidden" name="cid" value="<?php echo $row->cid; ?>" />
 		<input type="hidden" name="task" value="" />
+		<input type="hidden" name="<?php echo josSpoofValue(); ?>" value="1" />
 		</form>
 		<?php
 	}
