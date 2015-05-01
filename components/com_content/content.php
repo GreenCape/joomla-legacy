@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.php 3755 2006-05-31 12:54:01Z stingrey $
+* @version $Id: content.php 4124 2006-06-25 15:51:17Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -20,8 +20,11 @@ require_once( $mainframe->getPath( 'front_html', 'com_content' ) );
 $id			= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 $sectionid 	= intval( mosGetParam( $_REQUEST, 'sectionid', 0 ) );
 $pop 		= intval( mosGetParam( $_REQUEST, 'pop', 0 ) );
-$limit 		= intval( mosGetParam( $_REQUEST, 'limit', $mosConfig_list_limit ) );
+$limit 		= intval( mosGetParam( $_REQUEST, 'limit', 0 ) );
 $limitstart = intval( mosGetParam( $_REQUEST, 'limitstart', 0 ) );
+$year 		= intval( mosGetParam( $_REQUEST, 'year', 	date( 'Y' ) ) );
+$month 		= intval( mosGetParam( $_REQUEST, 'month', 	date( 'm' ) ) );
+$module 	= intval( mosGetParam( $_REQUEST, 'module', 0 ) );
 
 // Editor usertype check
 $access = new stdClass();
@@ -52,7 +55,10 @@ switch ( $task ) {
 		break;
 
 	case 'category':
-		$cache->call( 'showCategory', $id, $gid, $access, $sectionid, $limit, NULL, $limitstart, 0 );
+		$selected 	= strval( mosGetParam( $_REQUEST, 'order', '' ) );
+		$filter 	= strval( mosGetParam( $_REQUEST, 'filter', '' ) );	
+
+		$cache->call( 'showCategory', $id, $gid, $access, $sectionid, $limit, NULL, $limitstart, 0, $selected, $filter );
 		break;
 
 	case 'blogsection':
@@ -68,12 +74,12 @@ switch ( $task ) {
 
 	case 'archivesection':
 		// Itemid is a dummy value to cater for caching
-		$cache->call( 'showArchiveSection', $id, $gid, $access, $pop, $option, $Itemid );
+		$cache->call( 'showArchiveSection', $id, $gid, $access, $pop, $option, $year, $month, $Itemid );
 		break;
 
 	case 'archivecategory':
 		// Itemid is a dummy value to cater for caching
-		$cache->call( 'showArchiveCategory', $id, $gid, $access, $pop, $option, $Itemid );
+		$cache->call( 'showArchiveCategory', $id, $gid, $access, $pop, $option, $year, $month, $module, $Itemid );
 		break;
 
 	case 'edit':
@@ -142,7 +148,7 @@ function findKeyItem( $gid, $access, $pop, $option, $now ) {
 }
 
 function frontpage( $gid, &$access, $pop, $now ) {
-	global $database, $mainframe, $my, $Itemid;
+	global $database, $mainframe;
 
 	$now 		= _CURRENT_SERVER_TIME;
 	$nullDate 	= $database->getNullDate();
@@ -151,14 +157,16 @@ function frontpage( $gid, &$access, $pop, $now ) {
 	// Parameters
 	$menu = $mainframe->get( 'menu' );
 	$params = new mosParameters( $menu->params );
-	$orderby_sec = $params->def( 'orderby_sec', '' );
-	$orderby_pri = $params->def( 'orderby_pri', '' );
 
 	// Ordering control
-	$order_sec = _orderby_sec( $orderby_sec );
-	$order_pri = _orderby_pri( $orderby_pri );
-
-	$voting = votingQuery();
+	$orderby_sec 	= $params->def( 'orderby_sec', '' );
+	$orderby_pri 	= $params->def( 'orderby_pri', '' );
+	$order_sec 		= _orderby_sec( $orderby_sec );
+	$order_pri 		= _orderby_pri( $orderby_pri );
+	
+	// voting control
+	$voting = $params->def( 'rating', '' );
+	$voting = votingQuery($voting);
 	
 	$where 	= _where( 1, $access, $noauth, $gid, 0, $now, NULL, NULL, $params );	
 	$where 	= ( count( $where ) ? "\n WHERE ". implode( "\n AND ", $where ) : '' );
@@ -216,7 +224,7 @@ function showSection( $id, $gid, &$access, $now ) {
 	// Paramters
 	$params = new stdClass();
 	if ( $Itemid ) {
-		$menu = $mainframe->get( 'menu' );
+		$menu 	= $mainframe->get( 'menu' );
 		$params = new mosParameters( $menu->params );
 	} else {
 		$menu 	= '';
@@ -225,24 +233,30 @@ function showSection( $id, $gid, &$access, $now ) {
 	}
 	$orderby = $params->get( 'orderby', '' );
 
-	$params->set( 'type', 				'section' );
+	$params->set( 'type', 					'section' );
 
-	$params->def( 'page_title', 		1 );
-	$params->def( 'pageclass_sfx', 		'' );
-	$params->def( 'other_cat_section', 	1 );
-	$params->def( 'empty_cat_section', 	0 );
-	$params->def( 'other_cat', 			1 );
-	$params->def( 'empty_cat', 			0 );
-	$params->def( 'cat_items', 			1 );
-	$params->def( 'cat_description', 	1 );
-	$params->def( 'back_button', 		$mainframe->getCfg( 'back_button' ) );
-	$params->def( 'pageclass_sfx', 		'' );
+	$params->def( 'page_title', 			1 );
+	$params->def( 'pageclass_sfx', 			'' );
+	$params->def( 'description_sec', 		1 );
+	$params->def( 'description_sec_image', 	1 );
+	$params->def( 'other_cat_section', 		1 );
+	$params->def( 'empty_cat_section', 		0 );
+	$params->def( 'other_cat', 				1 );
+	$params->def( 'empty_cat', 				0 );
+	$params->def( 'cat_items', 				1 );
+	$params->def( 'cat_description', 		1 );
+	$params->def( 'back_button', 			$mainframe->getCfg( 'back_button' ) );
+	$params->def( 'pageclass_sfx', 			'' );
 	// param controls whether unpublished items visible to publishers and above
-	$params->def( 'unpublished', 		1 );
+	$params->def( 'unpublished', 			1 );
 		
 	// Ordering control
 	$orderby = _orderby_sec( $orderby );
 
+	// Description & Description Image control
+	$params->def( 'description', 			$params->get( 'description_sec' ) );
+	$params->def( 'description_image', 		$params->get( 'description_sec_image' ) );	
+	
 	if ( $access->canEdit ) {
 		$xwhere = '';
 		if ( $params->get( 'unpublished' ) ) {
@@ -295,6 +309,9 @@ function showSection( $id, $gid, &$access, $now ) {
 	;
 	$database->setQuery( $query );
 	$categories = $database->loadObjectList();
+	
+	// remove slashes
+	$section->name = stripslashes($section->name);
 
 	// Dynamic Page Title
 	$mainframe->SetPageTitle( $menu->name );
@@ -312,11 +329,9 @@ function showSection( $id, $gid, &$access, $now ) {
 * @param int The number of items to dislpay
 * @param int The offset for pagination
 */
-function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limitstart, $now  ) {
+function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limitstart, $now, $selected, $filter ) {
 	global $database, $mainframe, $Itemid, $mosConfig_list_limit;
 	
-	$selected = strval( mosGetParam( $_REQUEST, 'order', '' ) );
-
 	$category = new mosCategory( $database );
 	$category->load( $id );
 	
@@ -360,7 +375,7 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limi
 	// Paramters
 	$params = new stdClass();
 	if ( $Itemid ) {
-		$menu = $mainframe->get( 'menu' );
+		$menu 	= $mainframe->get( 'menu' );
 		$params = new mosParameters( $menu->params );
 	} else {
 		$menu = '';
@@ -378,31 +393,37 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limi
 
 	$params->set( 'type', 				'category' );
 
-	$params->def( 'page_title',			1 );
-	$params->def( 'title', 				1 );
-	$params->def( 'hits', 				$mainframe->getCfg( 'hits' ) );
-	$params->def( 'author', 			!$mainframe->getCfg( 'hideAuthor' ) );
-	$params->def( 'date', 				!$mainframe->getCfg( 'hideCreateDate' ) );
-	$params->def( 'date_format', 		_DATE_FORMAT_LC );
-	$params->def( 'navigation', 		2 );
-	$params->def( 'display', 			1 );
-	$params->def( 'display_num', 		$mosConfig_list_limit );
-	$params->def( 'other_cat', 			1 );
-	$params->def( 'empty_cat', 			0 );
-	$params->def( 'cat_items', 			1 );
-	$params->def( 'cat_description', 	0 );
-	$params->def( 'back_button', 		$mainframe->getCfg( 'back_button' ) );
-	$params->def( 'pageclass_sfx', 		'' );
-	$params->def( 'headings', 			1 );
-	$params->def( 'order_select', 		1 );
-	$params->def( 'filter', 			1 );
-	$params->def( 'filter_type', 		'title' );
+	$params->def( 'description_cat', 		1 );
+	$params->def( 'description_cat_image', 	1 );
+	$params->def( 'page_title',				1 );
+	$params->def( 'title', 					1 );
+	$params->def( 'hits', 					$mainframe->getCfg( 'hits' ) );
+	$params->def( 'author', 				!$mainframe->getCfg( 'hideAuthor' ) );
+	$params->def( 'date', 					!$mainframe->getCfg( 'hideCreateDate' ) );
+	$params->def( 'date_format', 			_DATE_FORMAT_LC );
+	$params->def( 'navigation', 			2 );
+	$params->def( 'display', 				1 );
+	$params->def( 'display_num', 			$mosConfig_list_limit );
+	$params->def( 'other_cat', 				1 );
+	$params->def( 'empty_cat', 				0 );
+	$params->def( 'cat_items', 				1 );
+	$params->def( 'cat_description', 		0 );
+	$params->def( 'back_button', 			$mainframe->getCfg( 'back_button' ) );
+	$params->def( 'pageclass_sfx', 			'' );
+	$params->def( 'headings', 				1 );
+	$params->def( 'order_select', 			1 );
+	$params->def( 'filter', 				1 );
+	$params->def( 'filter_type', 			'title' );
 	// param controls whether unpublished items visible to publishers and above
 	$params->def( 'unpublished', 		1 );
 
 	// Ordering control
 	$orderby = _orderby_sec( $orderby );
 
+	// Description & Description Image control
+	$params->def( 'description', 			$params->get( 'description_cat' ) );
+	$params->def( 'description_image', 		$params->get( 'description_cat_image' ) );	
+	
 	if ( $sectionid == 0 ) {
 		$sectionid = $category->section;
 	}
@@ -453,10 +474,7 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limi
 	// get the total number of published items in the category
 	// filter functionality
 	$and 	= null;
-	$filter = null;
 	if ( $params->get( 'filter' ) ) {
-		$filter = strval( mosGetParam( $_REQUEST, 'filter', '' ) );
-		
 		if ( $filter ) {
 			// clean filter variable
 			$filter = strtolower( $filter );
@@ -506,8 +524,11 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limi
 	$database->setQuery( $query );
 	$counter = $database->loadObjectList();
 	$total = $counter[0]->numitems;
+	
 	$limit = $limit ? $limit : $params->get( 'display_num' ) ;
-	if ( $total <= $limit ) $limitstart = 0;
+	if ( $total <= $limit ) { 
+		$limitstart = 0;
+	}
 
 	require_once( $GLOBALS['mosConfig_absolute_path'] . '/includes/pageNavigation.php' );
 	$pageNav = new mosPageNav( $total, $limitstart, $limit );
@@ -558,6 +579,9 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limi
 	$lists['task'] 			= 'category';
 	$lists['filter'] 		= $filter;
 
+	// remove slashes
+	$category->name = stripslashes($category->name);
+	
 	// Dynamic Page Title
 	$mainframe->SetPageTitle( $pagetitle );
 
@@ -598,7 +622,9 @@ function showBlogSection( $id=0, $gid, &$access, $pop, $now=NULL ) {
 	$order_sec 		= _orderby_sec( $orderby_sec );
 	$order_pri 		= _orderby_pri( $orderby_pri );
 
-	$voting = votingQuery();
+	// voting control
+	$voting = $params->def( 'rating', '' );
+	$voting = votingQuery($voting);
 	
 	// Main data query
 	$query = "SELECT a.id, a.title, a.title_alias, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
@@ -678,8 +704,10 @@ function showBlogCategory( $id=0, $gid, &$access, $pop, $now ) {
 	$orderby_pri 	= $params->def( 'orderby_pri', '' );
 	$order_sec 		= _orderby_sec( $orderby_sec );
 	$order_pri 		= _orderby_pri( $orderby_pri );
-
-	$voting = votingQuery();
+	
+	// voting control
+	$voting = $params->def( 'rating', '' );
+	$voting = votingQuery($voting);
 	
 	// Main data query
 	$query = "SELECT a.id, a.title, a.title_alias, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
@@ -743,17 +771,13 @@ function showBlogCategory( $id=0, $gid, &$access, $pop, $now ) {
 	BlogOutput( $rows, $params, $gid, $access, $pop, $menu );
 }
 
-function showArchiveSection( $id=NULL, $gid, &$access, $pop, $option ) {
+function showArchiveSection( $id=NULL, $gid, &$access, $pop, $option, $year, $month ) {
 	global $database, $mainframe;
 	global $Itemid;
 
 	$secID 	= ( $id ? $id : 0 );
 	
 	$noauth = !$mainframe->getCfg( 'shownoauth' );
-
-	// Paramters
-	$year 	= strval( mosGetParam( $_REQUEST, 'year', date( 'Y' ) ) );
-	$month 	= strval( mosGetParam( $_REQUEST, 'month', date( 'm' ) ) );
 
 	$params = new stdClass();
 	if ( $Itemid ) {
@@ -793,8 +817,10 @@ function showArchiveSection( $id=NULL, $gid, &$access, $pop, $option ) {
 	$database->setQuery( $query );
 	$items = $database->loadObjectList();
 	$archives = count( $items );
-
-	$voting = votingQuery();
+	
+	// voting control
+	$voting = $params->def( 'rating', '' );
+	$voting = votingQuery($voting);
 	
 	// Main Query
 	$query = "SELECT a.id, a.title, a.title_alias, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
@@ -856,7 +882,7 @@ function showArchiveSection( $id=NULL, $gid, &$access, $pop, $option ) {
 }
 
 
-function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
+function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $year, $month, $module ) {
 	global $database, $mainframe;
 	global $Itemid;
 
@@ -866,11 +892,6 @@ function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
 	// needed for check whether section & category is published
 	$catID 	= ( $id ? $id : 0 );
 	
-	// Parameters
-	$year 	= intval( mosGetParam( $_REQUEST, 'year', 	date( 'Y' ) ) );
-	$month 	= intval( mosGetParam( $_REQUEST, 'month', 	date( 'm' ) ) );
-	$module = intval( mosGetParam( $_REQUEST, 'module', 0 ) );
-
 	// used by archive module
 	if ( $module ) {
 		$check = '';
@@ -906,8 +927,10 @@ function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
 	$database->setQuery( $query );
 	$items 		= $database->loadObjectList();
 	$archives 	= count( $items );
-
-	$voting = votingQuery();
+	
+	// voting control
+	$voting = $params->def( 'rating', '' );
+	$voting = votingQuery($voting);
 	
 	// main query
 	$query = "SELECT a.id, a.title, a.title_alias, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
@@ -979,9 +1002,9 @@ function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
 	} else {
 		// if coming from the Archive Module, the Archive Dropdown selector is not shown
 		if ( $id ) {
-			BlogOutput( $rows, $params, $gid, $access, $pop, $menu, 1 );
+			BlogOutput( $rows, $params, $gid, $access, $pop, $menu, 1, 1 );
 		} else {
-			BlogOutput( $rows, $params, $gid, $access, $pop, $menu, 0 );
+			BlogOutput( $rows, $params, $gid, $access, $pop, $menu, 0, 1 );
 		}
 	}
 
@@ -993,7 +1016,7 @@ function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
 }
 
 
-function BlogOutput ( &$rows, &$params, $gid, &$access, $pop, &$menu, $archive=NULL ) {
+function BlogOutput ( &$rows, &$params, $gid, &$access, $pop, &$menu, $archive=NULL, $archive_page=NULL ) {
 	global $mainframe, $Itemid, $task, $id, $option, $database, $mosConfig_live_site;
 
 	// parameters
@@ -1190,11 +1213,21 @@ function BlogOutput ( &$rows, &$params, $gid, &$access, $pop, &$menu, $archive=N
 				
 				if ( $option == 'com_frontpage' ) {
 					$link 	= 'index.php?option=com_frontpage'. $Itemid_link;
-				} else if ( $archive ) {
+				} else if ( $archive_page ) {
 					$year 	= $params->get( 'year' );
 					$month 	= $params->get( 'month' );
 					
-					$link 	= 'index.php?option=com_content&amp;task='. $task .'&amp;id='. $id . $Itemid_link .'&amp;year='. $year .'&amp;month='. $month;
+					if (!$archive) {
+					// used when access via archive module
+						$id		= '&amp;id=0';
+						$module	= '&amp;module=1';
+					} else {
+					// used when access via menu item
+						$id 	= '&amp;id='. $id;
+						$module	= '';
+					}
+					
+					$link 	= 'index.php?option=com_content&amp;task='. $task . $id . $Itemid_link .'&amp;year='. $year .'&amp;month='. $month . $module;
 				} else {
 					$link 	= 'index.php?option=com_content&amp;task='. $task .'&amp;id='. $id . $Itemid_link;
 				}
@@ -1250,19 +1283,15 @@ function showItem( $uid, $gid, &$access, $pop, $option='com_content', $now ) {
 		;
 	}
 
-	$voting = votingQuery();
-	
 	// main query
 	$query = "SELECT a.*, u.name AS author, u.usertype, cc.name AS category, s.name AS section, g.name AS groups,"
 	. "\n s.published AS sec_pub, cc.published AS cat_pub, s.access AS sec_access, cc.access AS cat_access,"
 	. "\n s.id AS sec_id, cc.id as cat_id"
-	. $voting['select']
 	. "\n FROM #__content AS a"
 	. "\n LEFT JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n LEFT JOIN #__sections AS s ON s.id = cc.section AND s.scope = 'content'"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"
 	. "\n LEFT JOIN #__groups AS g ON a.access = g.id"
-	. $voting['join']
 	. "\n WHERE a.id = $uid"
 	. $xwhere
 	. "\n AND a.access <= $gid"
@@ -1432,6 +1461,22 @@ function show( $row, $params, $gid, &$access, $pop, $option='com_content', $Item
 	// if a popup item (e.g. print page) set popup param to correct value
 	if ( $pop ) {
 		$params->set( 'popup', 1 );
+	}
+	
+	// check if voting/rating enabled
+	if ( $params->get( 'rating' ) ) {
+		// voting query
+		$query = "SELECT ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count"
+		. "\n FROM #__content AS a"
+		. "\n LEFT JOIN #__content_rating AS v ON a.id = v.content_id"
+		. "\n WHERE a.id = $row->id"
+		;
+		$database->setQuery( $query );
+		$database->loadObject($voting);
+
+		// add to $row info
+		$row->rating 		= $voting->rating;
+		$row->rating_count 	= $voting->rating_count;
 	}
 	
 	if ( $params->get( 'section_link' ) || $params->get( 'category_link' ) ) {
@@ -1769,8 +1814,11 @@ function editItem( $uid, $gid, &$access, $sectionid=0, $task, $Itemid ){
 */
 function saveContent( &$access, $task ) {
 	global $database, $mainframe, $my;
-	global $mosConfig_absolute_path, $Itemid;
+	global $mosConfig_absolute_path, $mosConfig_offset, $Itemid;
 
+	// simple spoof check security
+	josSpoofCheck();	
+	
 	$nullDate = $database->getNullDate();
 	
 	$row = new mosContent( $database );
@@ -1940,7 +1988,11 @@ function saveContent( &$access, $task ) {
 		default:
 			$Itemid = mosGetParam( $_POST, 'Returnid', '' );
 			if ( $Itemid ) {
-				$link = 'index.php?option=com_content&task=view&id='. $row->id.'&Itemid='. $Itemid;
+				if ( $access->canEdit ) {
+					$link = 'index.php?option=com_content&task=view&id='. $row->id.'&Itemid='. $Itemid;
+				} else {
+					$link = 'index.php';
+				}
 			} else {
 				$link = strval( mosGetParam( $_POST, 'referer', '' ) );
 			}
@@ -2017,54 +2069,12 @@ function emailContentForm( $uid ) {
  */
 function emailContentSend( $uid ) {
 	global $database, $mainframe;
-	global $mosConfig_live_site, $mosConfig_sitename, $mosConfig_db;
+	global $mosConfig_live_site, $mosConfig_sitename;
 
-	$validate 	= mosGetParam( $_POST, mosHash( $mosConfig_db ), 0 );
+	// simple spoof check security
+	josSpoofCheck(1);	
+	
 	$itemid 	= intval( mosGetParam( $_POST, 'itemid', 0 ) );
-	
-	if (!$validate) {
-		// probably a spoofing attack
-		mosErrorAlert( _NOT_AUTH );
-	}
-
-	// First, make sure the form was posted from a browser.
-	// For basic web-forms, we don't care about anything
-	// other than requests from a browser:   
-	if (!isset( $_SERVER['HTTP_USER_AGENT'] )) {
-		header( "HTTP/1.0 403 Forbidden" );
-		mosErrorAlert( _NOT_AUTH );
-	}
-	
-	// Make sure the form was indeed POST'ed:
-	//  (requires your html form to use: action="post")
-	if (!$_SERVER['REQUEST_METHOD'] == 'POST' ) {
-		header("HTTP/1.0 403 Forbidden");
-		mosErrorAlert( _NOT_AUTH );
-	}
-	
-	// Attempt to defend against header injections:
-	$badStrings = array(
-		'Content-Type:',
-		'MIME-Version:',
-		'Content-Transfer-Encoding:',
-		'bcc:',
-		'cc:'
-	);
-	
-	// Loop through each POST'ed value and test if it contains
-	// one of the $badStrings:
-	foreach ($_POST as $k => $v){
-		foreach ($badStrings as $v2) {
-			if (strpos( $v, $v2 ) !== false) {
-				header( "HTTP/1.0 403 Forbidden" );
-				mosErrorAlert( _NOT_AUTH );
-			}
-		}
-	}   
-	
-	// Made it past spammer test, free up some memory
-	// and continue rest of script:   
-	unset($k, $v, $v2, $badStrings);
 	
 	// check for session cookie
 	// Session Cookie `name`
@@ -2131,7 +2141,7 @@ function recordVote() {
 	$cid 			= intval( mosGetParam( $_REQUEST, 'cid', 0 ) );
 
 	if (($user_rating >= 1) and ($user_rating <= 5)) {
-		$currip = getenv( 'REMOTE_ADDR' );
+		$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
 
 		$query = "SELECT *"
 		. "\n FROM #__content_rating"
@@ -2203,11 +2213,11 @@ function _orderby_sec( $orderby ) {
 			break;
 
 		case 'hits':
-			$orderby = 'a.hits';
+			$orderby = 'a.hits DESC';
 			break;
 
 		case 'rhits':
-			$orderby = 'a.hits DESC';
+			$orderby = 'a.hits';
 			break;
 
 		case 'order':
@@ -2310,10 +2320,10 @@ function _where( $type=1, &$access, &$noauth, $gid, $id, $now=NULL, $year=NULL, 
 	return $where;
 }
 
-function votingQuery() {
+function votingQuery( $active=NULL ) {
 	global $mainframe;
 	
-	$voting	= $mainframe->getCfg( 'vote' );
+	$voting	= ( $active ? $active : $mainframe->getCfg( 'vote' ) );
 
 	if ( $voting ) {
 		// calculate voting count

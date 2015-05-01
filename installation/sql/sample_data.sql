@@ -1,7 +1,7 @@
-# $Id: sample_data.sql 3846 2006-06-04 14:10:01Z stingrey $
+# $Id: sample_data.sql 4067 2006-06-20 15:12:33Z stingrey $
 
 #
-# Dumping data for table `jos_banner`
+# Dumping data for table `#__banner`
 #
 
 INSERT INTO `#__banner` VALUES (1, 1, 'banner', 'OSM 1', 0, 42, 0, 'osmbanner1.png', 'http://www.opensourcematters.org', '2004-07-07 15:31:29', 1, 0, '0000-00-00 00:00:00', NULL, NULL);

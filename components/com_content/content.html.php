@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.html.php 3755 2006-05-31 12:54:01Z stingrey $
+* @version $Id: content.html.php 4113 2006-06-23 22:48:11Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -47,21 +47,29 @@ class HTML_content {
 		}
 		?>
 		<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center" class="contentpane<?php echo $params->get( 'pageclass_sfx' ); ?>">
-		<tr>
-			<td width="60%" valign="top" class="contentdescription<?php echo $params->get( 'pageclass_sfx' ); ?>" colspan="2">
-			<?php
-			if ( $title->image ) {
-				$link = $mosConfig_live_site .'/images/stories/'. $title->image;
-				?>
-				<img src="<?php echo $link;?>" align="<?php echo $title->image_position;?>" hspace="6" alt="<?php echo $title->image;?>" />
-				<?php
-			}
-			echo $title->description;
+		<?php
+		if ( $params->get('description') || $params->get('description_image') ) {
 			?>
-			</td>
-		</tr>
+			<tr>
+				<td width="60%" valign="top" class="contentdescription<?php echo $params->get( 'pageclass_sfx' ); ?>" colspan="2">
+				<?php
+				if ( $params->get('description_image') && $title->image ) {
+					$link = $mosConfig_live_site .'/images/stories/'. $title->image;
+					?>
+					<img src="<?php echo $link;?>" align="<?php echo $title->image_position;?>" hspace="6" alt="<?php echo $title->image;?>" />
+					<?php
+				}
+				if ( $params->get('description') ) {
+					echo $title->description;
+				}
+				?>
+				</td>
+			</tr>
+			<?php
+		}
+		?>
 		<tr>
-			<td>
+			<td width="100%">
 			<?php
 			// Displays the Table of Items in Category View
 			if ( $items ) {
@@ -177,10 +185,10 @@ class HTML_content {
 						if ( $params->get( 'filter' ) ) {
 							?>
 							<td align="right" width="100%" nowrap="nowrap">
-							<?php
-							echo _FILTER .'&nbsp;';
-							?>
-							<input type="text" name="filter" value="<?php echo $lists['filter'];?>" class="inputbox" onchange="document.adminForm.submit();" />
+								<?php
+								echo _FILTER .'&nbsp;';
+								?>
+								<input type="text" name="filter" value="<?php echo $lists['filter'];?>" class="inputbox" onchange="document.adminForm.submit();" />
 							</td>
 							<?php
 						}
@@ -188,10 +196,10 @@ class HTML_content {
 						if ( $params->get( 'order_select' ) ) {
 							?>
 							<td align="right" width="100%" nowrap="nowrap">
-							<?php
-							echo '&nbsp;&nbsp;&nbsp;'. _ORDER_DROPDOWN .'&nbsp;';
-							echo $lists['order'];
-							?>
+								<?php
+								echo '&nbsp;&nbsp;&nbsp;'. _ORDER_DROPDOWN .'&nbsp;';
+								echo $lists['order'];
+								?>
 							</td>
 							<?php
 						}
@@ -199,21 +207,21 @@ class HTML_content {
 						if ( $params->get( 'display' ) ) {
 							?>
 							<td align="right" width="100%" nowrap="nowrap">
-							<?php
-							$order = '';
-							if ( $lists['order_value'] ) {
-								$order = '&amp;order='. $lists['order_value'];
-							}
-							$filter = '';
-							if ( $lists['filter'] ) {
-								$filter = '&amp;filter='. $lists['filter'];
-							}
-
-							$link = 'index.php?option=com_content&amp;task=category&amp;sectionid='. $sectionid .'&amp;id='. $catid .'&amp;Itemid='. $Itemid . $order . $filter;
-							
-							echo '&nbsp;&nbsp;&nbsp;'. _PN_DISPLAY_NR .'&nbsp;';
-							echo $pageNav->getLimitBox( $link );
-							?>
+								<?php
+								$order = '';
+								if ( $lists['order_value'] ) {
+									$order = '&amp;order='. $lists['order_value'];
+								}
+								$filter = '';
+								if ( $lists['filter'] ) {
+									$filter = '&amp;filter='. $lists['filter'];
+								}
+	
+								$link = 'index.php?option=com_content&amp;task=category&amp;sectionid='. $sectionid .'&amp;id='. $catid .'&amp;Itemid='. $Itemid . $order . $filter;
+								
+								echo '&nbsp;&nbsp;&nbsp;'. _PN_DISPLAY_NR .'&nbsp;';
+								echo $pageNav->getLimitBox( $link );
+								?>
 							</td>
 							<?php
 						}
@@ -232,28 +240,28 @@ class HTML_content {
 				if ( $params->get( 'date' ) ) {
 					?>
 					<td class="sectiontableheader<?php echo $params->get( 'pageclass_sfx' ); ?>" width="35%">
-					&nbsp;<?php echo _DATE; ?>
+						<?php echo _DATE; ?>
 					</td>
 					<?php
 				}
 				if ( $params->get( 'title' ) ) {
 					?>
 					<td class="sectiontableheader<?php echo $params->get( 'pageclass_sfx' ); ?>">
-					<?php echo _HEADER_TITLE; ?>
+						<?php echo _HEADER_TITLE; ?>
 					</td>
 					<?php
 				}
 				if ( $params->get( 'author' ) ) {
 					?>
 					<td class="sectiontableheader<?php echo $params->get( 'pageclass_sfx' ); ?>" align="left" width="25%">
-					<?php echo _HEADER_AUTHOR; ?>
+						<?php echo _HEADER_AUTHOR; ?>
 					</td>
 					<?php
 				}
 				if ( $params->get( 'hits' ) ) {
 					?>
 					<td align="center" class="sectiontableheader<?php echo $params->get( 'pageclass_sfx' ); ?>" width="5%">
-					<?php echo _HEADER_HITS; ?>
+						<?php echo _HEADER_HITS; ?>
 					</td>
 					<?php
 				}
@@ -417,7 +425,7 @@ class HTML_content {
 	* @param object An object with the record data
 	* @param boolean If <code>false</code>, the print button links to a popup window.  If <code>true</code> then the print button invokes the browser print method.
 	*/
-	function show( &$row, &$params, &$access, $page=0, $option='com_content', $ItemidCount=NULL ) {
+	function show( &$row, &$params, &$access, $page=0 ) {
 		global $mainframe, $hide_js;
 		global $mosConfig_live_site;
 		global $_MAMBOTS;
@@ -956,6 +964,9 @@ class HTML_content {
 		mosMakeHtmlSafe( $row );
 
 		require_once( $GLOBALS['mosConfig_absolute_path'] . '/includes/HTML_toolbar.php' );
+		
+		// used for spoof hardening
+		$validate = josSpoofValue();
 
 		$Returnid 	= intval( mosGetParam( $_REQUEST, 'Returnid', $Itemid ) );
 		$tabs 		= new mosTabs(0, 1);
@@ -1387,6 +1398,7 @@ class HTML_content {
 		<input type="hidden" name="created_by" value="<?php echo $row->created_by; ?>" />
 		<input type="hidden" name="referer" value="<?php echo ampReplace( @$_SERVER['HTTP_REFERER'] ); ?>" />
 		<input type="hidden" name="task" value="" />
+		<input type="hidden" name="<?php echo $validate; ?>" value="1" />
 		</form>
 		<?php
 	}
@@ -1395,8 +1407,11 @@ class HTML_content {
 	* Writes Email form for filling in the send destination
 	*/
 	function emailForm( $uid, $title, $template='', $itemid ) {
-		global $mosConfig_sitename, $mainframe, $mosConfig_db;
-
+		global $mainframe;
+		
+		// used for spoof hardening
+		$validate = josSpoofValue();
+		
 		$mainframe->setPageTitle( $title );
 		$mainframe->addCustomHeadTag( '<link rel="stylesheet" href="templates/'. $template .'/css/template_css.css" type="text/css" />' );
 		?>
@@ -1468,7 +1483,7 @@ class HTML_content {
 
 		<input type="hidden" name="id" value="<?php echo $uid; ?>" />
 		<input type="hidden" name="itemid" value="<?php echo $itemid; ?>" />
-		<input type="hidden" name="<?php echo mosHash( $mosConfig_db );?>" value="1" />
+		<input type="hidden" name="<?php echo $validate; ?>" value="1" />
 		</form>
 		<?php
 	}
