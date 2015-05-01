@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: poll.php 743 2005-10-31 04:48:00Z stingrey $
+* @version $Id: poll.php 2613 2006-02-25 01:44:55Z stingrey $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -24,8 +24,6 @@ $polls_barheight 	= 2;
 $polls_maxcolors 	= 5;
 $polls_barcolor 	= 0;
 
-$poll = new mosPoll( $database );
-
 $id 	= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 $task 	= mosGetParam( $_REQUEST, 'task', '' );
 
@@ -44,7 +42,7 @@ function pollAddVote( $uid ) {
 
 	$redirect = 1;
 
-	$sessionCookieName 	= md5( 'site'.$GLOBALS['mosConfig_live_site'] );
+	$sessionCookieName 	= mosMainFrame::sessionCookieName();
 	$sessioncookie 		= mosGetParam( $_REQUEST, $sessionCookieName, '' );
 
 	if (!$sessioncookie) {
@@ -118,16 +116,26 @@ function pollresult( $uid ) {
 	$poll = new mosPoll( $database );
 	$poll->load( $uid );
 
-	if (empty($poll->title)) {
-		$poll->id = '';
-		$poll->title = _SELECT_POLL;
+	// if id value is passed and poll not published then exit
+	if ($poll->id != '' && !$poll->published) {
+		mosNotAuth();
+		return;
 	}
 
 	$first_vote = '';
 	$last_vote 	= '';
 	$votes		= '';
 	
-	if (isset($poll->id) && $poll->id != '') {
+	/*
+	Check if there is a poll corresponding to id
+	and if poll is published
+	*/
+	if (isset($poll->id) && $poll->id != '' && $poll->published == 1) {
+		if (empty($poll->title)) {
+			$poll->id = '';
+			$poll->title = _SELECT_POLL;
+		}
+		
 		$query = "SELECT MIN( date ) AS mindate, MAX( date ) AS maxdate"
 		. "\n FROM #__poll_date"
 		. "\n WHERE poll_id = $poll->id"
@@ -152,6 +160,7 @@ function pollresult( $uid ) {
 		$votes = $database->loadObjectList();		
 	}
 
+	// list of polls for dropdown selection
 	$query = "SELECT id, title"
 	. "\n FROM #__polls"
 	. "\n WHERE published = 1"
@@ -159,9 +168,15 @@ function pollresult( $uid ) {
 	;
 	$database->setQuery( $query );
 	$polls = $database->loadObjectList();
-
-	reset( $polls );
-	$link = sefRelToAbs( 'index.php?option=com_poll&amp;task=results&amp;id=\' + this.options[selectedIndex].value + \'&amp;Itemid='. $Itemid .'\' + \'' );
+	
+	// Itemid for dropdown
+	$_Itemid = '';
+	if ( $Itemid && $Itemid != 99999999 ) {
+		$_Itemid = '&amp;Itemid='. $Itemid;
+	}
+	
+	// dropdown output
+	$link = sefRelToAbs( 'index.php?option=com_poll&amp;task=results&amp;id=\' + this.options[selectedIndex].value + \''. $_Itemid .'\' + \'' );
 	$pollist = '<select name="id" class="inputbox" size="1" style="width:200px" onchange="if (this.options[selectedIndex].value != \'\') {document.location.href=\''. $link .'\'}">';
 	$pollist .= '<option value="">'. _SELECT_POLL .'</option>';
 	for ($i=0, $n=count( $polls ); $i < $n; $i++ ) {

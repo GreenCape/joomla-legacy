@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: registration.php 1489 2005-12-20 15:14:54Z Jinx $
+* @version $Id: registration.php 2323 2006-02-12 19:06:40Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -132,7 +132,7 @@ function saveRegistration( $option ) {
 	}
 
 	if (!$row->check()) {
-		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
+		echo "<script> alert('".html_entity_decode($row->getError())."'); window.history.go(-1); </script>\n";
 		exit();
 	}
 
@@ -141,7 +141,7 @@ function saveRegistration( $option ) {
 	$row->registerDate 	= date('Y-m-d H:i:s');
 
 	if (!$row->store()) {
-		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
+		echo "<script> alert('".html_entity_decode($row->getError())."'); window.history.go(-1); </script>\n";
 		exit();
 	}
 	$row->checkin();

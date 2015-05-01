@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.php 1516 2005-12-21 02:16:16Z eddieajau $
+* @version $Id: admin.content.php 2454 2006-02-17 22:17:28Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -17,8 +17,8 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
-$sectionid 	= mosGetParam( $_REQUEST, 'sectionid', 0 );
-$id 		= mosGetParam( $_REQUEST, 'id', '' );
+$sectionid 	= intval( mosGetParam( $_REQUEST, 'sectionid', 0 ) );
+$id 		= intval( mosGetParam( $_REQUEST, 'id', '' ) );
 $cid 		= mosGetParam( $_POST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
@@ -34,7 +34,7 @@ switch ($task) {
 		break;
 
 	case 'editA':
-		editContent( $cid[0], '', $option );
+		editContent( intval( $cid[0] ), '', $option );
 		break;
 
 	case 'go2menu':
@@ -76,11 +76,11 @@ switch ($task) {
 		break;
 
 	case 'orderup':
-		orderContent( $cid[0], -1, $option );
+		orderContent( intval( $cid[0] ), -1, $option );
 		break;
 
 	case 'orderdown':
-		orderContent( $cid[0], 1, $option );
+		orderContent( intval( $cid[0] ), 1, $option );
 		break;
 
 	case 'showarchive':
@@ -104,15 +104,15 @@ switch ($task) {
 		break;
 
 	case 'accesspublic':
-		accessMenu( $cid[0], 0, $option );
+		accessMenu( intval( $cid[0] ), 0, $option );
 		break;
 
 	case 'accessregistered':
-		accessMenu( $cid[0], 1, $option );
+		accessMenu( intval( $cid[0] ), 1, $option );
 		break;
 
 	case 'accessspecial':
-		accessMenu( $cid[0], 2, $option );
+		accessMenu( intval( $cid[0] ), 2, $option );
 		break;
 
 	case 'saveorder':
@@ -131,11 +131,11 @@ switch ($task) {
 function viewContent( $sectionid, $option ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 
-	$catid 				= $mainframe->getUserStateFromRequest( "catid{$option}{$sectionid}", 'catid', 0 );
-	$filter_authorid 	= $mainframe->getUserStateFromRequest( "filter_authorid{$option}{$sectionid}", 'filter_authorid', 0 );
-	$filter_sectionid 	= $mainframe->getUserStateFromRequest( "filter_sectionid{$option}{$sectionid}", 'filter_sectionid', 0 );
-	$limit 				= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart 		= $mainframe->getUserStateFromRequest( "view{$option}{$sectionid}limitstart", 'limitstart', 0 );
+	$catid 				= intval( $mainframe->getUserStateFromRequest( "catid{$option}{$sectionid}", 'catid', 0 ) );
+	$filter_authorid 	= intval( $mainframe->getUserStateFromRequest( "filter_authorid{$option}{$sectionid}", 'filter_authorid', 0 ) );
+	$filter_sectionid 	= intval( $mainframe->getUserStateFromRequest( "filter_sectionid{$option}{$sectionid}", 'filter_sectionid', 0 ) );
+	$limit 				= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart 		= intval( $mainframe->getUserStateFromRequest( "view{$option}{$sectionid}limitstart", 'limitstart', 0 ) );
 	$search 			= $mainframe->getUserStateFromRequest( "search{$option}{$sectionid}", 'search', '' );
 	$search 			= $database->getEscaped( trim( strtolower( $search ) ) );
 	$redirect 			= $sectionid;
@@ -254,12 +254,12 @@ function viewContent( $sectionid, $option ) {
 function viewArchive( $sectionid, $option ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 
-	$catid 				= $mainframe->getUserStateFromRequest( "catidarc{$option}{$sectionid}", 'catid', 0 );
-	$limit 				= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart 		= $mainframe->getUserStateFromRequest( "viewarc{$option}{$sectionid}limitstart", 'limitstart', 0 );
+	$catid 				= intval( $mainframe->getUserStateFromRequest( "catidarc{$option}{$sectionid}", 'catid', 0 ) );
+	$limit 				= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart 		= intval( $mainframe->getUserStateFromRequest( "viewarc{$option}{$sectionid}limitstart", 'limitstart', 0 ) );
+	$filter_authorid 	= intval( $mainframe->getUserStateFromRequest( "filter_authorid{$option}{$sectionid}", 'filter_authorid', 0 ) );
+	$filter_sectionid 	= intval( $mainframe->getUserStateFromRequest( "filter_sectionid{$option}{$sectionid}", 'filter_sectionid', 0 ) );
 	$search 			= $mainframe->getUserStateFromRequest( "searcharc{$option}{$sectionid}", 'search', '' );
-	$filter_authorid 	= $mainframe->getUserStateFromRequest( "filter_authorid{$option}{$sectionid}", 'filter_authorid', 0 );
-	$filter_sectionid 	= $mainframe->getUserStateFromRequest( "filter_sectionid{$option}{$sectionid}", 'filter_sectionid', 0 );
 	$search 			= $database->getEscaped( trim( strtolower( $search ) ) );
 	$redirect 			= $sectionid;
 
@@ -382,31 +382,6 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		}
 	}
 
-	if ( $sectionid == 0 ) {
-		$where = "\n WHERE section NOT LIKE '%com_%'";
-	} else {
-		$where = "\n WHERE section = '$sectionid'";
-	}
-
-	// get the type name - which is a special category
-	 if ($row->sectionid){
-		$query = "SELECT name"
-		. "\n FROM #__sections"
-		. "\n WHERE id = $row->sectionid"
-		;
-		$database->setQuery( $query );
-		$section = $database->loadResult();
-		$contentSection = $section;
-	} else {
-		$query = "SELECT name"
-		. "\n FROM #__sections"
-		. "\n WHERE id = $sectionid"
-		;
-		$database->setQuery( $query );
-		$section = $database->loadResult();
-		$contentSection = $section;
-	}
-
 	// fail if checked out not by 'me'
 	if ($row->checked_out && $row->checked_out != $my->id) {
 		mosRedirect( 'index2.php?option=com_content', 'The module '. $row->title .' is currently being edited by another administrator' );
@@ -421,7 +396,7 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		}
 
  		$row->created 		= mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S' );
-		$row->modified 		= mosFormatDate( $row->modified, '%Y-%m-%d %H:%M:%S' );
+		$row->modified 		= $row->modified == '0000-00-00 00:00:00' ? '' : mosFormatDate( $row->modified, '%Y-%m-%d %H:%M:%S' );
 		$row->publish_up 	= mosFormatDate( $row->publish_up, '%Y-%m-%d %H:%M:%S' );
 
 		$nullDate = $database->getNullDate();
@@ -436,12 +411,17 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		$database->setQuery( $query );
 		$row->creator = $database->loadResult();
 
-		$query = "SELECT name"
-		. "\n FROM #__users"
-		. "\n WHERE id = $row->modified_by"
-		;
-		$database->setQuery( $query );
-		$row->modifier = $database->loadResult();
+		// test to reduce unneeded query
+		if ( $row->created_by == $row->modified_by ) {
+			$row->modifier = $row->creator;
+		} else {
+			$query = "SELECT name"
+			. "\n FROM #__users"
+			. "\n WHERE id = $row->modified_by"
+			;
+			$database->setQuery( $query );
+			$row->modifier = $database->loadResult();
+		}
 
 		$query = "SELECT content_id"
 		. "\n FROM #__content_frontpage"
@@ -465,14 +445,16 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		} else {
 			$row->catid 	= NULL;
 		}
+		
 		$row->sectionid 	= $sectionid;
 		$row->version 		= 0;
 		$row->state 		= 1;
 		$row->ordering 		= 0;
 		$row->images 		= array();
-		$row->publish_up 	= date( 'Y-m-d', time() + $mosConfig_offset * 60 * 60 );
+		$row->publish_up 	= date( 'Y-m-d H:i:s', time() + ( $mosConfig_offset * 60 * 60 ) );
 		$row->publish_down 	= 'Never';
 		$row->creator 		= '';
+		$row->modified 		= '0000-00-00 00:00:00';
 		$row->modifier 		= '';
 		$row->frontpage 	= 0;
 		$menus = array();
@@ -492,39 +474,67 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		$sections = $database->loadObjectList();
 		$lists['sectionid'] = mosHTML::selectList( $sections, 'sectionid', 'class="inputbox" size="1" '. $javascript, 'id', 'title', intval( $row->sectionid ) );
 	}
-
-	$sections = $database->loadObjectList();
+	
+	$contentSection = '';
+	foreach($sections as $section) {
+		$section_list[] = $section->id;
+		// get the type name - which is a special category
+		if ($row->sectionid){
+			if ( $section->id == $row->sectionid ) {
+				$contentSection = $section->title;
+			}
+		} else {
+			if ( $section->id == $sectionid ) {
+				$contentSection = $section->title;
+			}
+		}		
+	}
 
 	$sectioncategories 			= array();
 	$sectioncategories[-1] 		= array();
 	$sectioncategories[-1][] 	= mosHTML::makeOption( '-1', 'Select Category', 'id', 'name' );
+	$section_list 				= implode( '\', \'', $section_list );
+	
+	$query = "SELECT id, name, section"
+	. "\n FROM #__categories"
+	. "\n WHERE section IN ( '$section_list' )"
+	. "\n ORDER BY ordering"
+	;
+	$database->setQuery( $query );
+	$cat_list = $database->loadObjectList();
 	foreach($sections as $section) {
 		$sectioncategories[$section->id] = array();
-		$query = "SELECT id, name"
-		. "\n FROM #__categories"
-		. "\n WHERE section = '$section->id'"
-		. "\n ORDER BY ordering"
-		;
-		$database->setQuery( $query );
-		$rows2 = $database->loadObjectList();
+		$rows2 = array();
+		foreach($cat_list as $cat) {
+			if ($cat->section == $section->id) {
+				$rows2[] = $cat;
+			}
+		}
 		foreach($rows2 as $row2) {
 			$sectioncategories[$section->id][] = mosHTML::makeOption( $row2->id, $row2->name, 'id', 'name' );
 		}
-	}
+	}	
 
  	// get list of categories
   	if ( !$row->catid && !$row->sectionid ) {
  		$categories[] 		= mosHTML::makeOption( '-1', 'Select Category', 'id', 'name' );
  		$lists['catid'] 	= mosHTML::selectList( $categories, 'catid', 'class="inputbox" size="1"', 'id', 'name' );
   	} else {
- 		$query = "SELECT id, name"
- 		. "\n FROM #__categories"
- 		. $where
- 		. "\n ORDER BY ordering"
- 		;
- 		$database->setQuery( $query );
- 		$categories[] 		= mosHTML::makeOption( '-1', 'Select Category', 'id', 'name' );
- 		$categories 		= array_merge( $categories, $database->loadObjectList() );
+		if ( $sectionid == 0 ) {
+			//$where = "\n WHERE section NOT LIKE '%com_%'";
+			foreach($cat_list as $cat) {		
+				$categoriesA[] = $cat;
+			}
+		} else {
+			//$where = "\n WHERE section = '$sectionid'";
+			foreach($cat_list as $cat) {		
+				if ($cat->section == $sectionid) {
+					$categoriesA[] = $cat;
+				}
+			}
+		}		
+		$categories[] 		= mosHTML::makeOption( '-1', 'Select Category', 'id', 'name' );
+		$categories 		= array_merge( $categories, $categoriesA );
  		$lists['catid'] 	= mosHTML::selectList( $categories, 'catid', 'class="inputbox" size="1"', 'id', 'name', intval( $row->catid ) );
   	}
 
@@ -592,20 +602,19 @@ function saveContent( $sectionid, $task ) {
 		exit();
 	}
 
-	$isNew = ( $row->id < 1 );
-	if ($isNew) {
+	if ($row->id) {
+		$row->modified 		= date( 'Y-m-d H:i:s' );
+		$row->modified_by 	= $my->id;
 		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
 		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	} else {
-		$row->modified 		= date( 'Y-m-d H:i:s' );
-		$row->modified_by 	= $my->id;
 		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
 		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	}
 
 	if (strlen(trim( $row->publish_up )) <= 10) {
-  		$row->publish_up .= " 00:00:00";
-	}
+		$row->publish_up .= ' 00:00:00';
+ 	}
 	$row->publish_up = mosFormatDate($row->publish_up, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset );
 
 	$nullDate = $database->getNullDate();

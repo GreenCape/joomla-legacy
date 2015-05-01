@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: configuration.php-dist 506 2005-10-13 05:49:24Z stingrey $
+* @version $Id: configuration.php-dist 2622 2006-02-26 04:16:09Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -40,7 +40,8 @@ $mosConfig_shownoauth = '1';				// Display links & categories users don't have a
 $mosConfig_useractivation = '1';			// Send new registration passwords via e-mail
 $mosConfig_uniquemail = '1';				// Require unique email adress for each user
 $mosConfig_offline_message = 'This site is down for maintenance.<br /> Please check back again soon.';
-$mosConfig_lifetime = '900'; 				// Session time
+$mosConfig_lifetime = '900'; 				// Frontend Session time
+$mosConfig_session_life_admin = '1800'		// Admin Session Time
 $mosConfig_MetaDesc = 'Joomla - the dynamic portal engine and content management system';
 $mosConfig_MetaKeys = 'joomla';
 $mosConfig_MetaTitle = '1';

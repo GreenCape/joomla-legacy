@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.typedcontent.php 652 2005-10-25 22:23:27Z Jinx $
+* @version $Id: admin.typedcontent.php 2447 2006-02-17 20:51:51Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -17,7 +17,7 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
-$id 	= mosGetParam( $_REQUEST, 'id', '' );
+$id 	= intval( mosGetParam( $_REQUEST, 'id', '' ) );
 $cid 	= mosGetParam( $_POST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
@@ -38,7 +38,7 @@ switch ( $task ) {
 		break;
 
 	case 'editA':
-		edit( $cid[0], $option );
+		edit( intval( $cid[0] ), $option );
 		break;
 
 	case 'go2menu':
@@ -63,15 +63,15 @@ switch ( $task ) {
 		break;
 
 	case 'accesspublic':
-		changeAccess( $cid[0], 0, $option );
+		changeAccess( intval( $cid[0] ), 0, $option );
 		break;
 
 	case 'accessregistered':
-		changeAccess( $cid[0], 1, $option );
+		changeAccess( intval( $cid[0] ), 1, $option );
 		break;
 
 	case 'accessspecial':
-		changeAccess( $cid[0], 2, $option );
+		changeAccess( intval( $cid[0] ), 2, $option );
 		break;
 
 	case 'saveorder':
@@ -90,10 +90,10 @@ switch ( $task ) {
 function view( $option ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 
-	$filter_authorid 	= $mainframe->getUserStateFromRequest( "filter_authorid{$option}", 'filter_authorid', 0 );
+	$filter_authorid 	= intval( $mainframe->getUserStateFromRequest( "filter_authorid{$option}", 'filter_authorid', 0 ) );
 	$order 				= $mainframe->getUserStateFromRequest( "zorder", 'zorder', 'c.ordering DESC' );
-	$limit 				= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart 		= $mainframe->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 );
+	$limit 				= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart 		= intval( $mainframe->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 ) );
 	$search 			= $mainframe->getUserStateFromRequest( "search{$option}", 'search', '' );
 	$search 			= $database->getEscaped( trim( strtolower( $search ) ) );
 
@@ -196,28 +196,32 @@ function view( $option ) {
 */
 function edit( $uid, $option ) {
 	global $database, $my, $mainframe;
-	global $mosConfig_absolute_path, $mosConfig_live_site;
+	global $mosConfig_absolute_path, $mosConfig_live_site, $mosConfig_offset;
 
-	$nullDate = $database->getNullDate();
 	$row = new mosContent( $database );
+	$row->load( $uid );
 
 	$lists = array();
 
 	if ($uid) {
-		// load the row from the db table
-		$row->load( $uid );
-
 		// fail if checked out not by 'me'
 		if ($row->isCheckedOut( $my->id )) {
 			mosErrorAlert( "The module ".$row->title." is currently being edited by another administrator" );
 		}
 
 		$row->checkout( $my->id );
+		
 		if (trim( $row->images )) {
 			$row->images = explode( "\n", $row->images );
 		} else {
 			$row->images = array();
 		}
+		
+		$row->created 		= mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S' );
+		$row->modified 		= $row->modified == '0000-00-00 00:00:00' ? '' : mosFormatDate( $row->modified, '%Y-%m-%d %H:%M:%S' );
+		$row->publish_up 	= mosFormatDate( $row->publish_up, '%Y-%m-%d %H:%M:%S' );
+		
+		$nullDate = $database->getNullDate();
 		if (trim( $row->publish_down ) == $nullDate) {
 			$row->publish_down = "Never";
 		}
@@ -229,12 +233,17 @@ function edit( $uid, $option ) {
 		$database->setQuery( $query );
 		$row->creator = $database->loadResult();
 
-		$query = "SELECT name"
-		. "\n FROM #__users"
-		. "\n WHERE id = $row->modified_by"
-		;
-		$database->setQuery( $query );
-		$row->modifier = $database->loadResult();
+		// test to reduce unneeded query
+		if ( $row->created_by == $row->modified_by ) {
+			$row->modifier = $row->creator;
+		} else {
+			$query = "SELECT name"
+			. "\n FROM #__users"
+			. "\n WHERE id = $row->modified_by"
+			;
+			$database->setQuery( $query );
+			$row->modifier = $database->loadResult();
+		}
 
 		// get list of links to this item
 		$and 	= "\n AND componentid = ". $row->id;
@@ -244,11 +253,12 @@ function edit( $uid, $option ) {
 		$row->version 		= 0;
 		$row->state 		= 1;
 		$row->images 		= array();
-		$row->publish_up 	= date( "Y-m-d", time() );
-		$row->publish_down 	= "Never";
+		$row->publish_up 	= date( 'Y-m-d H:i:s', time() + ( $mosConfig_offset * 60 * 60 ) );
+		$row->publish_down 	= 'Never';
 		$row->sectionid 	= 0;
 		$row->catid 		= 0;
 		$row->creator 		= '';
+		$row->modified 		= '0000-00-00 00:00:00';
 		$row->modifier 		= '';
 		$row->ordering 		= 0;
 		$menus = array();
@@ -294,7 +304,7 @@ function edit( $uid, $option ) {
 * Saves the typed content item
 */
 function save( $option, $task ) {
-	global $database, $my;
+	global $database, $my, $mosConfig_offset;
 
 	$nullDate = $database->getNullDate();
 	$menu 		= mosGetParam( $_POST, 'menu', 'mainmenu' );
@@ -306,16 +316,27 @@ function save( $option, $task ) {
 		exit();
 	}
 
-	if ( $row->id ) {
-		$row->modified = date( 'Y-m-d H:i:s' );
-		$row->modified_by = $my->id;
+	if ($row->id) {
+		$row->modified 		= date( 'Y-m-d H:i:s' );
+		$row->modified_by 	= $my->id;
+		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
+		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	} else {
-		$row->created = date( 'Y-m-d H:i:s' );
+		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
 		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	}
-	if (trim( $row->publish_down ) == 'Never') {
+	
+	if (strlen(trim( $row->publish_up )) <= 10) {
+		$row->publish_up .= ' 00:00:00';
+	}
+	$row->publish_up = mosFormatDate($row->publish_up, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset );
+	
+	$nullDate = $database->getNullDate();
+	if (trim( $row->publish_down ) == "Never") {
 		$row->publish_down = $nullDate;
 	}
+	
+	$row->state = mosGetParam( $_REQUEST, 'published', 0 );
 
 	// Save Parameters
 	$params = mosGetParam( $_POST, 'params', '' );
@@ -329,8 +350,6 @@ function save( $option, $task ) {
 
 	// code cleaner for xhtml transitional compliance
 	$row->introtext = str_replace( '<br>', '<br />', $row->introtext );
-
-	$row->state = mosGetParam( $_REQUEST, 'published', 0 );
 
 	$row->title = ampReplace( $row->title );
 	

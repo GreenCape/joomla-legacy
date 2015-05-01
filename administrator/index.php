@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 1838 2006-01-15 14:01:27Z stingrey $
+* @version $Id: index.php 2599 2006-02-24 07:49:49Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -65,6 +65,7 @@ if (isset( $_POST['submit'] )) {
 	$query = "SELECT *"
 	. "\n FROM #__users"
 	. "\n WHERE username = '$usrname'"
+	. "\n AND password = '$pass'"
 	. "\n AND block = 0"
 	;
 	$database->setQuery( $query );

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.mambots.php 652 2005-10-25 22:23:27Z Jinx $
+* @version $Id: admin.mambots.php 2308 2006-02-12 15:58:25Z stingrey $
 * @package Joomla
 * @subpackage Mambots
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -34,7 +34,7 @@ switch ( $task ) {
 
 	case 'new':
 	case 'edit':
-		editMambot( $option, $cid[0], $client );
+		editMambot( $option, intval( $cid[0] ), $client );
 		break;
 
 	case 'editA':
@@ -61,13 +61,13 @@ switch ( $task ) {
 
 	case 'orderup':
 	case 'orderdown':
-		orderMambot( $cid[0], ($task == 'orderup' ? -1 : 1), $option, $client );
+		orderMambot( intval( $cid[0] ), ($task == 'orderup' ? -1 : 1), $option, $client );
 		break;
 
 	case 'accesspublic':
 	case 'accessregistered':
 	case 'accessspecial':
-		accessMenu( $cid[0], $task, $option, $client );
+		accessMenu( intval( $cid[0] ), $task, $option, $client );
 		break;
 
 	case 'saveorder':
@@ -86,8 +86,8 @@ function viewMambots( $option, $client ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 	global $mosConfig_absolute_path;
 
-	$limit 			= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart 	= $mainframe->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 );
+	$limit 			= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart 	= intval( $mainframe->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 ) );
 	$filter_type	= $mainframe->getUserStateFromRequest( "filter_type{$option}{$client}", 'filter_type', 1 );
 	$search 		= $mainframe->getUserStateFromRequest( "search{$option}{$client}", 'search', '' );
 	$search 		= $database->getEscaped( trim( strtolower( $search ) ) );

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: config.class.php 475 2005-10-12 18:57:19Z stingrey $
+* @version $Id: config.class.php 2622 2006-02-26 04:16:09Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -54,23 +54,27 @@ class mosConfig {
 
 // Server Settings
 	/** @var string */
-	var $config_absolute_path	= null;
+	var $config_absolute_path		= null;
 	/** @var string */
-	var $config_live_site		= null;
+	var $config_live_site			= null;
 	/** @var string */
-	var $config_secret			= null;
+	var $config_secret				= null;
 	/** @var int */
-	var $config_gzip			= 0;
+	var $config_gzip				= 0;
 	/** @var int */
-	var $config_lifetime		= null;
+	var $config_lifetime			= 900;
 	/** @var int */
-	var $config_error_reporting	= 0;
+	var $config_session_life_admin	= 1800;
+	/** @var int */
+	var $config_session_type		= 0;
+	/** @var int */
+	var $config_error_reporting		= 0;
 	/** @var string */
-	var $config_helpurl			= 'http://help.joomla.org';
+	var $config_helpurl				= 'http://help.joomla.org';
 	/** @var string */
-	var $config_fileperms		= '0644';
+	var $config_fileperms			= '0644';
 	/** @var string */
-	var $config_dirperms		= '0755';
+	var $config_dirperms			= '0755';
 
 // Locale Settings
 	/** @var string */

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: login.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: login.php 2293 2006-02-11 19:35:36Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -20,9 +20,6 @@ require_once( $mainframe->getPath( 'front_html' ) );
 
 global $database, $my;
 global $mosConfig_live_site;
-
-$return = mosGetParam( $_SERVER, 'REQUEST_URI', null );
-$return = ampReplace( $return );
 
 $menu = new mosMenu( $database );
 $menu->load( $Itemid );

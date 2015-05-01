@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.php 1501 2005-12-20 20:11:18Z Jinx $
+* @version $Id: admin.php 2488 2006-02-19 08:42:36Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -123,13 +123,14 @@ function mosLoadAdminModule( $name, $params=NULL ) {
 }
 
 function mosLoadCustomModule( &$module, &$params ) {
-	global $mosConfig_absolute_path;
+	global $mosConfig_absolute_path, $mosConfig_cachepath;
 
 	$rssurl 			= $params->get( 'rssurl', '' );
 	$rssitems 			= $params->get( 'rssitems', '' );
 	$rssdesc 			= $params->get( 'rssdesc', '' );
 	$moduleclass_sfx 	= $params->get( 'moduleclass_sfx', '' );
-
+	$cachePath			= $mosConfig_cachepath .'/';
+	
 	echo '<table cellpadding="0" cellspacing="0" class="moduletable' . $moduleclass_sfx . '">';
 
 	if ($module->content) {
@@ -140,8 +141,7 @@ function mosLoadCustomModule( &$module, &$params ) {
 
 	// feed output
 	if ( $rssurl ) {
-		$cacheDir = $mosConfig_absolute_path .'/cache/';
-		if (!is_writable( $cacheDir )) {
+		if (!is_writable( $cachePath )) {
 			echo '<tr>';
 			echo '<td>Please make cache directory writable.</td>';
 			echo '</tr>';
@@ -149,38 +149,67 @@ function mosLoadCustomModule( &$module, &$params ) {
 			$LitePath = $mosConfig_absolute_path .'/includes/Cache/Lite.php';
 			require_once( $mosConfig_absolute_path .'/includes/domit/xml_domit_rss_lite.php');
 			$rssDoc = new xml_domit_rss_document_lite();
-			$rssDoc->useCacheLite(true, $LitePath, $cacheDir, 3600);
-			$rssDoc->loadRSS( $rssurl );
-			$totalChannels = $rssDoc->getChannelCount();
-
-			for ($i = 0; $i < $totalChannels; $i++) {
-				$currChannel =& $rssDoc->getChannel($i);
-				echo '<tr>';
-				echo '<td><strong><a href="'. $currChannel->getLink() .'" target="_child">';
-				echo $currChannel->getTitle() .'</a></strong></td>';
-				echo '</tr>';
-				if ($rssdesc) {
-					echo '<tr>';
-					echo '<td>'. $currChannel->getDescription() .'</td>';
-					echo '</tr>';
-				}
-
-				$actualItems = $currChannel->getItemCount();
-				$setItems = $rssitems;
-
-				if ($setItems > $actualItems) {
-					$totalItems = $actualItems;
-				} else {
-					$totalItems = $setItems;
-				}
-
-				for ($j = 0; $j < $totalItems; $j++) {
-					$currItem =& $currChannel->getItem($j);
+			$rssDoc->useCacheLite(true, $LitePath, $cachePath, 3600);
+			$rssDoc->useHTTPClient(true); 
+			$success = $rssDoc->loadRSS( $rssurl );
+			
+			if ( $success )	{		
+				$totalChannels = $rssDoc->getChannelCount();
+	
+				// special handling for feed encoding
+				$encoding = mosCommonHTML::newsfeedEncoding( $rssDoc );
+				
+				for ($i = 0; $i < $totalChannels; $i++) {
+					$currChannel =& $rssDoc->getChannel($i);
+					
+					$feed_title = $currChannel->getTitle();
+					$feed_title = $encoding( $feed_title );
+					$feed_title = html_entity_decode($feed_title);
+					$feed_title = str_replace('&apos;', "'", $feed_title);				
 
 					echo '<tr>';
-					echo '<td><strong><a href="'. $currItem->getLink() .'" target="_child">';
-					echo $currItem->getTitle() .'</a></strong> - '. $currItem->getDescription() .'</td>';
+					echo '<td><strong><a href="'. $currChannel->getLink() .'" target="_child">';
+					echo $feed_title .'</a></strong></td>';
 					echo '</tr>';
+					
+					if ($rssdesc) {
+						$feed_descrip = $currChannel->getDescription();
+						$feed_descrip = $encoding( $feed_descrip );
+						$feed_descrip = html_entity_decode($feed_descrip);
+						$feed_descrip = str_replace('&apos;', "'", $feed_descrip);
+						
+						echo '<tr>';
+						echo '<td>'. $feed_descrip .'</td>';
+						echo '</tr>';
+					}
+	
+					$actualItems = $currChannel->getItemCount();
+					$setItems = $rssitems;
+	
+					if ($setItems > $actualItems) {
+						$totalItems = $actualItems;
+					} else {
+						$totalItems = $setItems;
+					}
+	
+					for ($j = 0; $j < $totalItems; $j++) {
+						$currItem =& $currChannel->getItem($j);
+	
+						$item_title = $currItem->getTitle();
+						$item_title = $encoding( $item_title );
+						$item_title = html_entity_decode($item_title);
+						$item_title = str_replace('&apos;', "'", $item_title);
+						
+						$text 		= $currItem->getDescription();
+						$text 		= $encoding( $text );
+						$text 		= html_entity_decode($text);
+						$text 		= str_replace('&apos;', "'", $text);					
+
+						echo '<tr>';
+						echo '<td><strong><a href="'. $currItem->getLink() .'" target="_child">';
+						echo $item_title .'</a></strong> - '. $text .'</td>';
+						echo '</tr>';
+					}
 				}
 			}
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.banners.php 1596 2005-12-31 05:40:31Z stingrey $
+* @version $Id: admin.banners.php 2301 2006-02-12 10:46:38Z stingrey $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -34,7 +34,7 @@ switch ($task) {
 		break;
 
 	case 'editclient':
-		editBannerClient( $cid[0], $option );
+		editBannerClient( intval( $cid[0] ), $option );
 		break;
 
 	case 'editclientA':
@@ -100,8 +100,8 @@ switch ($task) {
 function viewBanners( $option ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 
-	$limit 		= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart = $mainframe->getUserStateFromRequest( "viewban{$option}limitstart", 'limitstart', 0 );
+	$limit 		= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart = intval( $mainframe->getUserStateFromRequest( "viewban{$option}limitstart", 'limitstart', 0 ) );
 
 	// get the total number of records
 	$query = "SELECT COUNT(*)"
@@ -264,8 +264,8 @@ function removeBanner( $cid ) {
 function viewBannerClients( $option ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 
-	$limit = $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart = $mainframe->getUserStateFromRequest( "viewcli{$option}limitstart", 'limitstart', 0 );
+	$limit 		= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart = intval( $mainframe->getUserStateFromRequest( "viewcli{$option}limitstart", 'limitstart', 0 ) );
 
 	// get the total number of records
 	$query = "SELECT COUNT(*)"

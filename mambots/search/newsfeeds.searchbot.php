@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: newsfeeds.searchbot.php 1268 2005-11-30 22:55:50Z eddieajau $
+* @version $Id: newsfeeds.searchbot.php 2444 2006-02-17 18:59:08Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -29,15 +29,14 @@ function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 	global $database, $my;
 	
 	// load mambot params info
-	$query = "SELECT id"
+	$query = "SELECT params"
 	. "\n FROM #__mambots"
 	. "\n WHERE element = 'newsfeeds.searchbot'"
 	. "\n AND folder = 'search'"
 	;
 	$database->setQuery( $query );
-	$id 	= $database->loadResult();
-	$mambot = new mosMambot( $database );
-	$mambot->load( $id );
+	$database->loadObject($mambot);
+	
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit = $botParams->def( 'search_limit', 50 );
@@ -95,9 +94,11 @@ function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 	. "\n CONCAT( 'index.php?option=com_newsfeeds&task=view&feedid=', a.id ) AS href,"
 	. "\n '1' AS browsernav"
 	. "\n FROM #__newsfeeds AS a"
-	. "\n INNER JOIN #__categories AS b ON b.id = a.catid AND b.access <= '$my->gid'"
+	. "\n INNER JOIN #__categories AS b ON b.id = a.catid"
 	. "\n WHERE ( $where )"
 	. "\n AND a.published = 1"
+	. "\n AND b.published = 1"
+	. "\n AND b.access <= $my->gid"
 	. "\n ORDER BY $order"
 	;
 	$database->setQuery( $query, 0, $limit );

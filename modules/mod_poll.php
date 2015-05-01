@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_poll.php 1830 2006-01-15 12:45:17Z stingrey $
+* @version $Id: mod_poll.php 2407 2006-02-16 16:34:39Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -72,11 +72,13 @@ if (!defined( '_JOS_POLL_MODULE' )) {
 		<form name="form2" method="post" action="<?php echo sefRelToAbs("index.php?option=com_poll&amp;Itemid=$Itemid"); ?>">
 		
 		<table width="95%" border="0" cellspacing="0" cellpadding="1" align="center" class="poll<?php echo $moduleclass_sfx; ?>">
+		<thead>
 		<tr>
-			<td>
-				<b><?php echo $poll->title; ?></b>
+			<td style="font-weight: bold;">
+				<?php echo $poll->title; ?>
 			</td>
 		</tr>
+		</thead>
 		<tr>
 			<td align="center">
 				<table class="pollstableborder<?php echo $moduleclass_sfx; ?>" cellspacing="0" cellpadding="0" border="0">

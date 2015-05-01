@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.trash.php 328 2005-10-02 15:39:51Z Jinx $
+* @version $Id: admin.trash.php 2301 2006-02-12 10:46:38Z stingrey $
 * @package Joomla
 * @subpackage Trash
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -59,8 +59,8 @@ function viewTrash( $option ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 	require_once( $GLOBALS['mosConfig_absolute_path'] . '/administrator/includes/pageNavigation.php' );
 
-	$limit 		= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart = $mainframe->getUserStateFromRequest( "view{". $option ."}limitstart", 'limitstart', 0 );
+	$limit 		= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart = intval( $mainframe->getUserStateFromRequest( "view{". $option ."}limitstart", 'limitstart', 0 ) );
 
 	// get the total number of content
 	$query = "SELECT count(*)"

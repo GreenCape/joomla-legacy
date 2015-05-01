@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: poll.html.php 1830 2006-01-15 12:45:17Z stingrey $
+* @version $Id: poll.html.php 1854 2006-01-17 06:37:18Z stingrey $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -77,14 +77,6 @@ class poll_html {
 						<?php
 						poll_html::graphit( $data_arr, $poll->title, $first_vote, $last_vote );
 						?>
-						</td>
-					</tr>
-					<?php
-				} else {
-					?>
-					<tr>
-						<td valign="bottom">
-						<?php echo _NO_RESULTS; ?>
 						</td>
 					</tr>
 					<?php

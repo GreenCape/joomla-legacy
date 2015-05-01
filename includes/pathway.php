@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pathway.php 1696 2006-01-07 17:00:03Z stingrey $
+* @version $Id: pathway.php 2552 2006-02-23 01:30:49Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -33,29 +33,24 @@ function pathwayMakeLink( $id, $name, $link, $parent ) {
 function showPathway( $Itemid ) {
 	global $database, $option, $task, $mainframe, $mosConfig_absolute_path, $mosConfig_live_site;
 
-	// get the home page
-	$query = "SELECT id, name, link, parent, type"
-	. "\n FROM #__menu"
-	. "\n WHERE menutype = 'mainmenu'"
-	. "\n AND published = 1"
-	. "\n ORDER BY parent, ordering"
-	. "\n LIMIT 1"
-	;
-	$database->setQuery( $query );
-	$home_menu = new mosMenu( $database );
-	$database->loadObject( $home_menu );
-
 	// the the whole menu array and index the array by the id
-	$query = "SELECT id, name, link, parent, type"
+	$query = "SELECT id, name, link, parent, type, menutype"
 	. "\n FROM #__menu"
 	. "\n WHERE published = 1"
-	. "\n ORDER BY parent, ordering"
+	. "\n ORDER BY menutype, parent, ordering"
 	;
 	$database->setQuery( $query );
 	$mitems = $database->loadObjectList( 'id' );
 
-	//$isWin = (substr(PHP_OS, 0, 3) == 'WIN');
-	//$optionstring = $isWin ? $_SERVER['QUERY_STRING'] : $_SERVER['REQUEST_URI'];
+	// get the home page
+	$home_menu = new mosMenu( $database );
+	foreach( $mitems as $mitem ) {
+		if ( $mitem->menutype == 'mainmenu' ) {
+			$home_menu = $mitem;
+			break;
+		}
+	}
+	
 	$optionstring = '';
 	if ( isset( $_SERVER['REQUEST_URI'] ) ) {
 		$optionstring = $_SERVER['REQUEST_URI'];
@@ -74,7 +69,6 @@ function showPathway( $Itemid ) {
 			case 'content':
 			$id = intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 			if ($task=='blogsection'){
-
 				$query = "SELECT title, id"
 				. "\n FROM #__sections"
 				. "\n WHERE id = $id"

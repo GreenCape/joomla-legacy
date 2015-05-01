@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_login.php 739 2005-10-31 04:28:04Z stingrey $
+* @version $Id: mod_login.php 2550 2006-02-23 00:25:34Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -14,9 +14,24 @@
 // no direct access
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
-$return = mosGetParam( $_SERVER, 'REQUEST_URI', null );
+// url of current page that user will be returned to after login
+$url = mosGetParam( $_SERVER, 'REQUEST_URI', null );
+// if return link does not contain https:// & http:// and to url
+if ( strpos($url, 'http:') !== 0 && strpos($url, 'https:') !== 0 ) {
+	$url = mosGetParam( $_SERVER, 'HTTP_HOST', null ) . $url;
+
+	// check if link is https://
+	if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] ) {
+		$return = 'https://'. $url;
+	} else {
+	// normal http:// link
+		$return = 'http://'. $url;
+	}
+} else {
+	$return = $request_uri;
+}
 // converts & to &amp; for xtml compliance
-$return = str_replace( '&', '&amp;', $return );
+$return 				= str_replace( '&', '&amp;', $return );
 
 $registration_enabled 	= $mainframe->getCfg( 'allowUserRegistration' );
 $message_login 			= $params->def( 'login_message', 0 );
@@ -28,20 +43,12 @@ $logout 				= $params->def( 'logout', $return );
 $name 					= $params->def( 'name', 1 );
 $greeting 				= $params->def( 'greeting', 1 );
 
-if ( $name ) {
-	$query = "SELECT name"
-	. "\n FROM #__users"
-	. "\n WHERE id = $my->id"
-	;
-	$database->setQuery( $query );
-	$name = $database->loadResult();
-} else {
-	$name = $my->username;
-}
-
 if ( $my->id ) {
 // Logout output
 // ie HTML when already logged in and trying to logout
+	if ( $name ) {
+		$name = $my->username;
+	}
 	?>
 	<form action="<?php echo sefRelToAbs( 'index.php?option=logout' ); ?>" method="post" name="login">
 	<?php

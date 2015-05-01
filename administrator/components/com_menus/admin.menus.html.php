@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menus.html.php 254 2005-09-29 17:10:05Z stingrey $
+* @version $Id: admin.menus.html.php 2564 2006-02-23 12:14:12Z rmuilwijk $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -200,7 +200,7 @@ class HTML_menusections {
 			</th>
 			<td valign="bottom" nowrap style="color: red;">
 			<?php //echo _MENU_GROUP; ?>
-			* Note that some menu types appear in more that one grouping, but they are still the same menu type.
+			* Note that some menu types appear in more than one grouping, but they are still the same menu type.
 			</td>
 		</tr>
 		</table>

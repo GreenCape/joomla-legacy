@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contacts.searchbot.php 1490 2005-12-20 15:53:29Z Jinx $
+* @version $Id: contacts.searchbot.php 2444 2006-02-17 18:59:08Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -29,15 +29,14 @@ function botSearchContacts( $text, $phrase='', $ordering='' ) {
 	global $database, $my;
 
 	// load mambot params info
-	$query = "SELECT id"
+	$query = "SELECT params"
 	. "\n FROM #__mambots"
 	. "\n WHERE element = 'contacts.searchbot'"
 	. "\n AND folder = 'search'"
 	;
 	$database->setQuery( $query );
-	$id 	= $database->loadResult();
-	$mambot = new mosMambot( $database );
-	$mambot->load( $id );
+	$database->loadObject($mambot);
+	
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit = $botParams->def( 'search_limit', 50 );
@@ -73,7 +72,7 @@ function botSearchContacts( $text, $phrase='', $ordering='' ) {
 	. "\n '2' AS browsernav,"
 	. "\n CONCAT( 'index.php?option=com_contact&task=view&&contact_id=', a.id ) AS href"
 	. "\n FROM #__contact_details AS a"
-	. "\n INNER JOIN #__categories AS b ON b.id = a.catid AND b.access <= '$my->gid'"
+	. "\n INNER JOIN #__categories AS b ON b.id = a.catid"
 	. "\n WHERE ( a.name LIKE '%$text%'"
 	. "\n OR a.misc LIKE '%$text%'"
 	. "\n OR a.con_position LIKE '%$text%'"
@@ -85,6 +84,9 @@ function botSearchContacts( $text, $phrase='', $ordering='' ) {
 	. "\n OR a.telephone LIKE '%$text%'"
 	. "\n OR a.fax LIKE '%$text%' )"
 	. "\n AND a.published = 1"
+	. "\n AND b.published = 1"
+	. "\n AND a.access <= $my->gid"
+	. "\n AND b.access <= $my->gid"
 	. "\n GROUP BY a.id"
 	. "\n ORDER BY $order"
 	;

@@ -1,6 +1,6 @@
 // <?php !! This fools phpdocumentor into parsing this file
 /**
-* @version $Id: joomla.javascript.js 199 2005-09-20 13:29:10Z stingrey $
+* @version $Id: joomla.javascript.js 2316 2006-02-12 17:41:33Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL
@@ -424,6 +424,7 @@ function showCalendar(id) {
 		calendar = cal;		// remember the calendar in the global
 		cal.setRange(1900, 2070);	// min/max year allowed
 		calendar.create();		// create a popup calendar
+		calendar.parseDate(el.value); // set it to a new date
 	}
 	calendar.sel = el;		// inform it about the input field in use
 	calendar.showAtElement(el);	// show the calendar next to the input field

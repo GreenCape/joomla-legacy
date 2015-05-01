@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menumanager.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: admin.menumanager.php 2301 2006-02-12 10:46:38Z stingrey $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -75,8 +75,8 @@ switch ($task) {
 function showMenu( $option ) {
 	global $database, $mainframe, $mosConfig_list_limit;
 
-	$limit 		= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart = $mainframe->getUserStateFromRequest( "view{". $option ."}limitstart", 'limitstart', 0 );
+	$limit 		= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart = intval( $mainframe->getUserStateFromRequest( "view{". $option ."}limitstart", 'limitstart', 0 ) );
 
 	$menuTypes 	= mosAdminMenus::menutypes();
 	$total		= count( $menuTypes );

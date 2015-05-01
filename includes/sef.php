@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: sef.php 1822 2006-01-14 21:22:37Z stingrey $
+* @version $Id: sef.php 2546 2006-02-22 23:25:28Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -179,16 +179,53 @@ if ($mosConfig_sef) {
 		$uri = explode('component/', $_SERVER['REQUEST_URI']);
 		$uri_array = explode('/', $uri[1]);
 		$QUERY_STRING = '';
+		
+		// needed for check if component exists
+		$path 		= $mosConfig_absolute_path .'/components';
+		$dirlist 	= array();
+		if ( is_dir( $path ) ) {
+			$base = opendir( $path );	
+			while (false !== ( $dir = readdir($base) ) ) {
+				if (is_dir($path .'/'. $dir) && $dir !== '.' && $dir !== '..' && strtolower($dir) !== 'cvs' && strtolower($dir) !== '.svn') {
+					$dirlist[] = $dir;
+				}
+			}
+			closedir($base);
+		}
 
 		foreach($uri_array as $value) {
 			$temp = explode(',', $value);
 			if (isset($temp[0]) && $temp[0]!='' && isset($temp[1]) && $temp[1]!='') {
 				$_GET[$temp[0]] 	= $temp[1];
 				$_REQUEST[$temp[0]] = $temp[1];
-				$QUERY_STRING .= $QUERY_STRING=='' ? "$temp[0]=$temp[1]" : "&$temp[0]=$temp[1]";
+				
+				// check to ensure component actually exists
+				if ( $temp[0] == 'option' ) {
+					$check = '';
+					if (count( $dirlist )) {
+						foreach ( $dirlist as $dir ) {
+							if ( $temp[1] == $dir ) {
+								$check = 1;
+								break;
+							}
+						}
+					}
+					// redirect to 404 page if no component found to match url
+					if ( !$check ) {
+						header( 'HTTP/1.0 404 Not Found' );
+						require_once( $mosConfig_absolute_path . '/templates/404.php' );
+						exit( 404 );
+					}
+				}
+				
+				if ( $QUERY_STRING == '' ) {
+					$QUERY_STRING .= "$temp[0]=$temp[1]";
+				} else {
+					$QUERY_STRING .= "&$temp[0]=$temp[1]";
+				}
 			}
 		}
-
+		
 		$_SERVER['QUERY_STRING'] 	= $QUERY_STRING;
 		$REQUEST_URI 				= $uri[0].'index.php?'.$QUERY_STRING;
 		$_SERVER['REQUEST_URI'] 	= $REQUEST_URI;
@@ -212,14 +249,13 @@ if ($mosConfig_sef) {
 		*/
 		$jdir = str_replace( 'index.php', '', $_SERVER['PHP_SELF'] );
 		$juri = str_replace( $jdir, '', $_SERVER['REQUEST_URI'] );
-
-		if ($juri != "" && !eregi( "index\.php", $_SERVER['REQUEST_URI'] ) && !eregi( "index2\.php", $_SERVER['REQUEST_URI'] ) && !eregi( "/\?", $_SERVER['REQUEST_URI'] ) ) {
+		
+		if ($juri != '' && $juri != '/' && !eregi( "index\.php", $_SERVER['REQUEST_URI'] ) && !eregi( "index2\.php", $_SERVER['REQUEST_URI'] ) && !eregi( "/\?", $_SERVER['REQUEST_URI'] ) && $_SERVER['QUERY_STRING'] == '' ) {
 			header( 'HTTP/1.0 404 Not Found' );
 			require_once( $mosConfig_absolute_path . '/templates/404.php' );
 			exit( 404 );
 		}
 	}
-
 }
 
 /**
@@ -231,12 +267,13 @@ function sefRelToAbs( $string ) {
 	global $mosConfig_live_site, $mosConfig_sef, $mosConfig_mbf_content;
 	global $iso_client_lang;
 
+	//multilingual code url support
 	if( $mosConfig_mbf_content && $string!='index.php' && !eregi("^(([^:/?#]+):)",$string) && !strcasecmp(substr($string,0,9),'index.php') && !eregi('lang=', $string) ) {
 		$string .= '&lang='. $iso_client_lang;
 	}
 
+	// SEF URL Handling
 	if ($mosConfig_sef && !eregi("^(([^:/?#]+):)",$string) && !strcasecmp(substr($string,0,9),'index.php')) {
-
 		// Replace all &amp; with &
 		$string = str_replace( '&amp;', '&', $string );
 
@@ -250,6 +287,17 @@ function sefRelToAbs( $string ) {
 
 		$sefstring = '';
 		if ( (eregi('option=com_content',$string) || eregi('option=content',$string) ) && !eregi('task=new',$string) && !eregi('task=edit',$string) ) {
+			// Handle fragment identifiers (ex. #foo)
+			$fragment = '';
+			if (eregi('#', $string)) {
+				$temp = split('#', $string, 2);
+				$string = $temp[0];
+				// ensure fragment identifiers are compatible with HTML4
+				if (preg_match('@^[A-Za-z][A-Za-z0-9:_.-]*$@', $temp[1])) {
+					$fragment = '#'. $temp[1];
+				}
+			}
+			
 			/*
 			Content
 			index.php?option=com_content&task=$task&sectionid=$sectionid&id=$id&Itemid=$Itemid&limit=$limit&limitstart=$limitstart&year=$year&month=$month&module=$module
@@ -317,18 +365,8 @@ function sefRelToAbs( $string ) {
 				
 				$sefstring .= $temp[0].'/';
 			}
-			// Handle fragment identifiers (ex. #foo)
-			if (eregi('#', $string)) {
-				$temp = split('#', $string, 2);
-				$string = $temp[0];
-				// ensure fragment identifiers are compatible with HTML4
-				if (preg_match('@^[A-Za-z][A-Za-z0-9:_.-]*$@', $temp[1])) {
-					$fragment = '#'. $temp[1];
-					$sefstring .= $fragment .'/';
-				}
-			}
-
-			$string = $sefstring;
+			
+			$string = $sefstring . $fragment;
 		} else if (eregi('option=com_',$string) && !eregi('task=new',$string) && !eregi('task=edit',$string)) {
 			/*
 			Components
@@ -345,14 +383,32 @@ function sefRelToAbs( $string ) {
 		}
 
 		// comment line below if you dont have mod_rewrite
-		return $mosConfig_live_site.'/'.$string;
+		return $mosConfig_live_site .'/'. $string;
 
 		// allows SEF without mod_rewrite
 		// uncomment Line 348 and comment out Line 354	
 	
-		// comment out line below if you dont have mod_rewrite
-		//return $mosConfig_live_site.'/index.php/'.$string;
+		// uncomment line below if you dont have mod_rewrite
+		// return $mosConfig_live_site.'/index.php/'.$string;
+		// If the above doesnt work - try uncommenting this line instead
+		// return $mosConfig_live_site.'/index.php?/'.$string;
 	} else {
+	// Handling for when SEF is not activated
+		// Relative link handling
+		if ( !(strpos( $string, $mosConfig_live_site ) === 0) ) {
+			// if URI starts with a "/", means URL is at the root of the host...
+			if (strncmp($string, '/', 1) == 0) {
+				// splits http(s)://xx.xx/yy/zz..." into [1]="htpp(s)://xx.xx" and [2]="/yy/zz...":
+				$live_site_parts = array();
+				eregi("^(https?:[\/]+[^\/]+)(.*$)", $mosConfig_live_site, $live_site_parts);
+				
+				$string = $live_site_parts[1] . $string;
+			} else {
+				// URI doesn't start with a "/" so relative to the page (live-site):
+				$string = $mosConfig_live_site .'/'. $string;
+			}
+		}
+		
 		return $string;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: geshi.php 427 2005-10-09 18:59:01Z stingrey $
+* @version $Id: geshi.php 2411 2006-02-16 17:23:32Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -24,6 +24,11 @@ $_MAMBOTS->registerFunction( 'onPrepareContent', 'botGeshi' );
 function botGeshi( $published, &$row, &$params, $page=0 ) {
 	require_once( $GLOBALS['mosConfig_absolute_path'] . '/includes/domit/xml_saxy_shared.php' );
 
+	// simple performance check to determine whether bot should process further
+	if ( strpos( $row->text, 'pre>' ) === false ) {
+		return true;
+	}
+	
 	// define the regular expression for the bot
 	$regex = "#<pre\s*(.*?)>(.*?)</pre>#s";
 

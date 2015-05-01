@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: frontend.php 1334 2005-12-07 05:32:52Z eddieajau $
+* @version $Id: frontend.php 2456 2006-02-18 01:36:30Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -175,16 +175,12 @@ function mosShowHead() {
 	}
 
 	// support for Firefox Live Bookmarks ability for site syndication
-	$query = "SELECT a.id"
+	$query = "SELECT a.*"
 	. "\n FROM #__components AS a"
 	. "\n WHERE a.name = 'Syndicate'"
 	;
 	$database->setQuery( $query );
-	$id = $database->loadResult();
-
-	// load the row from the db table
-	$row = new mosComponent( $database );
-	$row->load( $id );
+	$database->loadObject( $row );
 
 	// get params definitions
 	$params = new mosParameters( $row->params, $mainframe->getPath( 'com_xml', $row->option ), 'component' );

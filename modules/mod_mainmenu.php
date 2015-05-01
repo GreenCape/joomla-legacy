@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_mainmenu.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: mod_mainmenu.php 2437 2006-02-17 10:37:36Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -153,20 +153,16 @@ if (!defined( '_MOS_MAINMENU_MODULE' )) {
 			$intUserType = 0;
 		}
 
-		if ($mosConfig_shownoauth) {
-			$sql = "SELECT m.*"
-			. "\n FROM #__menu AS m"
-			. "\n WHERE menutype = '". $params->get( 'menutype' ) ."'"
-			. "\n AND published = 1"
-			. "\n ORDER BY parent, ordering";
-		} else {
-			$sql = "SELECT m.*"
-			. "\n FROM #__menu AS m"
-			. "\n WHERE menutype = '". $params->get( 'menutype' ) ."'"
-			. "\n AND published = 1"
-			. "\n AND access <= $my->gid"
-			. "\n ORDER BY parent, ordering";
-		}
+		$and = '';
+		if ( !$mosConfig_shownoauth ) {
+			$and = "\n AND access <= $my->gid";
+		}		
+		$sql = "SELECT m.*"
+		. "\n FROM #__menu AS m"
+		. "\n WHERE menutype = '". $params->get( 'menutype' ) ."'"
+		. "\n AND published = 1"
+		. $and
+		. "\n ORDER BY parent, ordering";
 		$database->setQuery( $sql );
 		$rows = $database->loadObjectList( 'id' );
 

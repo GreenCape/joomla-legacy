@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.modules.php 1805 2006-01-14 14:14:14Z stingrey $
+* @version $Id: admin.modules.php 2612 2006-02-25 01:31:16Z stingrey $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -40,7 +40,7 @@ switch ( $task ) {
 		break;
 
 	case 'edit':
-		editModule( $option, $cid[0], $client );
+		editModule( $option, intval( $cid[0] ), $client );
 		break;
 
 	case 'editA':
@@ -69,13 +69,13 @@ switch ( $task ) {
 
 	case 'orderup':
 	case 'orderdown':
-		orderModule( $cid[0], ($task == 'orderup' ? -1 : 1), $option );
+		orderModule( intval( $cid[0] ), ($task == 'orderup' ? -1 : 1), $option );
 		break;
 
 	case 'accesspublic':
 	case 'accessregistered':
 	case 'accessspecial':
-		accessMenu( $cid[0], $task, $option, $client );
+		accessMenu( intval( $cid[0] ), $task, $option, $client );
 		break;
 
 	case 'saveorder':
@@ -95,8 +95,8 @@ function viewModules( $option, $client ) {
 
 	$filter_position 	= $mainframe->getUserStateFromRequest( "filter_position{$option}{$client}", 'filter_position', 0 );
 	$filter_type	 	= $mainframe->getUserStateFromRequest( "filter_type{$option}{$client}", 'filter_type', 0 );
-	$limit 				= $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit );
-	$limitstart 		= $mainframe->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 );
+	$limit 				= intval( $mainframe->getUserStateFromRequest( "viewlistlimit", 'limit', $mosConfig_list_limit ) );
+	$limitstart 		= intval( $mainframe->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 ) );
 	$search 			= $mainframe->getUserStateFromRequest( "search{$option}{$client}", 'search', '' );
 	$search 			= $database->getEscaped( trim( strtolower( $search ) ) );
 
@@ -326,7 +326,7 @@ function editModule( $option, $uid, $client ) {
 		mosErrorAlert( "The module ".$row->title." is currently being edited by another administrator" );
 	}
 
-	$row->content = htmlspecialchars( str_replace( '&amp;', '&', $row->content ) );
+	$row->content = htmlspecialchars( $row->content );
 
 	if ( $uid ) {
 		$row->checkout( $my->id );

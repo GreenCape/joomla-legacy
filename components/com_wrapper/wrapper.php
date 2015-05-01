@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: wrapper.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: wrapper.php 2430 2006-02-17 02:31:15Z stingrey $
 * @package Joomla
 * @subpackage Wrapper
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -32,7 +32,7 @@ function showWrap( $option ) {
 	$params->def( 'pageclass_sfx', '' );
 	$params->def( 'header', $menu->name );
 	$params->def( 'height', '500' );
-	$params->def( 'height_auto', '1' );
+	$params->def( 'height_auto', '0' );
 	$params->def( 'width', '100%' );
 	$params->def( 'add', '1' );
 	$url = $params->def( 'url', '' );

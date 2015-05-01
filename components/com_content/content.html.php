@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.html.php 1673 2006-01-06 16:49:32Z stingrey $
+* @version $Id: content.html.php 2614 2006-02-25 02:26:07Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -73,7 +73,17 @@ class HTML_content {
 				<br /><br />
 				<?php
 			}
-			?>
+			// New Content Icon
+			if ( $access->canEdit || $access->canEditOwn ) {
+				$link = sefRelToAbs( 'index.php?option=com_content&amp;task=new&amp;sectionid='. $id .'&amp;Itemid='. $Itemid );
+				?>
+				<a href="<?php echo $link; ?>">
+					<img src="<?php echo $mosConfig_live_site;?>/images/M_images/new.png" width="13" height="14" align="middle" border="0" alt="<?php echo _CMN_NEW;?>" />
+						&nbsp;<?php echo _CMN_NEW;?>...</a>
+				<br /><br />
+				<?php
+			}
+			?>				
 			</td>
 		</tr>
 		<tr>
@@ -216,7 +226,7 @@ class HTML_content {
 				}
 				if ( $params->get( 'title' ) ) {
 					?>
-					<td class="sectiontableheader<?php echo $params->get( 'pageclass_sfx' ); ?>" width="45%">
+					<td class="sectiontableheader<?php echo $params->get( 'pageclass_sfx' ); ?>">
 					<?php echo _HEADER_TITLE; ?>
 					</td>
 					<?php
@@ -319,21 +329,6 @@ class HTML_content {
 			<?php
 		}
 		?>
-		<?php
-		if ( $access->canEdit || $access->canEditOwn ) {
-			$link = sefRelToAbs( 'index.php?option=com_content&amp;task=new&amp;sectionid='. $id .'&amp;cid='. $row->id .'&amp;Itemid='. $Itemid );
-			?>
-			<tr>
-				<td colspan="4">
-				<a href="<?php echo $link; ?>">
-				<img src="<?php echo $mosConfig_live_site;?>/images/M_images/new.png" width="13" height="14" align="middle" border="0" alt="<?php echo _CMN_NEW;?>" />
-				&nbsp;<?php echo _CMN_NEW;?>...
-				</a>
-				</td>
-			</tr>
-			<?php
-		}
-		?>
 		</table>
 		<input type="hidden" name="id" value="<?php echo $catid; ?>" />
 		<input type="hidden" name="sectionid" value="<?php echo $sectionid; ?>" />
@@ -407,7 +402,7 @@ class HTML_content {
 
 		// adds mospagebreak heading or title to <site> Title
 		if ( isset($row->page_title) ) {
-			$mainframe->setPageTitle( $row->title .': '. $row->page_title );
+			$mainframe->setPageTitle( $row->title .' '. $row->page_title );
 		}
 
 		// determines the link and link text of the readmore button
@@ -432,11 +427,6 @@ class HTML_content {
 		}
 
 		$no_html = mosGetParam( $_REQUEST, 'no_html', null);
-
-		// for pop-up page
-		if ( $params->get( 'popup' ) && $no_html == 0) {
-			$mainframe->setPageTitle( $mosConfig_sitename .' :: '. $row->title );
-		}
 
 		// determines links to next and prev content items within category
 		if ( $params->get( 'item_navigation' ) ) {
@@ -1332,9 +1322,9 @@ class HTML_content {
 	* Writes Email form for filling in the send destination
 	*/
 	function emailForm( $uid, $title, $template='' ) {
-		global $mosConfig_sitename, $mainframe;
+		global $mosConfig_sitename, $mainframe, $mosConfig_db;
 
-		$mainframe->setPageTitle( $mosConfig_sitename .' :: '. $title );
+		$mainframe->setPageTitle( $title );
 		$mainframe->addCustomHeadTag( '<link rel="stylesheet" href="templates/'. $template .'/css/template_css.css" type="text/css" />' );
 		?>
 		<script language="javascript" type="text/javascript">
@@ -1404,7 +1394,7 @@ class HTML_content {
 		</table>
 
 		<input type="hidden" name="id" value="<?php echo $uid; ?>" />
-		<input type="hidden" name="<?php echo mosHash( 'validate' );?>" value="1" />
+		<input type="hidden" name="<?php echo mosHash( $mosConfig_db );?>" value="1" />
 		</form>
 		<?php
 	}

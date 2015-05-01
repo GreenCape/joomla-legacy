@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 1838 2006-01-15 14:01:27Z stingrey $
+* @version $Id: index.php 2578 2006-02-23 19:10:07Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -31,7 +31,6 @@ if (file_exists( 'installation/index.php' )) {
 	include ('offline.php');
 	exit();
 }
-
 
 // displays offline/maintanance page or bar
 if ($mosConfig_offline == 1) {

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_whosonline.php 1462 2005-12-16 22:55:18Z rhuk $
+* @version $Id: mod_whosonline.php 2478 2006-02-19 02:25:25Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -19,19 +19,22 @@ $showmode 	= $params->get( 'showmode' );
 $content 	= '';
 
 if ($showmode==0 || $showmode==2) {
-	$query = "SELECT COUNT( session_id ) AS guest_online"
+	$query = "SELECT guest, usertype"
 	. "\n FROM #__session"
-	. "\n WHERE guest = 1"
-	. "\n AND ( usertype is NULL OR usertype = '' )";
-	$database->setQuery( $query );
-	$guest_array = $database->loadResult();
-
-	$query = "SELECT COUNT( DISTINCT( username ) ) AS user_online"
-	. "\n FROM #__session"
-	. "\n WHERE guest = 0"
 	;
 	$database->setQuery( $query );
-	$user_array = $database->loadResult();
+	$sessions = $database->loadObjectList();
+
+	$user_array 	= 0;
+	$guest_array 	= 0;
+	foreach( $sessions as $session ) {
+		if ( $session->guest == 1 && !$session->usertype ) {
+			$guest_array++;
+		}
+		if ( $session->guest == 0 ) {
+			$user_array++;
+		}
+	}
 
 	if ($guest_array != 0 && $user_array==0) {
 		if ($guest_array==1) {

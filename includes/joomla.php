@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.php 1817 2006-01-14 19:54:33Z stingrey $
+* @version $Id: joomla.php 2599 2006-02-24 07:49:49Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -167,7 +167,7 @@ class mosAbstractTasker {
 	 * @param string Set the default task
 	 */
 	function mosAbstractTasker( $default='' ) {
-		$taskMap = array();
+		$this->_taskMap = array();
 		$this->_methods = array();
 		foreach (get_class_methods( get_class( $this ) ) as $method) {
 			if (substr( $method, 0, 1 ) != '_') {
@@ -350,23 +350,24 @@ class mosCache {
 */
 class mosMainFrame {
 	/** @var database Internal database class pointer */
-	var $_db				= null;
+	var $_db						= null;
 	/** @var object An object of configuration variables */
-	var $_config			= null;
+	var $_config					= null;
 	/** @var object An object of path variables */
-	var $_path				= null;
+	var $_path						= null;
 	/** @var mosSession The current session */
-	var $_session			= null;
+	var $_session					= null;
 	/** @var string The current template */
-	var $_template			= null;
+	var $_template					= null;
 	/** @var array An array to hold global user state within a session */
-	var $_userstate			= null;
+	var $_userstate					= null;
 	/** @var array An array of page meta information */
-	var $_head				= null;
+	var $_head						= null;
 	/** @var string Custom html string to append to the pathway */
-	var $_custom_pathway	= null;
+	var $_custom_pathway			= null;
 	/** @var boolean True if in the admin client */
-	var $_isAdmin 			= false;
+	var $_isAdmin 					= false;	
+	
 
 	/**
 	* Class constructor
@@ -591,7 +592,7 @@ class mosMainFrame {
 				$this->setUserState( $var_name, $_REQUEST[$req_name] );
 			} else if (!isset( $this->_userstate[$var_name] )) {
 				$this->setUserState( $var_name, $var_default );
-			}
+			}			
 			return $this->_userstate[$var_name];
 		} else {
 			return null;
@@ -616,40 +617,271 @@ class mosMainFrame {
 	* the jos_sessions table.
 	*/
 	function initSession() {
-		$session =& $this->_session;
-		$session = new mosSession( $this->_db );
-		$session->purge(intval( $this->getCfg( 'lifetime' ) ));
+		// initailize session variables
+		$session 	=& $this->_session;
+		$session 	= new mosSession( $this->_db );
+		
+		// purge expired frontend logged sessions only - expiry time set in Global Config
+		$and 		= "\n AND guest = 0 \n AND gid > 0";
+		$session->purge(intval( $this->getCfg( 'lifetime' ) ), $and );
+		// purge expired frontend guest sessions only - expire time fixed at 15 mins
+		$and 		= "\n AND guest = 1 \n AND userid = 0";
+		$session->purge( 900, $and );
 
-		$sessionCookieName = md5( 'site'.$GLOBALS['mosConfig_live_site'] );
-
-		$sessioncookie 	= mosGetParam( $_COOKIE, $sessionCookieName, null );
-		$usercookie 	= mosGetParam( $_COOKIE, 'usercookie', null );
-
-		if ($session->load( md5( $sessioncookie . $_SERVER['REMOTE_ADDR'] ) )) {
-			// Session cookie exists, update time in session table
+		// Session Cookie `name`
+		$sessionCookieName 	= mosMainFrame::sessionCookieName();
+		// Get Session Cookie `value`
+		$sessioncookie 		= mosGetParam( $_COOKIE, $sessionCookieName, null );
+		
+		// Session ID / `value`
+		$sessionValueCheck 	= mosMainFrame::sessionCookieValue( $sessioncookie );
+		//echo mosMakePassword(32);
+		// Check if existing session exists in db corresponding to Session cookie `value` 
+		// extra check added in 1.0.8 to test sessioncookie value is of correct length
+		if ( $sessioncookie && strlen($sessioncookie) == 32 && $sessioncookie != '-' && $session->load($sessionValueCheck) ) {
+			// update time in session table
 			$session->time = time();
 			$session->update();
 		} else {
-			$session->generateId();
-			$session->guest 	= 1;
-			$session->username 	= '';
-			$session->time 		= time();
-			$session->gid 		= 0;
+			// Remember Me Cookie `name`
+			$remCookieName = mosMainFrame::remCookieName_User();
+			
+			// test if cookie found
+			$cookie_found = false;
+			if ( isset($_COOKIE[$sessionCookieName]) || isset($_COOKIE[$remCookieName]) || isset($_POST['force_session']) ) {
+				$cookie_found = true;
+			}
+			
+			// check if neither remembermecookie or sessioncookie found
+			if (!$cookie_found) {
+				// create sessioncookie and set it to a test value set to expire on session end
+				setcookie( $sessionCookieName, '-', false, '/' );				
+			} else {
+			// otherwise, sessioncookie was found, but set to test val or the session expired, prepare for session registration and register the session
+				$session->guest 	= 1;
+				$session->username 	= '';
+				$session->time 		= time();
+				$session->gid 		= 0;
+				// Generate Session Cookie `value`
+				$session->generateId();
 
-			if (!$session->insert()) {
-				die( $session->getError() );
+				if (!$session->insert()) {
+					die( $session->getError() );
+				}
+				
+				// create Session Tracking Cookie set to expire on session end
+				setcookie( $sessionCookieName, $session->getCookie(), false, '/' );
 			}
 
-			setcookie( $sessionCookieName, $session->getCookie(), time() + 43200, '/' );
-			//$_COOKIE["sessioncookie"] = $session->getCookie();
+			// Cookie used by Remember me functionality
+			$remCookieValue	= mosGetParam( $_COOKIE, $remCookieName, null );
+			
+			// test if cookie is correct length			
+			if ( strlen($remCookieValue) == 64 ) {
+				// Separate Values from Remember Me Cookie
+				$remUser	= substr( $remCookieValue, 0, 32 );
+				$remPass	= substr( $remCookieValue, 32, 32 );
 
-			if ($usercookie) {
-				// Remember me cookie exists. Login with usercookie info.
-				$this->login($usercookie['username'], $usercookie['password']);
+				// check if Remember me cookie exists. Login with usercookie info.
+				if ( strlen($remUser) == 32 && strlen($remPass) == 32 ) {
+					$this->login( $remUser, $remPass, 1 );
+				}
 			}
 		}
 	}
+	
+	/*
+	* Function used to conduct admin session duties
+	* Added as of 1.0.8
+	* Deperciated 1.1
+	*/
+	function initSessionAdmin($option) {	
+		global $_VERSION;
+		
+		// logout check
+		if ($option == 'logout') {
+			require 'logout.php';
+			exit();
+		}
+		
+		$site			= $this->getCfg( 'live_site' );
+		
+		// check if session name corresponds to correct format
+		if ( session_name() != md5( $site ) ) {
+			echo "<script>document.location.href='$site/administrator/index.php'</script>\n";
+			exit();
+		}
 
+		// restore some session variables
+		$my 			= new mosUser( $this->_db );
+		$my->id 		= mosGetParam( $_SESSION, 'session_user_id', '' );
+		$my->username 	= mosGetParam( $_SESSION, 'session_username', '' );
+		$my->usertype 	= mosGetParam( $_SESSION, 'session_usertype', '' );
+		$my->gid 		= mosGetParam( $_SESSION, 'session_gid', '' );
+		$my->params		= mosGetParam( $_SESSION, 'session_user_params', '' );
+
+		$session_id 	= mosGetParam( $_SESSION, 'session_id', '' );
+		$logintime 		= mosGetParam( $_SESSION, 'session_logintime', '' );
+		
+		// set garbage cleaning timeout
+		$this->setSessionGarbageClean();
+		
+		// check against db record of session
+		if ( $session_id == md5( $my->id . $my->username . $my->usertype . $logintime ) ) {
+			// check to see if site is a production site
+			// allows multiple logins with same user for a demo site
+			if ( $_VERSION->SITE ) {
+				$query = "SELECT COUNT( session_id )"
+				. "\n FROM #__session"
+				. "\n WHERE session_id = '$session_id'"
+				. "\n AND username = ". $this->_db->Quote( $my->username )
+				. "\n AND userid = ". intval( $my->id )
+				;
+				$this->_db->setQuery( $query );
+				$count = $this->_db->loadResult();
+				
+				// if no entry in session table that corresponds disallow login
+				if ( $count == 0 ) {
+					echo "<script>document.location.href='index.php'</script>\n";
+					exit();
+				}
+			}
+		} else {
+		// session id does not correspond to required session format
+			echo "<script>document.location.href='$site/administrator/index.php'</script>\n";
+			exit();
+		}
+		
+		// update session timestamp
+		$current_time = time();
+		$query = "UPDATE #__session"
+		. "\n SET time = '$current_time'"
+		. "\n WHERE session_id = '$session_id'"
+		;
+		$this->_db->setQuery( $query );
+		$this->_db->query();
+		
+		// purge expired admin sessions only		
+		$past = time() - $this->getCfg( 'session_life_admin' );
+		$query = "DELETE FROM #__session"
+		. "\n WHERE time < '$past'"
+		. "\n AND guest = 1"
+		. "\n AND gid = 0"
+		. "\n AND userid <> 0"
+		;
+		$this->_db->setQuery( $query );
+		$this->_db->query();	
+
+		return $my;
+	}
+	
+	/*
+	* Function used to set Session Garbage Cleaning
+	* garbage cleaning set at configured session time + 600 seconds
+	* Added as of 1.0.8
+	* Deperciated 1.1
+	*/
+	function setSessionGarbageClean() {
+		/** ensure that funciton is only called once */
+		if (!defined( '_JOS_GARBAGECLEAN' )) {
+			define( '_JOS_GARBAGECLEAN', 1 );
+			
+			$garbage_timeout = $this->getCfg('session_life_admin') + 600;
+			ini_set('session.gc_maxlifetime', $garbage_timeout);
+		}
+	}
+	
+	/*
+	* Static Function used to generate the Session Cookie Name
+	* Added as of 1.0.8
+	* Deperciated 1.1
+	*/
+	function sessionCookieName() {
+		global $mainframe;
+		
+		return md5( 'site' . $mainframe->getCfg( 'live_site' ) );		
+	}
+	
+	/*
+	* Static Function used to generate the Session Cookie Value
+	* Added as of 1.0.8
+	* Deperciated 1.1
+	*/
+	function sessionCookieValue( $id=null ) {
+		global $mainframe;		
+	
+		$type 		= $mainframe->getCfg( 'session_type' );
+		
+		$browser 	= @$_SERVER['HTTP_USER_AGENT'];
+		
+		switch ($type) {
+			case 2:
+			// 1.0.0 to 1.0.7 Compatibility
+			// lowest level security
+				$value 			= md5( $id . $_SERVER['REMOTE_ADDR'] );
+				break;
+
+			case 1:
+			// slightly reduced security - 3rd level IP authentication for those behind IP Proxy 
+				$remote_addr 	= explode('.',$_SERVER['REMOTE_ADDR']);
+				$ip				= $remote_addr[0] .'.'. $remote_addr[1] .'.'. $remote_addr[2];
+				$value 			= mosHash( $id . $ip . $browser );
+				break;
+			
+			default:
+			// Highest security level - new default for 1.0.8 and beyond
+				$ip				= $_SERVER['REMOTE_ADDR'];
+				$value 			= mosHash( $id . $ip . $browser );
+				break;
+		}		
+
+		return $value;
+	}
+	
+	/*
+	* Static Function used to generate the Rememeber Me Cookie Name for Username information
+	* Added as of 1.0.8
+	* Depreciated 1.1
+	*/
+	function remCookieName_User() {
+		$value = mosHash( 'remembermecookieusername'. mosMainFrame::sessionCookieName() );
+
+		return $value;
+	}
+	
+	/*
+	* Static Function used to generate the Rememeber Me Cookie Name for Password information
+	* Added as of 1.0.8
+	* Depreciated 1.1
+	*/
+	function remCookieName_Pass() {
+		$value = mosHash( 'remembermecookiepassword'. mosMainFrame::sessionCookieName() );
+
+		return $value;
+	}
+	
+	/*
+	* Static Function used to generate the Remember Me Cookie Value for Username information
+	* Added as of 1.0.8
+	* Depreciated 1.1
+	*/
+	function remCookieValue_User( $username ) {
+		$value = md5( $username . mosHash( @$_SERVER['HTTP_USER_AGENT'] ) );
+
+		return $value;
+	}
+	
+	/*
+	* Static Function used to generate the Remember Me Cookie Value for Password information
+	* Added as of 1.0.8
+	* Depreciated 1.1
+	*/
+	function remCookieValue_Pass( $passwd ) {
+		$value 	= md5( $passwd . mosHash( @$_SERVER['HTTP_USER_AGENT'] ) );
+		
+		return $value;
+	}
+	
 	/**
 	* Login validation function
 	*
@@ -657,54 +889,83 @@ class mosMainFrame {
 	* table. A successful validation updates the current session record with
 	* the users details.
 	*/
-	function login( $username=null,$passwd=null ) {
-		global $acl;
-
-		$usercookie 	= mosGetParam( $_COOKIE, 'usercookie', '' );
-		$sessioncookie 	= mosGetParam( $_COOKIE, 'sessioncookie', '' );
+	function login( $username=null,$passwd=null, $remember=null ) {
+		global $acl, $_VERSION;
+		
+		// if no username and password passed from function, then function is being called from login module/component
 		if (!$username || !$passwd) {
-			$username 	= mosGetParam( $_POST, 'username', '' );
+			$username 	= strval( mosGetParam( $_POST, 'username', '' ) );
 			$passwd 	= mosGetParam( $_POST, 'passwd', '' );
 			$passwd 	= md5( $passwd );
 			$bypost 	= 1;
 		}
-		$remember = mosGetParam( $_POST, 'remember', '' );
 
 		if (!$username || !$passwd) {
 			echo "<script> alert(\""._LOGIN_INCOMPLETE."\"); window.history.go(-1); </script>\n";
 			exit();
 		} else {
-			$query = "SELECT *"
-			. "\n FROM #__users"
-			. "\n WHERE username = '$username'"
-			. "\n AND password = '$passwd'"
-			;
+			if ( $remember && strlen($username) == 32 && strlen($passwd) == 32 ) {
+			// query used for remember me cookie
+				$harden = mosHash( @$_SERVER['HTTP_USER_AGENT'] );
+
+				$query = "SELECT *"
+				. "\n FROM #__users"
+				. "\n WHERE block != 1"
+				. "\n AND MD5( CONCAT( username , '$harden' ) ) = '$username'"
+				. "\n AND MD5( CONCAT( password , '$harden' ) ) = '$passwd'"
+				;
+			} else {
+			// query used for normal login
+				$query = "SELECT *"
+				. "\n FROM #__users"
+				. "\n WHERE block != 1"
+				. "\n AND username = '$username'"
+				. "\n AND password = '$passwd'"
+				;
+			}
 			$this->_db->setQuery( $query );
 			$row = null;
+			
 			if ($this->_db->loadObject( $row )) {
+				// user blocked from login
 				if ($row->block == 1) {
 					mosErrorAlert(_LOGIN_BLOCKED);
 				}
+				
 				// fudge the group stuff
 				$grp = $acl->getAroGroup( $row->id );
 				$row->gid = 1;
-
-				if ($acl->is_group_child_of( $grp->name, 'Registered', 'ARO' ) ||
-				$acl->is_group_child_of( $grp->name, 'Public Backend', 'ARO' )) {
+				if ($acl->is_group_child_of( $grp->name, 'Registered', 'ARO' ) || $acl->is_group_child_of( $grp->name, 'Public Backend', 'ARO' )) {
 					// fudge Authors, Editors, Publishers and Super Administrators into the Special Group
 					$row->gid = 2;
 				}
 				$row->usertype = $grp->name;
 
-				$session =& $this->_session;
-				$session->guest 		= 0;
-				$session->username 		= $username;
-				$session->userid 		= intval( $row->id );
-				$session->usertype 		= $row->usertype;
-				$session->gid 			= intval( $row->gid );
-
+				// initialize session data
+				$session 			=& $this->_session;
+				$session->guest 	= 0;
+				$session->username 	= $row->username;
+				$session->userid 	= intval( $row->id );
+				$session->usertype 	= $row->usertype;
+				$session->gid 		= intval( $row->gid );
 				$session->update();
-
+				
+				// check to see if site is a production site
+				// allows multiple logins with same user for a demo site
+				if ( $_VERSION->SITE ) {
+					// delete any old front sessions to stop duplicate sessions
+					$query = "DELETE FROM #__session"
+					. "\n WHERE session_id != '$session->session_id'"
+					. "\n AND username = '$row->username'"
+					. "\n AND userid = $row->id"
+					. "\n AND gid = $row->gid"
+					. "\n AND guest = 0"
+					;
+					$this->_db->setQuery( $query );
+					$this->_db->query();	
+				}
+				
+				// update user visit data
 				$currentDate = date("Y-m-d\TH:i:s");
 				$query = "UPDATE #__users"
 				. "\n SET lastvisitDate = '$currentDate'"
@@ -715,49 +976,53 @@ class mosMainFrame {
 					die($this->_db->stderr(true));
 				}
 
-				if ($remember=="yes") {
-					$lifetime = time() + 365*24*60*60;
-					setcookie( "usercookie[username]", $username, $lifetime, "/" );
-					setcookie( "usercookie[password]", $passwd, $lifetime, "/" );
+				// set remember me cookie if selected
+				$remember = mosGetParam( $_POST, 'remember', '' );
+				if ( $remember == 'yes' ) {
+					// cookie lifetime of 365 days
+					$lifetime 		= time() + 365*24*60*60;
+					$remCookieName 	= mosMainFrame::remCookieName_User();
+					$remCookieValue = mosMainFrame::remCookieValue_User( $row->username ) . mosMainFrame::remCookieValue_Pass( $row->password );
+					setcookie( $remCookieName, $remCookieValue, $lifetime, '/' );
 				}
-				//mosCache::cleanCache('com_content');
 				mosCache::cleanCache();
 			} else {
 				if (isset($bypost)) {
 					mosErrorAlert(_LOGIN_INCORRECT);
 				} else {
 					$this->logout();
-					mosRedirect("index.php");
+					mosRedirect('index.php');
 				}
 				exit();
 			}
 		}
 	}
+	
 	/**
 	* User logout
 	*
 	* Reverts the current session record back to 'anonymous' parameters
 	*/
 	function logout() {
-		//mosCache::cleanCache('com_content');
 		mosCache::cleanCache();
-		$session =& $this->_session;
-
-		$session->guest 		= 1;
-		$session->username 		= '';
-		$session->userid 		= '';
-		$session->usertype 		= '';
-		$session->gid = 0;
+		
+		$session 			=& $this->_session;
+		$session->guest 	= 1;
+		$session->username 	= '';
+		$session->userid 	= '';
+		$session->usertype 	= '';
+		$session->gid 		= 0;
 
 		$session->update();
 
-		// this is daggy??
-		$lifetime = time() - 1800;
-		setcookie( "usercookie[username]", " ", $lifetime, "/" );
-		setcookie( "usercookie[password]", " ", $lifetime, "/" );
-		setcookie( "usercookie", " ", $lifetime, "/" );
+		// kill remember me cookie
+		$lifetime 		= time() - 86400;
+		$remCookieName 	= mosMainFrame::remCookieName_User();
+		setcookie( $remCookieName, ' ', $lifetime, '/' );
+		
 		@session_destroy();
 	}
+	
 	/**
 	* @return mosUser A user object with the information from the current session
 	*/
@@ -801,30 +1066,7 @@ class mosMainFrame {
 	function _setTemplate( $isAdmin=false ) {
 		global $Itemid;
 		$mosConfig_absolute_path = $this->getCfg( 'absolute_path' );
-/*
-Unneeded Query
-http://developer.joomla.org/sf/go/artf1710?nav=1
-		// Default template
-		$query = "SELECT template"
-		. "\n FROM #__templates_menu"
-		. "\n WHERE client_id = 0"
-		. "\n AND menuid = 0"
-		;
-		$this->_db->setQuery( $query );
-		$cur_template = $this->_db->loadResult();
 
-		// Assigned template
-		if (isset($Itemid) && $Itemid!="" && $Itemid!=0) {
-			$query = "SELECT template"
-			. "\n FROM #__templates_menu"
-			. "\n WHERE client_id = 0"
-			. "\n AND menuid = $Itemid"
-			. "\n LIMIT 1"
-			;
-			$this->_db->setQuery( $query );
-			$cur_template = $this->_db->loadResult() ? $this->_db->loadResult() : $cur_template;
-		}
-*/
 		if ($isAdmin) {
 			$query = "SELECT template"
 			. "\n FROM #__templates_menu"
@@ -854,10 +1096,16 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 			$jos_user_template 		= mosGetParam( $_COOKIE, 'jos_user_template', '' );
 			$jos_change_template 	= mosGetParam( $_REQUEST, 'jos_change_template', $jos_user_template );
 			if ($jos_change_template) {
+				// clean template name
+				$jos_change_template = preg_replace( '#\W#', '', $jos_change_template );
+				if ( strlen( $jos_change_template ) >= 40 ) {
+					$jos_change_template = substr($jos_change_template, 0 , 39);
+				}
+				
 				// check that template exists in case it was deleted
 				if (file_exists( $mosConfig_absolute_path .'/templates/'. $jos_change_template .'/index.php' )) {
-					$lifetime = 60*10;
-					$cur_template = $jos_change_template;
+					$lifetime 		= 60*10;
+					$cur_template 	= $jos_change_template;
 					setcookie( 'jos_user_template', "$jos_change_template", time()+$lifetime);
 				} else {
 					setcookie( 'jos_user_template', '', time()-3600 );
@@ -1122,98 +1370,223 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 	*/
 	function getItemid( $id, $typed=1, $link=1, $bs=1, $bc=1, $gbs=1 ) {
 		global $Itemid;
+		
+		$bs 	= $this->get( '_BlogSectionCount' );
+		$bc 	= $this->get( '_BlogCategoryCount' );
+		$gbs 	= $this->get( '_GlobalBlogSectionCount' );
 
 		$_Itemid = '';
 		if ($_Itemid == '' && $typed) {
-			// Search for typed link
-			$query = "SELECT id"
-			. "\n FROM #__menu"
-			. "\n WHERE type = 'content_typed'"
-			. "\n AND published = 1"
-			. "\n AND link = 'index.php?option=com_content&task=view&id=$id'"
-			;
-			$this->_db->setQuery( $query );
-			$_Itemid = $this->_db->loadResult();
+			$exists = 0;
+			foreach( $this->get( '_ContentTyped', array() ) as $key => $value ) {
+				// check if id has been tested before, if it is pull from class variable store
+				if ( $key == $id ) {
+					$_Itemid 	= $value;
+					$exists 	= 1;
+					break;
+				}
+			}
+			// if id hasnt been checked before initaite query
+			if ( !$exists ) {				
+				// Search for typed link
+				$query = "SELECT id"
+				. "\n FROM #__menu"
+				. "\n WHERE type = 'content_typed'"
+				. "\n AND published = 1"
+				. "\n AND link = 'index.php?option=com_content&task=view&id=$id'"
+				;
+				$this->_db->setQuery( $query );
+				// pull existing query storage into temp variable
+				$ContentTyped 		= $this->get( '_ContentTyped', array() );
+				// add query result to temp array storage
+				$ContentTyped[$id] 	= $this->_db->loadResult();	
+				// save temp array to main array storage
+				$this->set( '_ContentTyped', $ContentTyped );
+				
+				$_Itemid = $ContentTyped[$id];				
+			}
 		}
 
 		if ($_Itemid == '' && $link) {
-			// Search for item link
-			$query = "SELECT id"
-			."\n FROM #__menu"
-			."\n WHERE type = 'content_item_link'"
-			. "\n AND published = 1"
-			. "\n AND link = 'index.php?option=com_content&task=view&id=$id'"
-			;
-			$this->_db->setQuery( $query );
-			$_Itemid = $this->_db->loadResult();
+			$exists = 0;
+			foreach( $this->get( '_ContentItemLink', array() ) as $key => $value ) {
+				// check if id has been tested before, if it is pull from class variable store
+				if ( $key == $id ) {
+					$_Itemid 	= $value;
+					$exists 	= 1;
+					break;
+				}
+			}
+			// if id hasnt been checked before initaite query
+			if ( !$exists ) {				
+				// Search for item link
+				$query = "SELECT id"
+				."\n FROM #__menu"
+				."\n WHERE type = 'content_item_link'"
+				. "\n AND published = 1"
+				. "\n AND link = 'index.php?option=com_content&task=view&id=$id'"
+				;
+				$this->_db->setQuery( $query );
+				// pull existing query storage into temp variable
+				$ContentItemLink 		= $this->get( '_ContentItemLink', array() );
+				// add query result to temp array storage
+				$ContentItemLink[$id] 	= $this->_db->loadResult();	
+				// save temp array to main array storage
+				$this->set( '_ContentItemLink', $ContentItemLink );
+				
+				$_Itemid = $ContentItemLink[$id];				
+			}
 		}
 
 		if ($_Itemid == '') {
-			// Search in sections
-			$query = "SELECT m.id "
-			. "\n FROM #__content AS i"
-			. "\n LEFT JOIN #__sections AS s ON i.sectionid = s.id"
-			. "\n LEFT JOIN #__menu AS m ON m.componentid = s.id "
-			. "\n WHERE m.type = 'content_section'"
-			. "\n AND m.published = 1"
-			. "\n AND i.id = $id"
-			;
-			$this->_db->setQuery( $query );
-			$_Itemid = $this->_db->loadResult();
+			$exists = 0;
+			foreach( $this->get( '_ContentSection', array() ) as $key => $value ) {
+			// check if id has been tested before, if it is pull from class variable store
+				if ( $key == $id ) {
+					$_Itemid 	= $value;
+					$exists 	= 1;
+					break;
+				}
+			}
+			// if id hasnt been checked before initaite query
+			if ( !$exists ) {
+				// Search in sections
+				$query = "SELECT m.id "
+				. "\n FROM #__content AS i"
+				. "\n LEFT JOIN #__sections AS s ON i.sectionid = s.id"
+				. "\n LEFT JOIN #__menu AS m ON m.componentid = s.id "
+				. "\n WHERE m.type = 'content_section'"
+				. "\n AND m.published = 1"
+				. "\n AND i.id = $id"
+				;
+				$this->_db->setQuery( $query );
+				// pull existing query storage into temp variable
+				$ContentSection 		= $this->get( '_ContentSection', array() );
+				// add query result to temp array storage
+				$ContentSection[$id] 	= $this->_db->loadResult();	
+				// save temp array to main array storage
+				$this->set( '_ContentSection', $ContentSection );
+				
+				$_Itemid = $ContentSection[$id];				
+			}
 		}
 
 		if ($_Itemid == '' && $bs) {
-			// Search in specific blog section
-			$query = "SELECT m.id "
-			. "\n FROM #__content AS i"
-			. "\n LEFT JOIN #__sections AS s ON i.sectionid = s.id"
-			. "\n LEFT JOIN #__menu AS m ON m.componentid = s.id "
-			. "\n WHERE m.type = 'content_blog_section'"
-			. "\n AND m.published = 1"
-			. "\n AND i.id = $id"
-			;
-			$this->_db->setQuery( $query );
-			$_Itemid = $this->_db->loadResult();
+			$exists = 0;
+			foreach( $this->get( '_ContentBlogSection', array() ) as $key => $value ) {
+				// check if id has been tested before, if it is pull from class variable store
+				if ( $key == $id ) {
+					$_Itemid 	= $value;
+					$exists 	= 1;
+					break;
+				}
+			}
+			// if id hasnt been checked before initaite query
+			if ( !$exists ) {
+				// Search in specific blog section
+				$query = "SELECT m.id "
+				. "\n FROM #__content AS i"
+				. "\n LEFT JOIN #__sections AS s ON i.sectionid = s.id"
+				. "\n LEFT JOIN #__menu AS m ON m.componentid = s.id "
+				. "\n WHERE m.type = 'content_blog_section'"
+				. "\n AND m.published = 1"
+				. "\n AND i.id = $id"
+				;
+				$this->_db->setQuery( $query );
+				// pull existing query storage into temp variable
+				$ContentBlogSection 		= $this->get( '_ContentBlogSection', array() );
+				// add query result to temp array storage
+				$ContentBlogSection[$id] 	= $this->_db->loadResult();	
+				// save temp array to main array storage
+				$this->set( '_ContentBlogSection', $ContentBlogSection );
+				
+				$_Itemid = $ContentBlogSection[$id];				
+			}
 		}
 
 		if ($_Itemid == '' && $bc) {
-			// Search in specific blog category
-			$query = "SELECT m.id "
-			. "\n FROM #__content AS i"
-			. "\n LEFT JOIN #__categories AS c ON i.catid = c.id"
-			. "\n LEFT JOIN #__menu AS m ON m.componentid = c.id "
-			. "\n WHERE m.type = 'content_blog_category'"
-			. "\n AND m.published = 1"
-			. "\n AND i.id = $id"
-			;
-			$this->_db->setQuery( $query );
-			$_Itemid = $this->_db->loadResult();
+			$exists = 0;
+			foreach( $this->get( '_ContentBlogCategory', array() ) as $key => $value ) {
+				// check if id has been tested before, if it is pull from class variable store
+				if ( $key == $id ) {
+					$_Itemid 	= $value;
+					$exists 	= 1;
+					break;
+				}
+			}
+			// if id hasnt been checked before initaite query
+			if ( !$exists ) {
+				// Search in specific blog category
+				$query = "SELECT m.id "
+				. "\n FROM #__content AS i"
+				. "\n LEFT JOIN #__categories AS c ON i.catid = c.id"
+				. "\n LEFT JOIN #__menu AS m ON m.componentid = c.id "
+				. "\n WHERE m.type = 'content_blog_category'"
+				. "\n AND m.published = 1"
+				. "\n AND i.id = $id"
+				;
+				$this->_db->setQuery( $query );
+				// pull existing query storage into temp variable
+				$ContentBlogCategory 		= $this->get( '_ContentBlogCategory', array() );
+				// add query result to temp array storage
+				$ContentBlogCategory[$id] 	= $this->_db->loadResult();	
+				// save temp array to main array storage
+				$this->set( '_ContentBlogCategory', $ContentBlogCategory );
+				
+				$_Itemid = $ContentBlogCategory[$id];				
+			}
 		}
 
 		if ($_Itemid == '' && $gbs) {
-			// Search in global blog section
-			$query = "SELECT id "
-			. "\n FROM #__menu "
-			. "\n WHERE type = 'content_blog_section'"
-			. "\n AND published = 1"
-			. "\n AND componentid = 0"
-			;
-			$this->_db->setQuery( $query );
-			$_Itemid = $this->_db->loadResult();
+			// ensure that query is only called once		
+			if ( !$this->get( '_GlobalBlogSection' ) && !defined( '_JOS_GBS' ) ) {					
+				define( '_JOS_GBS', 1 );
+				
+				// Search in global blog section
+				$query = "SELECT id "
+				. "\n FROM #__menu "
+				. "\n WHERE type = 'content_blog_section'"
+				. "\n AND published = 1"
+				. "\n AND componentid = 0"
+				;
+				$this->_db->setQuery( $query );
+				$this->set( '_GlobalBlogSection', $this->_db->loadResult() );
+			}
+			
+			$_Itemid = $this->get( '_GlobalBlogSection' );
 		}
 
 		if ($_Itemid == '') {
-			// Search in categories
-			$query = "SELECT m.id "
-			. "\n FROM #__content AS i"
-			. "\n LEFT JOIN #__categories AS cc ON i.catid = cc.id"
-			. "\n LEFT JOIN #__menu AS m ON m.componentid = cc.id "
-			. "\n WHERE m.type = 'content_category'"
-			. "\n AND m.published = 1"
-			. "\n AND i.id = $id"
-			;
-			$this->_db->setQuery( $query );
-			$_Itemid = $this->_db->loadResult();
+			$exists = 0;
+			foreach( $this->get( '_ContentCategory', array() ) as $key => $value ) {
+				// check if id has been tested before, if it is pull from class variable store
+				if ( $key == $id ) {
+					$_Itemid 	= $value;
+					$exists 	= 1;
+					break;
+				}
+			}
+			// if id hasnt been checked before initaite query
+			if ( !$exists ) {
+				// Search in categories
+				$query = "SELECT m.id "
+				. "\n FROM #__content AS i"
+				. "\n LEFT JOIN #__categories AS cc ON i.catid = cc.id"
+				. "\n LEFT JOIN #__menu AS m ON m.componentid = cc.id "
+				. "\n WHERE m.type = 'content_category'"
+				. "\n AND m.published = 1"
+				. "\n AND i.id = $id"
+				;
+				$this->_db->setQuery( $query );
+				// pull existing query storage into temp variable
+				$ContentCategory 		= $this->get( '_ContentCategory', array() );
+				// add query result to temp array storage
+				$ContentCategory[$id] 	= $this->_db->loadResult();	
+				// save temp array to main array storage
+				$this->set( '_ContentCategory', $ContentCategory );
+				
+				$_Itemid = $ContentCategory[$id];				
+			}
 		}
 
 		if ( $_Itemid != '' ) {
@@ -1227,71 +1600,105 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 	* @return number of Published Blog Sections
 	*/
 	function getBlogSectionCount( ) {
-		$query = "SELECT COUNT( id )"
-		."\n FROM #__menu "
-		."\n WHERE type = 'content_blog_section'"
-		."\n AND published = 1"
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-		return $count;
+		// ensure that query is only called once		
+		if ( !$this->get( '_BlogSectionCount' ) && !defined( '_JOS_BSC' ) ) {		
+			define( '_JOS_BSC', 1 );
+			
+			$query = "SELECT COUNT( id )"
+			."\n FROM #__menu "
+			."\n WHERE type = 'content_blog_section'"
+			."\n AND published = 1"
+			;
+			$this->_db->setQuery( $query );
+			// saves query result to variable
+			$this->set( '_BlogSectionCount', $this->_db->loadResult() );
+		}
+		
+		return $this->get( '_BlogSectionCount' );
 	}
 
 	/**
 	* @return number of Published Blog Categories
 	*/
 	function getBlogCategoryCount( ) {
-		$query = "SELECT COUNT( id )"
-		."\n FROM #__menu "
-		. "\n WHERE type = 'content_blog_category'"
-		. "\n AND published = 1"
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-		return $count;
+		// ensure that query is only called once		
+		if ( !$this->get( '_BlogCategoryCount' )&& !defined( '_JOS_BCC' ) ) {
+			define( '_JOS_BCC', 1 );
+			
+			$query = "SELECT COUNT( id )"
+			."\n FROM #__menu "
+			. "\n WHERE type = 'content_blog_category'"
+			. "\n AND published = 1"
+			;
+			$this->_db->setQuery( $query );
+			// saves query result to variable
+			$this->set( '_BlogCategoryCount', $this->_db->loadResult() );
+		}
+		
+		return $this->get( '_BlogCategoryCount' );
 	}
 
 	/**
 	* @return number of Published Global Blog Sections
 	*/
 	function getGlobalBlogSectionCount( ) {
-		$query = "SELECT COUNT( id )"
-		."\n FROM #__menu "
-		."\n WHERE type = 'content_blog_section'"
-		."\n AND published = 1"
-		."\n AND componentid = 0"
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-		return $count;
+		// ensure that query is only called once		
+		if ( !$this->get( '_GlobalBlogSectionCount' ) && !defined( '_JOS_GBSC' ) ) {		
+			define( '_JOS_GBSC', 1 );
+			
+			$query = "SELECT COUNT( id )"
+			."\n FROM #__menu "
+			."\n WHERE type = 'content_blog_section'"
+			."\n AND published = 1"
+			."\n AND componentid = 0"
+			;
+			$this->_db->setQuery( $query );
+			// saves query result to variable
+			$this->set( '_GlobalBlogSectionCount', $this->_db->loadResult() );
+		}
+		
+		return $this->get( '_GlobalBlogSectionCount' );
 	}
 
 	/**
 	* @return number of Static Content
 	*/
 	function getStaticContentCount( ) {
-		$query = "SELECT COUNT( id )"
-		."\n FROM #__menu "
-		."\n WHERE type = 'content_typed'"
-		."\n AND published = 1"
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-		return $count;
+		// ensure that query is only called once		
+		if ( !$this->get( '_StaticContentCount' ) && !defined( '_JOS_SCC' ) ) {		
+			define( '_JOS_SCC', 1 );
+			
+			$query = "SELECT COUNT( id )"
+			."\n FROM #__menu "
+			."\n WHERE type = 'content_typed'"
+			."\n AND published = 1"
+			;
+			$this->_db->setQuery( $query );
+			// saves query result to variable
+			$this->set( '_StaticContentCount', $this->_db->loadResult() );
+		}
+		
+		return $this->get( '_StaticContentCount' );		
 	}
 
 	/**
 	* @return number of Content Item Links
 	*/
 	function getContentItemLinkCount( ) {
-		$query = "SELECT COUNT( id )"
-		."\n FROM #__menu "
-		."\n WHERE type = 'content_item_link'"
-		."\n AND published = 1"
-		;
-		$this->_db->setQuery( $query );
-		$count = $this->_db->loadResult();
-		return $count;
+		// ensure that query is only called once		
+		if ( !$this->get( '_ContentItemLinkCount' ) && !defined( '_JOS_CILC' ) ) {		
+			define( '_JOS_CILC', 1 );
+			
+			$query = "SELECT COUNT( id )"
+			."\n FROM #__menu "
+			."\n WHERE type = 'content_item_link'"
+			."\n AND published = 1"
+			;
+			// saves query result to variable
+			$this->set( '_ContentItemLinkCount', $this->_db->loadResult() );
+		}
+
+		return $this->get( '_ContentItemLinkCount' );
 	}
 
 	/**
@@ -2338,15 +2745,19 @@ define( "_MOS_NOTRIM", 0x0001 );
 define( "_MOS_ALLOWHTML", 0x0002 );
 define( "_MOS_ALLOWRAW", 0x0004 );
 function mosGetParam( &$arr, $name, $def=null, $mask=0 ) {
-	static $noHtmlFilter = null;
-	static $safeHtmlFilter = null;
+	static $noHtmlFilter 	= null;
+	static $safeHtmlFilter 	= null;
 
 	$return = null;
 	if (isset( $arr[$name] )) {
-		if (is_string( $arr[$name] )) {
+		$return = $arr[$name];
+		
+		if (is_string( $return )) {
+			// trim data
 			if (!($mask&_MOS_NOTRIM)) {
-				$arr[$name] = trim( $arr[$name] );
+				$return = trim( $return );
 			}
+			
 			if ($mask&_MOS_ALLOWRAW) {
 				// do nothing
 			} else if ($mask&_MOS_ALLOWHTML) {
@@ -2358,16 +2769,20 @@ function mosGetParam( &$arr, $name, $def=null, $mask=0 ) {
 				$arr[$name] = $safeHtmlFilter->process( $arr[$name] );
 				*/
 			} else {
+				// send to inputfilter
 				if (is_null( $noHtmlFilter )) {
 					$noHtmlFilter = new InputFilter( /* $tags, $attr, $tag_method, $attr_method, $xss_auto */ );
 				}
-				$arr[$name] = $noHtmlFilter->process( $arr[$name] );
+				$return = $noHtmlFilter->process( $return );
 			}
+			
+			// account for magic quotes setting
 			if (!get_magic_quotes_gpc()) {
-				$arr[$name] = addslashes( $arr[$name] );
+				$return = addslashes( $return );
 			}
 		}
-		return $arr[$name];
+		
+		return $return;
 	} else {
 		return $def;
 	}
@@ -2805,8 +3220,9 @@ class mosSession extends mosDBTable {
 				}
 			}
 		}
-		$this->_session_cookie = $randnum;
-		$this->session_id = md5( $randnum . $_SERVER['REMOTE_ADDR'] );
+		
+		$this->_session_cookie = $randnum;		
+		$this->session_id = mosMainFrame::sessionCookieValue( $randnum );
 	}
 
 	/**
@@ -2820,10 +3236,12 @@ class mosSession extends mosDBTable {
 	 * Purge lapsed sessions
 	 * @return boolean
 	 */
-	function purge( $inc=1800 ) {
+	function purge( $inc=1800, $and='' ) {
 		$past = time() - $inc;
 		$query = "DELETE FROM $this->_tbl"
-		. "\n WHERE ( time < '$past' )";
+		. "\n WHERE ( time < '$past' )"
+		. $and
+		;
 		$this->_db->setQuery($query);
 
 		return $this->_db->query();
@@ -2970,29 +3388,32 @@ function mosMakeHtmlSafe( &$mixed, $quote_style=ENT_QUOTES, $exclude_keys='' ) {
 */
 function mosMenuCheck( $Itemid, $menu_option, $task, $gid ) {
 	global $database;
-	$dblink="index.php?option=$menu_option";
-	if ($Itemid!="" && $Itemid!=0 && $Itemid!=99999999) {
+	
+	$dblink = "index.php?option=$menu_option";
+	
+	if ( $Itemid != '' && $Itemid != 0 && $Itemid != 99999999 ) {
 		$query = "SELECT access"
 		. "\n FROM #__menu"
 		. "\n WHERE id = $Itemid"
 		;
-		$database->setQuery( $query );
 	} else {
-		if ($task!="") {
-			$dblink.="&task=$task";
+		if ($task != '') {
+			$dblink	.= "&task=$task";
 		}
+		
 		$query = "SELECT access"
 		. "\n FROM #__menu"
 		. "\n WHERE link LIKE '$dblink%'"
 		;
-		$database->setQuery( $query );
 	}
-	$results = $database->loadObjectList();
-	$access = 0;
-	//echo "<pre>"; print_r($results); echo "</pre>";
+	$database->setQuery( $query );
+	$results 	= $database->loadObjectList();
+	$access 	= 0;
+	
 	foreach ($results as $result) {
 		$access = max( $access, $result->access );
 	}
+	
 	return ($access <= $gid);
 }
 
@@ -3080,7 +3501,7 @@ function mosToolTip( $tooltip, $title='', $width='', $image='tooltip.png', $text
 function mosWarning($warning, $title='Joomla! Warning') {
 	global $mosConfig_live_site;
 
-	$mouseover 	= 'return overlib(\''. $warning .'\', CAPTION, \'$title\', BELOW, RIGHT);';
+	$mouseover 	= 'return overlib(\''. $warning .'\', CAPTION, \''. $title .'\', BELOW, RIGHT);';
 
 	$tip 		= "<!-- Warning -->\n";
 	$tip 		.= '<a href="javascript:void(0)" onmouseover="'. $mouseover .'" onmouseout="return nd();">';
@@ -3236,31 +3657,49 @@ function mosMail( $from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NU
  */
 function initGzip() {
 	global $mosConfig_gzip, $do_gzip_compress;
-
+	
 	$do_gzip_compress = FALSE;
 	if ($mosConfig_gzip == 1) {
-		$phpver = phpversion();
-		$useragent = mosGetParam( $_SERVER, 'HTTP_USER_AGENT', '' );
-		$canZip = mosGetParam( $_SERVER, 'HTTP_ACCEPT_ENCODING', '' );
+		$phpver 	= phpversion();
+		$useragent 	= mosGetParam( $_SERVER, 'HTTP_USER_AGENT', '' );
+		$canZip 	= mosGetParam( $_SERVER, 'HTTP_ACCEPT_ENCODING', '' );
+		
+		$gzip_check 	= 0;
+		$zlib_check 	= 0;
+		$gz_check		= 0;
+		$zlibO_check	= 0;
+		$sid_check		= 0;
+		if ( strpos( $canZip, 'gzip' ) !== false) {
+			$gzip_check = 1;
+		}		
+		if ( extension_loaded( 'zlib' ) ) {
+			$zlib_check = 1;
+		}		
+		if ( function_exists('ob_gzhandler') ) {
+			$gz_check = 1;
+		}
+		if ( ini_get('zlib.output_compression') ) {
+			$zlibO_check = 1;
+		}
+		if ( ini_get('session.use_trans_sid') ) {
+			$sid_check = 1;
+		}
 
-		if ( $phpver >= '4.0.4pl1' &&
-				( strpos($useragent,'compatible') !== false ||
-				  strpos($useragent,'Gecko')	  !== false
-				)
-			) {
-			if ( extension_loaded('zlib') && !ini_get('zlib.output_compression')) {
+		if ( $phpver >= '4.0.4pl1' && ( strpos($useragent,'compatible') !== false || strpos($useragent,'Gecko')	!== false ) ) {
+			// Check for gzip header or northon internet securities or session.use_trans_sid
+			if ( ( $gzip_check || isset( $_SERVER['---------------']) ) && $zlib_check && $gz_check && !$zlibO_check && !$sid_check ) {
 				// You cannot specify additional output handlers if
 				// zlib.output_compression is activated here
-				ob_start("ob_gzhandler");
+				ob_start( 'ob_gzhandler' );
 				return;
 			}
 		} else if ( $phpver > '4.0' ) {
-			if ( strpos($canZip,'gzip') !== false ) {
-				if (extension_loaded( 'zlib' )) {
+			if ( $gzip_check ) {
+				if ( $zlib_check ) {
 					$do_gzip_compress = TRUE;
 					ob_start();
 					ob_implicit_flush(0);
-
+					
 					header( 'Content-Encoding: gzip' );
 					return;
 				}
@@ -3301,12 +3740,12 @@ function doGzip() {
 * Random password generator
 * @return password
 */
-function mosMakePassword() {
+function mosMakePassword($length=8) {
 	$salt 		= "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	$len 		= strlen($salt);
 	$makepass	= '';
 	mt_srand(10000000*(double)microtime());
-	for ($i = 0; $i < 8; $i++)
+	for ($i = 0; $i < $length; $i++)
 	$makepass .= $salt[mt_rand(0,$len - 1)];
 	return $makepass;
 }
@@ -3343,13 +3782,20 @@ if (!function_exists('html_entity_decode')) {
 */
 class mosMambotHandler {
 	/** @var array An array of functions in event groups */
-	var $_events	= null;
+	var $_events			= null;
 	/** @var array An array of lists */
-	var $_lists		= null;
+	var $_lists				= null;
 	/** @var array An array of mambots */
-	var $_bots		= null;
+	var $_bots				= null;
 	/** @var int Index of the mambot being loaded */
-	var $_loading	= null;
+	var $_loading			= null;
+	
+	/** Added as of 1.0.8 to ensure queries are only called once **/
+	
+	/** @var array An array of the content mambots in the system */
+	var $_content_mambots	= null;
+	/** @var array An array of the content mambot params */
+	var $_content_mambot_params	= array();
 
 	/**
 	* Constructor
@@ -3362,8 +3808,7 @@ class mosMambotHandler {
 	* @param string The group name, relates to the sub-directory in the mambots directory
 	*/
 	function loadBotGroup( $group ) {
-		global $database, $my, $mosConfig_absolute_path;
-		global $_MAMBOTS;
+		global $database, $my;
 
 		$group = trim( $group );
 		if (is_object( $my )) {
@@ -3376,12 +3821,27 @@ class mosMambotHandler {
 
 		switch ( $group ) {
 			case 'content':
-				$query = "SELECT folder, element, published, params"
-				. "\n FROM #__mambots"
-				. "\n WHERE access <= $gid"
-				. "\n AND folder = '$group'"
-				. "\n ORDER BY ordering"
-				;
+				if (!defined( '_JOS_CONTENT_MAMBOTS' )) {
+					/** ensure that query is only called once */
+					define( '_JOS_CONTENT_MAMBOTS', 1 );
+	
+					$query = "SELECT folder, element, published, params"
+					. "\n FROM #__mambots"
+					. "\n WHERE access <= $gid"
+					. "\n AND folder = 'content'"
+					. "\n ORDER BY ordering"
+					;
+					$database->setQuery( $query );
+				
+					// load query into class variable _content_mambots
+					if (!($this->_content_mambots = $database->loadObjectList())) {
+						//echo "Error loading Mambots: " . $database->getErrorMsg();
+						return false;
+					}
+				}
+				
+				// pull bots to be processed from class variable 
+				$bots = $this->_content_mambots;
 				break;
 
 			default:
@@ -3392,18 +3852,21 @@ class mosMambotHandler {
 				. "\n AND folder = '$group'"
 				. "\n ORDER BY ordering"
 				;
+				$database->setQuery( $query );
+			
+				if (!($bots = $database->loadObjectList())) {
+					//echo "Error loading Mambots: " . $database->getErrorMsg();
+					return false;
+				}
 				break;
 		}
-		$database->setQuery( $query );
-
-		if (!($bots = $database->loadObjectList())) {
-			//echo "Error loading Mambots: " . $database->getErrorMsg();
-			return false;
-		}
+		
+		// load bots found by queries
 		$n = count( $bots);
-		for ($i = 0; $i < $n; $i++) {
+		for ($i = 0; $i < $n; $i++) {			
 			$this->loadBot( $bots[$i]->folder, $bots[$i]->element, $bots[$i]->published, $bots[$i]->params );
 		}
+
 		return true;
 	}
 	/**
@@ -3721,16 +4184,13 @@ class mosAdminMenus {
 		// get a list of the menu items
 		$query = "SELECT m.*"
 		. "\n FROM #__menu AS m"
-//		. "\n WHERE type != 'url'"
-//		. "\n AND type != 'separator'"
-// Change adds Itemid support for Link - Urls without `index.php` or `Itemid=` in their url
-		. "\n WHERE m.type != 'separator'"
+		. "\n WHERE m.published = 1"
+		//. "\n AND m.type != 'separator'"
 		. "\n AND NOT ("
 			. "\n ( m.type = 'url' )"
 			. "\n AND ( m.link LIKE '%index.php%' )"
 			. "\n AND ( m.link LIKE '%Itemid=%' )"
 		. "\n )"
-		. "\n AND m.published = 1"
 		. "\n ORDER BY m.menutype, m.parent, m.ordering"
 		;
 		$database->setQuery( $query );
@@ -4370,6 +4830,13 @@ class mosCommonHTML {
 		function go2( pressbutton, menu, id ) {
 			var form = document.adminForm;
 
+			// assemble the images back into one field
+			var temp = new Array;
+			for (var i=0, n=form.imagelist.options.length; i < n; i++) {
+				temp[i] = form.imagelist.options[i].value;
+			}
+			form.images.value = temp.join( '\n' );
+
 			if (pressbutton == 'go2menu') {
 				form.menu.value = menu;
 				submitform( pressbutton );
@@ -4527,7 +4994,7 @@ class mosCommonHTML {
 		?>
 		<input type="hidden" name="menu" value="" />
 		<input type="hidden" name="menuid" value="" />
-		<?php
+		<?php		
 	}
 
 	function checkedOut( &$row, $overlib=1 ) {
@@ -4626,6 +5093,52 @@ class mosCommonHTML {
 		;
 
 		return $href;
+	}
+
+	/*
+	* Special handling for newfeed encoding and possible conflicts with page encoding and PHP version
+	* Added 1.0.8
+	* Static Function
+	*/	
+	function newsfeedEncoding( $rssDoc ) {	
+		// test if PHP 5
+		if ( phpversion() >= 5 ) {		
+			// test if page is utf-8
+			if ( strpos(_ISO,'utf')!== false || strpos(_ISO,'UTF') !== false ) {
+				$encoding = 'html_entity_decode';
+			} else {
+			// non utf-8 page
+				$encoding = 'utf8_decode';
+			}
+		} else {
+		// handling for PHP 4
+			// determine encoding of feed
+			$text 		= $rssDoc->toNormalizedString(true);
+			$text 		= substr( $text, 0, 100 );
+			$utf8 		= strpos( $text, 'encoding=&quot;utf-8&quot;' );
+			
+			// test if feed is utf-8
+			if ( $utf8 !== false ) {
+				// test if page is utf-8
+				if ( strpos(_ISO,'utf')!== false || strpos(_ISO,'UTF') !== false ) {
+					$encoding = 'html_entity_decode';
+				} else {
+					// non utf-8 page
+					$encoding = 'utf8_decode';
+				}
+			} else {
+			// handling for non utf-8 feed
+				// test if page is utf-8
+				if ( strpos(_ISO,'utf') !== false || strpos(_ISO,'UTF') !== false ) {
+					$encoding = 'utf8_encode';
+				} else {
+					// non utf-8 page
+					$encoding = 'html_entity_decode';
+				}
+			}								
+		}
+		
+		return $encoding;
 	}
 }
 

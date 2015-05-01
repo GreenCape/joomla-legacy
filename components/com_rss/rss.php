@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: rss.php 1629 2006-01-03 06:40:18Z stingrey $
+* @version $Id: rss.php 2287 2006-02-11 16:03:50Z stingrey $
 * @package Joomla
 * @subpackage Syndicate
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -36,7 +36,7 @@ switch ( $task ) {
 */
 function feedFrontpage( $showFeed ) {
 	global $database, $mainframe;
-	global $mosConfig_live_site, $mosConfig_offset, $mosConfig_absolute_path;
+	global $mosConfig_live_site, $mosConfig_offset, $mosConfig_absolute_path, $mosConfig_cachepath;
 
 	$nullDate = $database->getNullDate();
 	// pull id of syndication component
@@ -52,51 +52,88 @@ function feedFrontpage( $showFeed ) {
 	$component->load( $id );
 	$params = new mosParameters( $component->params );
 
+	// test if security check is enbled
+	$check = $params->def( 'check', 1 );
+	if($check) {
+		// test if rssfeed module is published
+		// if not disable access
+		$query = "SELECT m.id"
+		. "\n FROM #__modules AS m"
+		. "\n WHERE m.module = 'mod_rssfeed'"
+		. "\n AND m.published = 1"
+		;
+		$database->setQuery( $query );
+		$check = $database->loadResultArray();
+		if(empty($check)) {
+			mosNotAuth();
+			return;		
+		}			
+	}
+	
 	$now 	= date( 'Y-m-d H:i:s', time() + $mosConfig_offset * 60 * 60 );
 	$iso 	= split( '=', _ISO );
 
 	// parameter intilization
-	$info[ 'date' ] 		= date( 'r' );
-	$info[ 'year' ] 		= date( 'Y' );
-	$info[ 'encoding' ] 	= $iso[1];
-	$info[ 'link' ] 		= htmlspecialchars( $mosConfig_live_site );
-	$info[ 'cache' ] 		= $params->def( 'cache', 1 );
-	$info[ 'cache_time' ] 	= $params->def( 'cache_time', 3600 );
-	$info[ 'count' ]		= $params->def( 'count', 5 );
-	$info[ 'orderby' ] 		= $params->def( 'orderby', '' );
-	$info[ 'title' ] 		= $params->def( 'title', 'Joomla! powered Site' );
-	$info[ 'description' ] 	= $params->def( 'description', 'Joomla! site syndication' );
-	$info[ 'image_file' ]	= $params->def( 'image_file', 'joomla_rss.png' );
+	$info[ 'date' ] 			= date( 'r' );
+	$info[ 'year' ] 			= date( 'Y' );
+	$info[ 'encoding' ] 		= $iso[1];
+	$info[ 'link' ] 			= htmlspecialchars( $mosConfig_live_site );
+	$info[ 'cache' ] 			= $params->def( 'cache', 1 );
+	$info[ 'cache_time' ] 		= $params->def( 'cache_time', 3600 );
+	$info[ 'count' ]			= $params->def( 'count', 5 );
+	$info[ 'orderby' ] 			= $params->def( 'orderby', '' );
+	$info[ 'title' ] 			= $params->def( 'title', 'Joomla! powered Site' );
+	$info[ 'description' ] 		= $params->def( 'description', 'Joomla! site syndication' );
+	$info[ 'image_file' ]		= $params->def( 'image_file', 'joomla_rss.png' );
 	if ( $info[ 'image_file' ] == -1 ) {
-		$info[ 'image' ]	= NULL;
+		$info[ 'image' ]		= NULL;
 	} else{
-		$info[ 'image' ]	= $mosConfig_live_site .'/images/M_images/'. $info[ 'image_file' ];
+		$info[ 'image' ]		= $mosConfig_live_site .'/images/M_images/'. $info[ 'image_file' ];
 	}
-	$info[ 'image_alt' ] 	= $params->def( 'image_alt', 'Powered by Joomla!' );
-	$info[ 'limit_text' ] 	= $params->def( 'limit_text', 1 );
-	$info[ 'text_length' ] 	= $params->def( 'text_length', 20 );
+	$info[ 'image_alt' ] 		= $params->def( 'image_alt', 'Powered by Joomla!' );
+	$info[ 'limit_text' ] 		= $params->def( 'limit_text', 1 );
+	$info[ 'text_length' ] 		= $params->def( 'text_length', 20 );
 	// get feed type from url
-	$info[ 'feed' ] 		= mosGetParam( $_GET, 'feed', 'RSS2.0' );
+	$info[ 'feed' ] 			= mosGetParam( $_GET, 'feed', 'RSS2.0' );
 	// live bookmarks
 	$info[ 'live_bookmark' ]	= $params->def( 'live_bookmark', '' );
 	$info[ 'bookmark_file' ]	= $params->def( 'bookmark_file', '' );
-	// content to syndicate
-//	$info[ 'content' ]		= $params->def( 'content', -1 );
 
 	// set filename for live bookmarks feed
 	if ( !$showFeed & $info[ 'live_bookmark' ] ) {
 		if ( $info[ 'bookmark_file' ] ) {
 		// custom bookmark filename
-			$info[ 'file' ] = $mosConfig_absolute_path .'/cache/'. $info[ 'bookmark_file' ];
+			$filename = $info[ 'bookmark_file' ];
 		} else {
 		// standard bookmark filename
-			$info[ 'file' ] = $mosConfig_absolute_path .'/cache/'. $info[ 'live_bookmark' ];
+			$filename = $info[ 'live_bookmark' ];
 		}
 	} else {
 	// set filename for rss feeds
 		$info[ 'file' ] = strtolower( str_replace( '.', '', $info[ 'feed' ] ) );
-		$info[ 'file' ] = $mosConfig_absolute_path .'/cache/'. $info[ 'file' ] .'.xml';
+		
+		// security check to limit arbitrary file creation.
+		switch ( $info[ 'file' ] ) {
+			case 'rss091':			
+			case 'rss10':			
+			case 'rss20':			
+			case 'atom03':			
+			case 'opml':			
+				$filename = $info[ 'file' ] .'.xml';
+				break;
+			
+			default:
+				echo _NOT_AUTH;
+				return;
+				break;			
+		}
 	}
+	// security check to stop server path disclosure
+	if ( strstr( $filename, '/' ) ) { 
+		echo _NOT_AUTH;
+		return;
+	}
+	$info[ 'file' ] = $mosConfig_cachepath .'/'. $filename;
 
 	// load feed creator class
 	$rss 	= new UniversalFeedCreator();
@@ -163,7 +200,6 @@ function feedFrontpage( $showFeed ) {
 	$and 		= '';
 
 	// query of frontpage content items
-	//$query = "SELECT a.*, u.name AS author, u.usertype, UNIX_TIMESTAMP( a.created ) AS created_ts"
 	$query = "SELECT a.*, u.name AS author, u.usertype, UNIX_TIMESTAMP( a.created ) AS created_ts, cat.title AS cat_title, sec.title AS section_title"
 	. "\n FROM #__content AS a"
 	. $join

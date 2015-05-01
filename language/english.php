@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: english.php 1570 2005-12-29 05:53:33Z eddieajau $
+* @version $Id: english.php 2526 2006-02-22 15:33:24Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -253,7 +253,7 @@ DEFINE('_E_SAVE','Save');
 DEFINE('_E_CANCEL','Cancel');
 DEFINE('_E_REGISTERED','Registered Users Only');
 DEFINE('_E_ITEM_INFO','Item Information');
-DEFINE('_E_ITEM_SAVED','Item succesfully saved.');
+DEFINE('_E_ITEM_SAVED','Item successfully saved.');
 DEFINE('_ITEM_PREVIOUS','&lt; Prev');
 DEFINE('_ITEM_NEXT','Next &gt;');
 
@@ -420,6 +420,7 @@ DEFINE('_HI','Hi, ');
 /** user.php */
 DEFINE('_SAVE_ERR','Please complete all the fields.');
 DEFINE('_THANK_SUB','Thanks for your submission. Your submission will now be reviewed before being posted to the site.');
+DEFINE('_THANK_SUB_PUB','Thanks for your submission.');
 DEFINE('_UP_SIZE','You cannot upload files greater than 15kb in size.');
 DEFINE('_UP_EXISTS','Image $userfile_name already exists. Please rename the file and try again.');
 DEFINE('_UP_COPY_FAIL','Failed to copy');
@@ -466,7 +467,7 @@ DEFINE('_BNR_URL','You must select a URL/Custom banner code for the banner.');
 DEFINE('_ALREADY_LOGIN','You are already logged in!');
 DEFINE('_LOGOUT','Click here to logout');
 DEFINE('_LOGIN_TEXT','Use the login and password fields opposite to gain full access');
-DEFINE('_LOGIN_SUCCESS','You have succesfully Logged In');
+DEFINE('_LOGIN_SUCCESS','You have successfully Logged In');
 DEFINE('_LOGOUT_SUCCESS','You have successfully Logged Out');
 DEFINE('_LOGIN_DESCRIPTION','To access the Private area of this site please Login');
 DEFINE('_LOGOUT_DESCRIPTION','You are currently Logged in to the private area of this site');

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.searchbot.php 1490 2005-12-20 15:53:29Z Jinx $
+* @version $Id: content.searchbot.php 2444 2006-02-17 18:59:08Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -30,15 +30,14 @@ function botSearchContent( $text, $phrase='', $ordering='' ) {
 	global $mosConfig_offset;
 
 	// load mambot params info
-	$query = "SELECT id"
+	$query = "SELECT params"
 	. "\n FROM #__mambots"
 	. "\n WHERE element = 'content.searchbot'"
 	. "\n AND folder = 'search'"
 	;
 	$database->setQuery( $query );
-	$id 	= $database->loadResult();
-	$mambot = new mosMambot( $database );
-	$mambot->load( $id );
+	$database->loadObject($mambot);
+	
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit 		= $botParams->def( 'search_limit', 50 );
@@ -114,13 +113,15 @@ function botSearchContent( $text, $phrase='', $ordering='' ) {
 	. "\n CONCAT( 'index.php?option=com_content&task=view&id=', a.id ) AS href,"
 	. "\n '2' AS browsernav"
 	. "\n FROM #__content AS a"
-	. "\n INNER JOIN #__categories AS b ON b.id=a.catid AND b.access <= '$my->gid'"
-	. "\n LEFT JOIN #__sections AS u ON u.id = a.sectionid"
+	. "\n INNER JOIN #__categories AS b ON b.id=a.catid"
+	. "\n INNER JOIN #__sections AS u ON u.id = a.sectionid"
 	. "\n WHERE ( $where )"
-	. "\n AND a.state = '1'"
-	. "\n AND a.access <= '$my->gid'"
-	. "\n AND u.published = '1'"
-	. "\n AND b.published = '1'"
+	. "\n AND a.state = 1"
+	. "\n AND u.published = 1"
+	. "\n AND b.published = 1"
+	. "\n AND a.access <= $my->gid"
+	. "\n AND b.access <= $my->gid"
+	. "\n AND u.access <= $my->gid"
 	. "\n AND ( publish_up = '$nullDate' OR publish_up <= '$now' )"
 	. "\n AND ( publish_down = '$nullDate' OR publish_down >= '$now' )"
 	. "\n GROUP BY a.id"
@@ -155,11 +156,15 @@ function botSearchContent( $text, $phrase='', $ordering='' ) {
 	. "\n CONCAT('index.php?option=com_content&task=view&id=',a.id) AS href,"
 	. "\n '2' AS browsernav"
 	. "\n FROM #__content AS a"
-	. "\n INNER JOIN #__categories AS b ON b.id=a.catid AND b.access <='$my->gid'"
-	. "\n LEFT JOIN #__sections AS u ON u.id = a.sectionid"
+	. "\n INNER JOIN #__categories AS b ON b.id=a.catid"
+	. "\n INNER JOIN #__sections AS u ON u.id = a.sectionid"
 	. "\n WHERE ( $where )"
 	. "\n AND a.state = -1"
+	. "\n AND u.published = 1"
+	. "\n AND b.published = 1"
 	. "\n AND a.access <= $my->gid"
+	. "\n AND b.access <= $my->gid"
+	. "\n AND u.access <= $my->gid"
 	. "\n AND ( publish_up = '0000-00-00 00:00:00' OR publish_up <= '$now' )"
 	. "\n AND ( publish_down = '0000-00-00 00:00:00' OR publish_down >= '$now' )"
 	. "\n ORDER BY $order"

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.php 1810 2006-01-14 17:11:39Z stingrey $
+* @version $Id: contact.php 2336 2006-02-13 22:25:09Z stingrey $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -69,11 +69,12 @@ function listContacts( $option, $catid ) {
 	$categories = $database->loadObjectList();
 
 	$count = count( $categories );
+
 	if ( ( $count < 2 ) && ( @$categories[0]->numlinks == 1 ) ) {
 		// if only one record exists loads that record, instead of displying category list
 		contactpage( $option, 0 );
 	} else {
-		$rows = array();
+		$rows 		= array();
 		$currentcat = NULL;
 
 		// Parameters
@@ -133,6 +134,14 @@ function listContacts( $option, $catid ) {
 			;
 			$database->setQuery( $query );
 			$database->loadObject( $currentcat );
+
+			/*
+			Check if the category is published or if access level allows access
+			*/
+			if (!$currentcat->name) {
+				mosNotAuth();
+				return;
+			}
 		}
 
 		// page description
@@ -178,13 +187,12 @@ function listContacts( $option, $catid ) {
 function contactpage( $contact_id ) {
 	global $mainframe, $database, $my, $Itemid;
 
-	$query = "SELECT a.id AS value, CONCAT_WS( ' - ', a.name, a.con_position ) AS text, a.catid"
+	$query = "SELECT a.id AS value, CONCAT_WS( ' - ', a.name, a.con_position ) AS text, a.catid, cc.access AS cat_access"
 	. "\n FROM #__contact_details AS a"
 	. "\n LEFT JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n WHERE a.published = 1"
 	. "\n AND cc.published = 1"
 	. "\n AND a.access <= $my->gid"
-	. "\n AND cc.access <= $my->gid"
 	. "\n ORDER BY a.default_con DESC, a.ordering ASC"
 	;
 	$database->setQuery( $query );
@@ -196,11 +204,12 @@ function contactpage( $contact_id ) {
 			$contact_id = $checks[0]->value;
 		}
 
-		$query = "SELECT *"
-		. "\n FROM #__contact_details"
-		. "\n WHERE published = 1"
-		. "\n AND id = $contact_id"
-		. "\n AND access <= $my->gid"
+		$query = "SELECT a.*, cc.access AS cat_access"
+		. "\n FROM #__contact_details AS a"
+		. "\n LEFT JOIN #__categories AS cc ON cc.id = a.catid"
+		. "\n WHERE a.published = 1"
+		. "\n AND a.id = $contact_id"
+		. "\n AND a.access <= $my->gid"
 		;
 		$database->SetQuery($query);
 		$contacts = $database->LoadObjectList();
@@ -209,11 +218,19 @@ function contactpage( $contact_id ) {
 			echo _NOT_AUTH;
 			return;
 		}
-		$contact = $contacts[0];
-		
+		$contact = $contacts[0];	
+			
+		/*
+		* check whether category access level allows access
+		*/
+		if ( $contact->cat_access > $my->gid ) {	
+			mosNotAuth();  
+			return;
+		}
+
 		$list = array();
 		foreach ( $checks as $check ) {
-			if ( $check->catid == $contact->catid ) {
+			if ( $check->catid == $contact->catid && $check->cat_access > $my->gid ) {
 				$list[] = $check;
 			}
 		}		
@@ -338,28 +355,26 @@ function contactpage( $contact_id ) {
 
 function sendmail( $con_id, $option ) {
 	global $database, $Itemid;
-	global $mosConfig_sitename, $mosConfig_live_site, $mosConfig_mailfrom, $mosConfig_fromname;
+	global $mosConfig_sitename, $mosConfig_live_site, $mosConfig_mailfrom, $mosConfig_fromname, $mosConfig_db;
 
-	$validate = mosGetParam( $_POST, mosHash( 'validate' ), 0 );
+	$validate = mosGetParam( $_POST, mosHash( $mosConfig_db ), 0 );
+	
 	// probably a spoofing attack
 	if (!$validate) {
-		echo _NOT_AUTH;
-		return;
+		mosErrorAlert( _NOT_AUTH );
 	}
 	
 	// First, make sure the form was posted from a browser.
 	// For basic web-forms, we don't care about anything
 	// other than requests from a browser:   
 	if (!isset( $_SERVER['HTTP_USER_AGENT'] )) {
-		echo _NOT_AUTH;
-		return;
+		mosErrorAlert( _NOT_AUTH );
 	}
 	
 	// Make sure the form was indeed POST'ed:
 	//  (requires your html form to use: action="post")
 	if (!$_SERVER['REQUEST_METHOD'] == 'POST' ) {
-		echo _NOT_AUTH;
-		return;
+		mosErrorAlert( _NOT_AUTH );
 	}
 	
 	// Attempt to defend against header injections:
@@ -376,8 +391,7 @@ function sendmail( $con_id, $option ) {
 	foreach ($_POST as $k => $v){
 		foreach ($badStrings as $v2) {
 			if (strpos( $v, $v2 ) !== false) {
-				echo _NOT_AUTH;
-				return;
+				mosErrorAlert( _NOT_AUTH );
 			}
 		}
 	}   
@@ -406,15 +420,27 @@ function sendmail( $con_id, $option ) {
 		$mparams = new mosParameters( $menu->params );		
 		$bannedEmail 	= $mparams->get( 'bannedEmail', 	'' );		
 		$bannedSubject 	= $mparams->get( 'bannedSubject', 	'' );		
-		$bannedText 	= $mparams->get( 'bannedText', 		'' );
+		$bannedText 	= $mparams->get( 'bannedText', 		'' );		
+		$sessionCheck 	= $mparams->get( 'sessionCheck', 	1 );
+		
+		// check for session cookie
+		if  ( $sessionCheck ) {		
+			// Session Cookie `name`
+			$sessionCookieName 	= mosMainFrame::sessionCookieName();		
+			// Get Session Cookie `value`
+			$sessioncookie 		= mosGetParam( $_COOKIE, $sessionCookieName, null );			
+			
+			if ( !(strlen($sessioncookie) == 32 || $sessioncookie == '-') ) {
+				mosErrorAlert( _NOT_AUTH );
+			}
+		}			
 		
 		// Prevent form submission if one of the banned text is discovered in the email field
 		if ( $bannedEmail ) {
 			$bannedEmail = explode( ';', $bannedEmail );
 			foreach ($bannedEmail as $value) {
 				if ( stristr($email, $value) ) {
-					echo _NOT_AUTH;
-					return;
+					mosErrorAlert( _NOT_AUTH );
 				}
 			}
 		}
@@ -423,8 +449,7 @@ function sendmail( $con_id, $option ) {
 			$bannedSubject = explode( ';', $bannedSubject );
 			foreach ($bannedSubject as $value) {
 				if ( stristr($subject, $value) ) {
-					echo _NOT_AUTH;
-					return;
+					mosErrorAlert( _NOT_AUTH );
 				}
 			}
 		}
@@ -433,10 +458,15 @@ function sendmail( $con_id, $option ) {
 			$bannedText = explode( ';', $bannedText );
 			foreach ($bannedText as $value) {
 				if ( stristr($text, $value) ) {
-					echo _NOT_AUTH;
-					return;
+					mosErrorAlert( _NOT_AUTH );
 				}
 			}
+		}
+		
+		// test to ensure that only one email address is entered
+		$check = explode( '@', $email );
+		if ( strpos( $email, ';' ) || strpos( $email, ',' ) || strpos( $email, ' ' ) || count( $check ) > 2 ) {
+			mosErrorAlert( 'You cannot enter more than one email address' );
 		}
 		
 		if ( !$email || !$text || ( is_email( $email ) == false ) ) {
@@ -451,6 +481,7 @@ function sendmail( $con_id, $option ) {
 		$params = new mosParameters( $contact[0]->params );		
 		$emailcopyCheck = $params->get( 'email_copy', 0 );
 			
+		// check whether email copy function activated
 		if ( $email_copy && $emailcopyCheck ) {
 			$copy_text = sprintf( _COPY_TEXT, $contact[0]->name, $mosConfig_sitename );
 			$copy_text = $copy_text ."\n\n". $text .'';

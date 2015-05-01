@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.xml.php 1511 2005-12-20 22:31:53Z Jinx $
+* @version $Id: joomla.xml.php 2512 2006-02-21 05:55:33Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -447,10 +447,10 @@ class mosParameters {
 			$options[] = mosHTML::makeOption( $file, $file );
 		}
 		if ( !$node->getAttribute( 'hide_none' ) ) {
-			array_unshift( $options, mosHTML::makeOption( '-1', '- '. 'Do not use an image' .' -' ) );
+			array_unshift( $options, mosHTML::makeOption( '-1', '- '. 'Do Not Use' .' -' ) );
 		}
 		if ( !$node->getAttribute( 'hide_default' ) ) {
-			array_unshift( $options, mosHTML::makeOption( '', '- '. 'Use Default image' .' -' ) );
+			array_unshift( $options, mosHTML::makeOption( '', '- '. 'Use Default' .' -' ) );
 		}
 
 		return mosHTML::selectList( $options, ''. $control_name .'['. $name .']', 'class="inputbox"', 'value', 'text', $value, "param$name" );

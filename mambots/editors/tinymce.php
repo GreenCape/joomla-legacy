@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: tinymce.php 1819 2006-01-14 20:28:36Z stingrey $
+* @version $Id: tinymce.php 2444 2006-02-17 18:59:08Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -25,15 +25,14 @@ function botTinymceEditorInit() {
 	global $mosConfig_live_site, $database, $mosConfig_absolute_path, $mainframe;
 
 	// load tinymce info
-	$query = "SELECT id"
+	$query = "SELECT params"
 	. "\n FROM #__mambots"
 	. "\n WHERE element = 'tinymce'"
 	. "\n AND folder = 'editors'"
 	;
 	$database->setQuery( $query );
-	$id = $database->loadResult();
-	$mambot = new mosMambot( $database );
-	$mambot->load( $id );
+	$database->loadObject($mambot);
+	
 	$params = new mosParameters( $mambot->params );
 
 	$theme = $params->get( 'theme', 'advanced' );
@@ -51,8 +50,10 @@ function botTinymceEditorInit() {
 	$invalid_elements	= $params->def( 'invalid_elements', 'script,applet,iframe' );
 	$newlines			= $params->def( 'newlines', 0 );
 	$cleanup			= $params->def( 'cleanup', 1 );
+	$cleanup_startup	= $params->def( 'cleanup_startup', 0 );
 	$compressed			= $params->def( 'compressed', 0 );
-
+	$relative_urls		= $params->def( 'relative_urls', 0 );
+	
 	// Plugins
 	// preview
 	$preview			= $params->def( 'preview', 1 );
@@ -76,6 +77,14 @@ function botTinymceEditorInit() {
 	$hr					=  $params->def( 'hr', 1 );
 	// fullscreen
 	$fullscreen			=  $params->def( 'fullscreen', 1 );
+	// autosave
+	$autosave			= $params->def( 'autosave', 0 );
+
+	if ( $relative_urls ) {
+		$relative_urls = 'true';
+	} else {
+		$relative_urls = 'false';
+	}
 	
 	if ( $content_css_custom ) {
 		$content_css = 'content_css : "'. $content_css_custom .'", ';
@@ -110,10 +119,16 @@ function botTinymceEditorInit() {
 	$elements[]	= '';
 
 	if ( $cleanup ) {
-		$cleanup	= 'true';
+		$cleanup = 'true';
 	} else {
-		$cleanup	= 'false';
+		$cleanup = 'false';
 	}
+	
+	if ( $cleanup_startup ) {
+		$cleanup_startup = 'true';
+	} else {
+		$cleanup_startup = 'false';
+	}	
 
 	if ( $newlines ) {
 		$br_newlines	= 'true';
@@ -178,11 +193,15 @@ function botTinymceEditorInit() {
 		$plugins[]	= 'fullscreen';
 		$buttons3[]	= 'fullscreen';
 	}
+	// autosave
+	if ( $autosave ) {
+		$plugins[]	= 'autosave';
+	}
 
-	$buttons2 	= implode( ',', $buttons2 );
-	$buttons3 	= implode( ',', $buttons3 );
-	$plugins 	= implode( ',', $plugins );
-	$elements 	= implode( ',', $elements );
+	$buttons2 	= implode( ', ', $buttons2 );
+	$buttons3 	= implode( ', ', $buttons3 );
+	$plugins 	= implode( ', ', $plugins );
+	$elements 	= implode( ', ', $elements );
 	
 return <<<EOD
 	$load	
@@ -192,7 +211,7 @@ return <<<EOD
 		language : "en",
 		mode : "specific_textareas",
 		document_base_url : "$mosConfig_live_site/",
-		relative_urls : false,
+		relative_urls : $relative_urls,
 		remove_script_host : false,
 		save_callback : "TinyMCE_Save",
 		invalid_elements : "$invalid_elements",
@@ -205,6 +224,7 @@ return <<<EOD
 		$content_css
 		debug : false,
 		cleanup : $cleanup,
+		cleanup_on_startup : $cleanup_startup,
 		safari_warning : false,
 		plugins : "advlink, advimage, $plugins",
 		theme_advanced_buttons2_add : "$buttons2",

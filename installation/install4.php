@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install4.php 1505 2005-12-20 21:02:16Z Saka $
+* @version $Id: install4.php 2622 2006-02-26 04:16:09Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -158,6 +158,8 @@ if ($siteUrl) {
 	$config .= "\$mosConfig_error_message = 'This site is temporarily unavailable.<br /> Please notify the System Administrator';\n";
 	$config .= "\$mosConfig_debug = '0';\n";
 	$config .= "\$mosConfig_lifetime = '900';\n";
+	$config .= "\$mosConfig_session_life_admin = '1800';\n";
+	$config .= "\$mosConfig_session_type = '0';\n";
 	$config .= "\$mosConfig_MetaDesc = 'Joomla - the dynamic portal engine and content management system';\n";
 	$config .= "\$mosConfig_MetaKeys = 'Joomla, joomla';\n";
 	$config .= "\$mosConfig_MetaTitle = '1';\n";
@@ -293,6 +295,7 @@ echo "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?".">";
 <head>
 <title>Joomla - Web Installer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
 <link rel="stylesheet" href="install.css" type="text/css" />
 </head>
 <body>

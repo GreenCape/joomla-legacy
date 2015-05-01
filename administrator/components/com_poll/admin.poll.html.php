@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.poll.html.php 1830 2006-01-15 12:45:17Z stingrey $
+* @version $Id: admin.poll.html.php 2613 2006-02-25 01:44:55Z stingrey $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -174,8 +174,15 @@ class HTML_poll {
 			</td>
 		</tr>
 		<tr>
+			<td valign="top">
+			Published:
+			</td>
+			<td>
+			<?php echo $lists['published']; ?>
+			</td>
+		</tr>
+		<tr>
 			<td colspan="3">
-			<br /><br />
 			Options:
 			</td>
 		</tr>

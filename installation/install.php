@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: install.php 2510 2006-02-21 04:59:41Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -31,7 +31,7 @@ function writableCell( $folder ) {
 <head>
 <title>Joomla - Web Installer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<link rel="shortcut icon" href="../../images/favicon.ico" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
 <link rel="stylesheet" href="install.css" type="text/css" />
 </head>
 <body>

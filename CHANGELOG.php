@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: CHANGELOG.php 1843 2006-01-15 19:41:35Z stingrey $
+* @version $Id: CHANGELOG.php 2623 2006-02-26 04:33:48Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -14,8 +14,13 @@
 // no direct access
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 ?>
+1. Copyright and disclaimer
+---------------------------
+This application is opensource software released under the GPL.  Please
+see source code and the LICENSE file
 
-1. Changelog
+
+2. Changelog
 ------------
 This is a non-exhaustive (but still near complete) changelog for
 Joomla! 1.0, including beta and release candidate versions.
@@ -32,10 +37,298 @@ Legend:
 ! -> Note
 
 
+---------------- 1.0.8 Stable Released -- [25-Feb-2006 04:00 UTC] ------------------
+
+This Release Contains following Security Fixes
+
+Medium Level Threat
+ * Hardening of Remember Me login functionality
+ * Protect against real server path disclosure via syndication component
+ * Limit arbitrary file creation via syndication component
+ * Protect against real server path disclosure in mod_templatechooser
+
+ * Disallow `Weblink` item from being accessible when 'unpublished'
+ * Disallow `Polls` item from being accessible when 'unpublished'
+ 
+ * Disallow `Newfeeds` item from being accessible when category 'unpublished'
+ * Disallow `Weblinks` item from being accessible when category 'unpublished' 
+ 
+ * Disallow `Content` item from being accessible despite section/category 'access level'
+ * Disallow `Newsfeed` item from being accessible despite category 'access level'
+ * Disallow `Weblink` item from being accessible despite category 'access level' 
+ 
+ * Disallow `Content` item from being visible despite category 'access level' in `Content Section` view  - `Blog - Content Section` & `Blog - Content Section Archive`
+
+ * Disallow `Content` items from being viewable when category/section 'unpublished' - mod_newsflash 
+ 
+ 
+ Low Level Threat
+ * Harden frontend Session ID
+ * Harden against multiple Admin SQL Injection Vulnerabilities
+ * Disable ability to enter more than one email address in Contact Component contact form
+ * Harden Contact Component with param option to check for existance of session cookie - enabled by default
+ * Addiotnal check for correct Admin session name 
+
+ * Disallow access to syndication functionality
+ * Disallow `Newsfeeds` Categories from being accessible when 'unpublished'
+ * Disallow `Contact` Categories from being accessible when 'unpublished'
+ * Disallow `Weblink` Categories from being accessible when 'unpublished'
+ * Disallow `Content Section` from being accessible when section 'unpublished' - `List - Content Section`
+ * Disallow `Content Category` from being accessible when category/section 'unpublished' - `Table - Content Category`
+
+ * Disallow `Contact` Categories from being accessible as per category 'access level'
+ * Disallow `Newsfeeds` Categories from being accessible as per category 'access level'
+ * Disallow `Weblinks` Categories from being accessible as per category 'access level'
+ * Disallow `Content Section` from being accessible as per section 'access level' - `List - Content Section`
+ * Disallow `Content Category` from being accessible as per section/category 'access level' - `Table - Content Category`
+ * Disallow `Content Category` from being accessible as per category 'access level' - `Blog - Content Category` & `Blog - Content Category Archive`
+
+ * Disallow `Content` item links from being visible as per category/section 'access level' - mod_newsflash, mod_latestnews, mod_mostread
+
+ * Disallow Category Search returning items despite section 'access level' & section 'state'
+ * Disallow Contact Search returning items despite 'access level' & category 'state'
+ * Disallow Content Search returning items despite section 'access level'
+ * Disallow Newsfeed Search returnings items despite category 'state'
+ * Disallow Weblink Search returning items despite category 'state'
+
+---
+
+
+25-Feb-2006 Rey Gigataras
+ # Fixed [topic,40568.0.html] : Conversion of &amp; to & when editing 'new' modules, breaking xhtml compliance
+ # Fixed [topic,40568.0.html] : Itemid=99999999 visible when navigating polls
+ # Fixed artf3630 : Site name printed twice in the popup window title (print, email to friend)
+ 
+ ^ Upgraded to TinyMCE 2.0.4
+ 
+ - Depreciated Admin templates - mambo_admin & mambo_admin_blue
+
+
+24-Feb-2006 Rey Gigataras
+ * SECURITY [ Low Level ]: Add check for correct Admin session name 
+ 
+ # Fixed HTTP_ACCEPT_ENCODING problems
+ # Fixed incorrect handling of external links with mossef
+   
+ ^ Special Flag to allow different login behaviour of site for Production vs online Demo site
+
+
+23-Feb-2006 Robin Muilwijk
+ # Fixed [topic,39449.0.html] : typo in menu manager
+
+
+23-Feb-2006 Rey Gigataras
+ ^ Global Config session life only controls purging of frontend logged in sessions
+ ^ Guests session separately purged at a hardcoded 900 seconds
+
+
+22-Feb-2006 Rey Gigataras
+ # Fixed artf3591 : Error if unpublish menu item
+ # Fixed [topic,39295.0.html] : SEF handling of custom .htaccess reconfigured urls
+ # Fixed [topic,39295.0.html] : mod_login return value incorrectly returning 'index.php?' if coming from site homepage
+ 
+ ^ Frontend Session Tracking cookie uses `Expire at End of Session`, rather than expiry by a set time to resolve issues with incorrect system clocks
+ 
+
+21-Feb-2006 Rey Gigataras
+ * SECURITY [ Medium Level ]: Real server path disclosure in mod_templatechooser
+
+ # Fixed [topic,39295.0.html] : Incorrect favicon path in installer 
+ # Fixed [topic,39295.0.html] : Admin logout does not clear/delete session being logged out
+ 
+ ^ Remember Me Cookie amalgamated into a single cookie.
+
+
+20-Feb-2006 Rey Gigataras
+ # Fixed [topic,39295.0.html] : error in TinyMCE 2.0.3 (toggle fullscreen mode)
+
+
+20-Feb-2006 Andrew Eddie
+ # Fixed filelist param - would always show list entries related to images for default and do not use
+
+
+19-Feb-2006 Rey Gigataras
+ # Fixed [topic,36462.0.html] : time check incorrectly being based on local time - rather than server time
+ # Fixed [topic,39103.0.html] : utf-8 encoded newsfeeds in a ISO-8559-1 site
+
+
+18-Feb-2006 Rey Gigataras
+ # Fixed [topic,39101.0.html] : Newsfeeds do not display
+
+ ^ PERFORMANCE : General query reduction work
+ ^ PERFORMANCE : Reduce queries used by search bots to load params
+ ^ PERFORMANCE : 'editor-xtd' bot group loaded only once - affect = reduction in queries
+ ^ Refactored session handling code for Admin sessions
+ 
+ + session.gc_maxlifetime setting for Admin Sessions
+
+
+17-Feb-2006 Rey Gigataras
+ # Fixed artf3543 : Rev 2393 Language Manager Error
+ # Fixed [topic,22061.0.html] : Wrapper Autoheight ability set to off by default, as causes javascript errors when used on sites not on your domain
+ # Fixed [topic,30542.0.html] : MySQL 5 support in strict mode 
+ # Fixed artf3605 : Spelling error when saving content
+ # Fixed artf3576 : Javascript conflict in mod_wrapper
+
+ ^ PERFORMANCE : `dynamic` Itemid checks store previous query results - affect = reduction in queries
+ ^ PERFORMANCE : `static` Itemid counters now loads only once - affect = reduction in queries
+ ^ PERFORMANCE : 'content' bot group loaded only once instead of each time content is loaded - affect = reduction in queries
+ ^ PERFORMANCE : individual 'content' bot query to pull params loaded only once instead of each time content is loaded - affect = reduction in queries
+
+ + new Admin Session Life Global Config param, allowing setting of admin session idle logout time
+ + query debug mode to backend
+ 
+
+16-Feb-2006 Rey Gigataras
+ # Fixed artf3523 : mosemailcloak issue with mailto params
+ # Fixed : disable mossef bot from working on mailto links
+ # Fixed [topic,36637.0.html] : SEF deactivated relative & absolute url handling
+ # Fixed [topic,36637.0.html] : Session username not correct for those coming from `Remember Me` cookie
+ 
+ + PERFORMANCE : Simple check for all bots to determine whether they should process further 
+ ^ PERFORMANCE : Reduce queries used by bots to load params - mosemailcloak, mosimage, mosloadposition, mospaging - affect = reduction in queries
+ ^ PERFORMANCE : 'editor-xtd' bot group loaded only when needed - affect = reduction in queries
+
+
+15-Feb-2006 Rey Gigataras
+ # Fixed artf3527 : "New" Content Link and Image Not Present When Category Empty
+ # Fixed [topic,36462.0.html] : Static Content Start/Finish publishing time is based on server time, not local time
+ # Fixed : Publisher submission message for frontend content editing/submission
+
+
+14-Feb-2006 Rey Gigataras
+ * SECURITY [ Low Level ]: Disable ability to enter more than one email address in Contact Component contact form
+ 
+ # Fixed artf3144 : NULL values from SQL tables not loaded
+ # Fixed [topic,31769.0.html] : $access variable conflict com_content
+ # Fixed [topic,32201.0.html] : mod_related_items urls not xhtml compliant
+ # Fixed [topic,31185.0.html] : heading in pagination not working
+ # Fixed [topic,10947.0.html] : Add Prefix check to installer  
+ # Fixed artf3082 : Template preview *still* not available 
+ # Fixed artf2925 : mosGetParam has side affects
+ # Fixed [topic,38017.0.html] : Content -> New -> Cancel 
+ 
+ ^ Upgraded TinyMCE to 2.0.3 & TinyMCE GZip Compressor to 1.0.7
+
+
+13-Feb-2006 Rey Gigataras
+ * SECURITY [ Medium Level ]: Hardening of Remember Me login functionality
+ * SECURITY [ Low Level ]: Harden Contact Component with param option to check for existance of session cookie - enabled by default
+
+
+12-Feb-2006 Rey Gigataras
+ * SECURITY [ Low Level ]: Multiple Admin SQL Injection Vulnerabilities
+ * SECURITY [ Low Level ]: Category Search returns items despite section 'access level' & section 'state'
+ * SECURITY [ Low Level ]: Contact Search returns items despite 'access level' & category 'state'
+ * SECURITY [ Low Level ]: Content Search returns items despite section 'access level'
+ * SECURITY [ Low Level ]: Newsfeed Search returns items despite category 'state'
+ * SECURITY [ Low Level ]: Weblink Search returns items despite category 'state'
+ 
+ # Fixed artf3391 : Aphostrophes in Category: Edit
+ # Fixed artf3291 : Alert() problem
+ # Fixed artf3188 : Unnecessary table cell in contact.html.php
+ # Fixed artf3121 : css errors in tiny_mce and rhuk_solarflare_ii template
+ # Fixed artf3181 : Task routing class
+ # Fixed artf3400 : showCalendar does not get value of date
+ # Fixed artf3348 : Bold tag overrides css in mod_poll.php 
+ # Fixed artf3120 : &and & &link not defined in admin.categories.php
+ # Fixed artf3446 : Problems with mosimage with caption
+ # Fixed artf3100 : Incorrect Response Headers for Missing Pages
+ # Fixed artf3220 : Search bug: No way to update referenced search component
+ # Fixed artf3438 : RSS Feed Created it not base on the same encoding of the content
+ # Fixed artf3108 : Joomla 1.0.7 core SEF bug gives 404 on homepage
+ # Fixed artf3169 : RSS feeds does not work with SEF disabled
+
+
+11-Feb-2006 Rey Gigataras
+ * SECURITY [ Medium Level ]: Protect against real server path disclosure via syndication component
+ * SECURITY [ Medium Level ]: Limit arbitrary file creation via syndication component
+ 
+ # Fixed artf3397 : link to menu and loss of images list
+ # Fixed artf3109 : 1.0.7 "The XML page cannot be displayed ERROR" ob_gzhandler issue
+ # Fixed artf3447 : TinyMCE and relative urls
+ # Fixed artf3183 : Sub-menu items of separators not showing in module menu selection list
+ # Fixed artf3103 : $mosConfig_cachepath not used everywhere
+ # Fixed artf3114 : mod_related_items outputs nothing
+ # Fixed artf3234 : mod_related_items unitialized mosConfig_offset variable
+ # Fixed artf3402 : Missing param in module
+ # Fixed artf3067 : Reopen: Unhandled fragment identifier with core SEF enabled
+ # Fixed [topic,31813.0.html] : new .htaccess gives proper 404s [Steve Graham]
+ 
+ + Disable session.use_trans_sid to .htaccess
+
+
+10-Feb-2006 Rey Gigataras
+ * SECURITY [ Low Level ]: Harden frontend Session ID
+ 
+ # Fixed artf3421 : Session cleanup relies on administrator login
+ # Fixed artf3307 : Error in code - non critical, but logout setcookie not working
+ # Fixed artf3126 : Short open PHP tag in pathway.php 
+ # Fixed artf3126 : artf3413 : small problem with variable in xml_domit_lite_parser.php
+ # Fixed [topic,34620.0.html] : Excessive Joomla Sessions, and AOL Login Problem [Steve Graham]
+ # Fixed mosWarning() $title error
+ 
+ + New Session Type Global Config param 
+
+08-Feb-2006 Rey Gigataras
+ * SECURITY [ Medium Level ]: # Fixed : `Content` items viewable when category/section 'unpublished' - mod_newsflash 
+ * SECURITY [ Low Level ]: # Fixed : `Content` item links visible despite category/section 'access level' - mod_newsflash, mod_latestnews, mod_mostread
+ 
+ # Fixed artf3393 : Latestnews doesn't show static content
+
+
+07-Feb-2006 Robin Muilwijk
+ # Fixed artf3328, 1.0.7 EN Installation Typo - Step 1
+ # Fixed artf3401 : Spelling errors in two modules
+
+
+31-Jan-2006 Rey Gigataras
+ + Additional Contact Component hardening
+
+
+30-Jan-2006 Rey Gigataras
+ * SECURITY [ Medium Level ]: # Fixed : `Content` item accessible despite section/category 'access level'
+ * SECURITY [ Medium Level ]: # Fixed : `Content Section` view `Content` items visible despite category 'access level' - `Blog - Content Section` & `Blog - Content Section Archive`
+ * SECURITY [ Medium Level ]: # Fixed : `Newsfeed` item accessible despite category 'access level'
+ * SECURITY [ Medium Level ]: # Fixed : `Weblink` item accessible despite category 'access level'
+ * SECURITY [ Low Level ]: # Fixed : `Contact` Categories accessible despite category 'access level'
+ * SECURITY [ Low Level ]: # Fixed : `Newsfeeds` Categories accessible despite category 'access level'
+ * SECURITY [ Low Level ]: # Fixed : `Weblinks` Categories accessible despite category 'access level'
+ * SECURITY [ Low Level ]: # Fixed : `Content Category` view accessible despite section/category 'access level' - `Table - Content Category`
+ * SECURITY [ Low Level ]: # Fixed : `Content Category` view accessible despite category 'access level' - `Blog - Content Category` & `Blog - Content Category Archive` 
+ * SECURITY [ Low Level ]: # Fixed : `Content Section` view accessible despite section 'access level' - `Table - Content Section`
+
+ ^ Contact Items display Authorization block text if category 'access level' denies access
+ ^ Blog pages display Authorization block text if section/category 'access level' denies access
+ 
+ 
+29-Jan-2006 Rey Gigataras
+ * SECURITY [ Medium Level ]: # Fixed : `Weblinks` item accessible when category 'unpublished' 
+ 
+ ^ Blog pages display Authorization block text if section/category being unpublished
+
+
+25-Jan-2006 Rey Gigataras
+ * SECURITY [ Low Level ]: # Fixed : No way to disable access to syndication functionality
+
+
+17-Jan-2006 Rey Gigataras
+ * SECURITY [ Medium Level ]: # Fixed : `Weblink` item accessible when 'unpublished'
+ * SECURITY [ Medium Level ]: # Fixed : `Polls` item accessible when 'unpublished'
+ * SECURITY [ Medium Level ]: # Fixed : `Newfeeds` item accessible when category 'unpublished'
+ * SECURITY [ Low Level ]: # Fixed : 'unpublished' `Newfeeds` Categories accessible
+ * SECURITY [ Low Level ]: # Fixed : 'unpublished' `Contact` Categories accessible
+ * SECURITY [ Low Level ]: # Fixed : 'unpublished' `Weblink` Categories accessible
+ * SECURITY [ Low Level ]: # Fixed : `Content Section` accessible when section 'unpublished' - `List - Content Section`
+ * SECURITY [ Low Level ]: # Fixed : `Content Category` view accessible when category/section 'unpublished' - `Table - Content Category`
+
+
 ---------------- 1.0.7 Released -- [15-Jan-2006 20:00 UTC] ------------------
+
 
 15-Jan-2006 Rey Gigataras
  # Fixed : database password being incorrectly overwritten with a blank
+
 
 ---------------- 1.0.6 Released -- [15-Jan-2006 15:00 UTC] ------------------
 
@@ -170,7 +463,9 @@ Low Level Threat
  # Fixed a bug with 404 header being returned for homepage when SEF activated
  # Fixed a bug with all items on frontpage returning Itemid=1 (duplicate content)
 
+
 ---------------- 1.0.5 Released -- [24-Dec-2005 10:00 UTC] ------------------
+
 
 This Release Contains following Security Fixes
 
@@ -300,7 +595,9 @@ Medium Level Threats
  # Fixed artf2224 : Problem with Media Manager
  # Fixed : Can't create new folders in media manager
 
+
 ---------------- 1.0.4 Released -- [21-Nov-2005 10:00 UTC] ------------------
+
 
 This Release Contains following Security Fixes
 
@@ -449,7 +746,9 @@ Low Level Threat
 ^ Artifact artf1282 : Easier sorting of static content in creating menu links
 ^ Artifact artf1162 : Remove hardcoding of <<, <, > and >> in pageNavigation.php
 
+
 ---------------- 1.0.3 Released -- [14-Oct-2005 10:00 UTC] ------------------
+
 
 Contains following Security Fixes
 Medium Level Threat
@@ -533,7 +832,9 @@ Low Level Threat
 05-Oct-2005 Robin Muilwijk
  # Fixed artf1366 : Typo in admin, Adding a new menu item - Blog Content Category
 
+
 ---------------- 1.0.2 Released -- [02-Oct-2005 16:00 UTC] ------------------
+
 
 02-Oct-2005 Rey Gigataras
  ^ Added check to mosCommonHTML::loadOverlib(); function that will stop it from being loaded twice on a page
@@ -630,7 +931,9 @@ Low Level Threat
  # Fixed artf1175 : Create catagory with selection of Section
  # Fixed artf1179 : Custom RSS Newsfeed Module has nested <TR>
 
+
 ---------------- 1.0.1 Released -- [21-Sep-2005 16:30 UTC] ------------------
+
 
 21-Sep-2005 Rey Gigataras
  # Fixed artf1157 : Section module: Content not displayed, wrong header
@@ -711,7 +1014,9 @@ Low Level Threat
  # Fixed artf1043: Template Chooser doesn't work
  # Fixed artf1042: Template Chooser shows rogue entry
 
+
 ---------------- 1.0.0 Released -- [17-Sep-2005 00:30 UTC] ------------------
+
 
 Contains following Security Fixes
 Medium Level Threat
@@ -930,9 +1235,6 @@ Low Level Threat
  * SECURITY [ Low Level ]: Fixed [#6775] Display of static content without Itemid
  # Fixed [#6330] Corrected default value of field
 
+
 ----- Derived from Mambo 4.5.2.3 circa. 17 Aug 12005 -----
 
-2. Copyright and disclaimer
----------------------------
-This application is opensource software released under the GPL.  Please
-see source code and the LICENSE file

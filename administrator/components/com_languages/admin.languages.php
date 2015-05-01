@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.languages.php 652 2005-10-25 22:23:27Z Jinx $
+* @version $Id: admin.languages.php 2526 2006-02-22 15:33:24Z stingrey $
 * @package Joomla
 * @subpackage Languages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -169,7 +169,7 @@ function publishLanguage( $p_lname, $option ) {
 	if ($fp = fopen("../configuration.php","w")){
 		fputs($fp, $config, strlen($config));
 		fclose($fp);
-		mosRedirect("index2.php","Configuration succesfully updated!");
+		mosRedirect("index2.php","Configuration successfully updated!");
 	} else {
 		mosRedirect("index2.php","Error! Make sure that configuration.php is writeable.");
 	}

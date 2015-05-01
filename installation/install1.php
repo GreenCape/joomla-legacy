@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install1.php 597 2005-10-23 17:11:09Z stingrey $
+* @version $Id: install1.php 2510 2006-02-21 04:59:41Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -30,7 +30,7 @@ echo "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?".">";
 <head>
 <title>Joomla - Web Installer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<link rel="shortcut icon" href="../../images/favicon.ico" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
 <link rel="stylesheet" href="install.css" type="text/css" />
 <script  type="text/javascript">
 <!--
@@ -49,6 +49,10 @@ function check() {
 	} else if ( f.DBname.value == '' ) {
 		alert('Please enter a Name for your new Database');
 		f.DBname.focus();
+		formValid=false;
+	} else if ( f.DBPrefix.value == '' ) {
+		alert('You must enter a MySQL Table Prefix for Joomla to operate correctly.');
+		f.DBPrefix.focus();
 		formValid=false;
 	} else if ( f.DBPrefix.value == 'old_' ) {
 		alert('You cannot use "old_" as the MySQL Table Prefix because Joomla uses this prefix for backup tables.');
@@ -198,7 +202,7 @@ function check() {
 							<label for="DBSample">Install Sample Data</label>
 						</td>
 			  			<td>
-			  				<em>Don't uncheck option this unless you are experienced in using Joomla!</em>
+			  				<em>Don't uncheck this option unless you are experienced in using Joomla!</em>
 			  			</td>
 			  		</tr>
 		  		 	</table>

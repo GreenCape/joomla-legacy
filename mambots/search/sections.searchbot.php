@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: sections.searchbot.php 1490 2005-12-20 15:53:29Z Jinx $
+* @version $Id: sections.searchbot.php 2444 2006-02-17 18:59:08Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -29,15 +29,14 @@ function botSearchSections( $text, $phrase='', $ordering='' ) {
 	global $database, $my;
 	
 	// load mambot params info
-	$query = "SELECT id"
+	$query = "SELECT params"
 	. "\n FROM #__mambots"
 	. "\n WHERE element = 'sections.searchbot'"
 	. "\n AND folder = 'search'"
 	;
 	$database->setQuery( $query );
-	$id 	= $database->loadResult();
-	$mambot = new mosMambot( $database );
-	$mambot->load( $id );
+	$database->loadObject($mambot);
+	
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit = $botParams->def( 'search_limit', 50 );

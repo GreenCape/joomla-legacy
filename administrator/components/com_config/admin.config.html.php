@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.html.php 1835 2006-01-15 13:42:38Z stingrey $
+* @version $Id: admin.config.html.php 2429 2006-02-17 02:02:41Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -22,83 +22,93 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 class HTML_config {
 
 	function showconfig( &$row, &$lists, $option) {
-		global $mosConfig_absolute_path, $mosConfig_live_site;
+		global $mosConfig_absolute_path, $mosConfig_live_site, $mosConfig_session_type;
 		$tabs = new mosTabs(1);
 		?>
 		<script type="text/javascript">
 		<!--
-			function saveFilePerms()
-			{
-				var f = document.adminForm;
-				if (f.filePermsMode0.checked)
-					f.config_fileperms.value = '';
-				else {
-					var perms = 0;
-					if (f.filePermsUserRead.checked) perms += 400;
-					if (f.filePermsUserWrite.checked) perms += 200;
-					if (f.filePermsUserExecute.checked) perms += 100;
-					if (f.filePermsGroupRead.checked) perms += 40;
-					if (f.filePermsGroupWrite.checked) perms += 20;
-					if (f.filePermsGroupExecute.checked) perms += 10;
-					if (f.filePermsWorldRead.checked) perms += 4;
-					if (f.filePermsWorldWrite.checked) perms += 2;
-					if (f.filePermsWorldExecute.checked) perms += 1;
-					f.config_fileperms.value = '0'+''+perms;
+		function saveFilePerms() {
+			var f = document.adminForm;
+			if (f.filePermsMode0.checked)
+				f.config_fileperms.value = '';
+			else {
+				var perms = 0;
+				if (f.filePermsUserRead.checked) perms += 400;
+				if (f.filePermsUserWrite.checked) perms += 200;
+				if (f.filePermsUserExecute.checked) perms += 100;
+				if (f.filePermsGroupRead.checked) perms += 40;
+				if (f.filePermsGroupWrite.checked) perms += 20;
+				if (f.filePermsGroupExecute.checked) perms += 10;
+				if (f.filePermsWorldRead.checked) perms += 4;
+				if (f.filePermsWorldWrite.checked) perms += 2;
+				if (f.filePermsWorldExecute.checked) perms += 1;
+				f.config_fileperms.value = '0'+''+perms;
+			}
+		}
+		function changeFilePermsMode(mode) {
+			if(document.getElementById) {
+				switch (mode) {
+					case 0:
+						document.getElementById('filePermsValue').style.display = 'none';
+						document.getElementById('filePermsTooltip').style.display = '';
+						document.getElementById('filePermsFlags').style.display = 'none';
+						break;
+					default:
+						document.getElementById('filePermsValue').style.display = '';
+						document.getElementById('filePermsTooltip').style.display = 'none';
+						document.getElementById('filePermsFlags').style.display = '';
+				} // switch
+			} // if
+			saveFilePerms();
+		}
+		function saveDirPerms() {
+			var f = document.adminForm;
+			if (f.dirPermsMode0.checked)
+				f.config_dirperms.value = '';
+			else {
+				var perms = 0;
+				if (f.dirPermsUserRead.checked) perms += 400;
+				if (f.dirPermsUserWrite.checked) perms += 200;
+				if (f.dirPermsUserSearch.checked) perms += 100;
+				if (f.dirPermsGroupRead.checked) perms += 40;
+				if (f.dirPermsGroupWrite.checked) perms += 20;
+				if (f.dirPermsGroupSearch.checked) perms += 10;
+				if (f.dirPermsWorldRead.checked) perms += 4;
+				if (f.dirPermsWorldWrite.checked) perms += 2;
+				if (f.dirPermsWorldSearch.checked) perms += 1;
+				f.config_dirperms.value = '0'+''+perms;
+			}
+		}
+		function changeDirPermsMode(mode) 	{
+			if(document.getElementById) {
+				switch (mode) {
+					case 0:
+						document.getElementById('dirPermsValue').style.display = 'none';
+						document.getElementById('dirPermsTooltip').style.display = '';
+						document.getElementById('dirPermsFlags').style.display = 'none';
+						break;
+					default:
+						document.getElementById('dirPermsValue').style.display = '';
+						document.getElementById('dirPermsTooltip').style.display = 'none';
+						document.getElementById('dirPermsFlags').style.display = '';
+				} // switch
+			} // if
+			saveDirPerms();
+		}
+		function submitbutton(pressbutton) {
+			var form = document.adminForm;
+			
+			// do field validation
+			if (form.config_session_type.value != <?php echo $mosConfig_session_type; ?> ){
+				if ( confirm('Are you sure you wish to change the `Session Authentication Method`? \n\n This will cause all existing frontend sessions to be deleted \n\n') ) {
+					submitform( pressbutton );
+				} else {
+					return;
 				}
+			} else {
+				submitform( pressbutton );
 			}
-			function changeFilePermsMode(mode)
-			{
-				if(document.getElementById) {
-					switch (mode) {
-						case 0:
-							document.getElementById('filePermsValue').style.display = 'none';
-							document.getElementById('filePermsTooltip').style.display = '';
-							document.getElementById('filePermsFlags').style.display = 'none';
-							break;
-						default:
-							document.getElementById('filePermsValue').style.display = '';
-							document.getElementById('filePermsTooltip').style.display = 'none';
-							document.getElementById('filePermsFlags').style.display = '';
-					} // switch
-				} // if
-				saveFilePerms();
-			}
-			function saveDirPerms()
-			{
-				var f = document.adminForm;
-				if (f.dirPermsMode0.checked)
-					f.config_dirperms.value = '';
-				else {
-					var perms = 0;
-					if (f.dirPermsUserRead.checked) perms += 400;
-					if (f.dirPermsUserWrite.checked) perms += 200;
-					if (f.dirPermsUserSearch.checked) perms += 100;
-					if (f.dirPermsGroupRead.checked) perms += 40;
-					if (f.dirPermsGroupWrite.checked) perms += 20;
-					if (f.dirPermsGroupSearch.checked) perms += 10;
-					if (f.dirPermsWorldRead.checked) perms += 4;
-					if (f.dirPermsWorldWrite.checked) perms += 2;
-					if (f.dirPermsWorldSearch.checked) perms += 1;
-					f.config_dirperms.value = '0'+''+perms;
-				}
-			}
-			function changeDirPermsMode(mode)
-			{
-				if(document.getElementById) {
-					switch (mode) {
-						case 0:
-							document.getElementById('dirPermsValue').style.display = 'none';
-							document.getElementById('dirPermsTooltip').style.display = '';
-							document.getElementById('dirPermsFlags').style.display = 'none';
-							break;
-						default:
-							document.getElementById('dirPermsValue').style.display = '';
-							document.getElementById('dirPermsTooltip').style.display = 'none';
-							document.getElementById('dirPermsFlags').style.display = '';
-					} // switch
-				} // if
-				saveDirPerms();
-			}
+		}
 		//-->
 		</script>
 		<form action="index2.php" method="post" name="adminForm">
@@ -414,11 +424,29 @@ class HTML_config {
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td>Login Session Lifetime:</td>
+				<td>Site Session Lifetime:</td>
 				<td>
 				<input class="text_area" type="text" name="config_lifetime" size="10" value="<?php echo $row->config_lifetime; ?>"/>
 				&nbsp;seconds&nbsp;
-				<?php echo mosToolTip('Auto logout after this time of inactivity'); ?>
+				<?php echo mosWarning('Auto logout after this time of inactivity for <strong>site/frontend</strong> users. The higher the value the greater the security risk!'); ?>
+				</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td>Admin Session Lifetime:</td>
+				<td>
+				<input class="text_area" type="text" name="config_session_life_admin" size="10" value="<?php echo $row->config_session_life_admin; ?>"/>
+				&nbsp;seconds&nbsp;
+				<?php echo mosWarning('Auto logout after this time of inactivity for <strong>admin/backend</strong> users. The higher the value the greater the security risk!'); ?>
+				</td>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td>Session Authentication Method:</td>
+				<td>
+				<?php echo $lists['session_type']; ?>
+				&nbsp;&nbsp;
+				<?php echo mosWarning('Do not change unless you know what you are doing!<br /><br /> If you have a number of users using AOL or behind Proxy banks, you might consider using the Level 2 setting' ); ?>
 				</td>
 				<td>&nbsp;</td>
 			</tr>
