@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.trash.php 5410 2006-10-10 22:08:59Z Saka $
+* @version $Id: admin.trash.php 5412 2006-10-10 22:08:59Z Saka $
 * @package Joomla
 * @subpackage Trash
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

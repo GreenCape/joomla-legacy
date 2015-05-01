@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_quickicon.php 5571 2006-10-26 05:20:13Z Saka $
+* @version $Id: mod_quickicon.php 5573 2006-10-26 05:20:13Z Saka $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

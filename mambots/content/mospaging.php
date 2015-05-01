@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mospaging.php 2574 2006-02-23 18:48:16Z stingrey $
+* @version $Id: mospaging.php 2576 2006-02-23 18:48:16Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

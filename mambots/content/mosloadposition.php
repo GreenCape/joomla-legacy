@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mosloadposition.php 5873 2006-11-28 23:31:00Z facedancer $
+* @version $Id: mosloadposition.php 5875 2006-11-28 23:31:00Z facedancer $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

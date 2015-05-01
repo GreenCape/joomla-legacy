@@ -2,7 +2,7 @@
 /**
  * patTemplate reader that reads HTML_Template_IT files
  *
- * $Id: IT.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: IT.php 49 2005-09-15 02:55:27Z rhuk $
  *
  * @package		patTemplate
  * @subpackage	Readers

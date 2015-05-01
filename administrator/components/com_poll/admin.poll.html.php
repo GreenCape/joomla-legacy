@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.poll.html.php 5948 2006-12-06 22:42:31Z facedancer $
+* @version $Id: admin.poll.html.php 5950 2006-12-06 22:42:31Z facedancer $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

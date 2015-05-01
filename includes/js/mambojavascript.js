@@ -1,6 +1,6 @@
 // <?php !! This fools phpdocumentor into parsing this file
 /**
-* @version $Id: mambojavascript.js 3562 2006-05-20 12:27:49Z stingrey $
+* @version $Id: mambojavascript.js 3564 2006-05-20 12:27:49Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL

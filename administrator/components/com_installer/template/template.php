@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: template.php 328 2005-10-02 15:39:51Z Jinx $
+* @version $Id: template.php 330 2005-10-02 15:39:51Z Jinx $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

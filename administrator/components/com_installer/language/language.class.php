@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: language.class.php 329 2005-10-02 15:48:09Z stingrey $
+* @version $Id: language.class.php 331 2005-10-02 15:48:09Z stingrey $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.categories.html.php 6000 2006-12-13 19:52:58Z friesengeist $
+* @version $Id: admin.categories.html.php 7409 2007-05-14 21:10:47Z robs $
 * @package Joomla
 * @subpackage Categories
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -278,6 +278,8 @@ class categories_html {
 
 			if ( form.name.value == "" ) {
 				alert("Category must have a name");
+			} else if (form.title.value ==""){
+				alert("Category must have a title");
 			} else {
 				<?php getEditorContents( 'editor1', 'description' ) ; ?>
 				submitform(pressbutton);

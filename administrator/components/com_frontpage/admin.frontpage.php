@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.frontpage.php 4994 2006-09-10 16:33:55Z friesengeist $
+* @version $Id: admin.frontpage.php 4996 2006-09-10 16:33:55Z friesengeist $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

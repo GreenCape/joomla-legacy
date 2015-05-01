@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: newsfeeds.searchbot.php 5055 2006-09-14 16:38:01Z friesengeist $
+* @version $Id: newsfeeds.searchbot.php 5057 2006-09-14 16:38:01Z friesengeist $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

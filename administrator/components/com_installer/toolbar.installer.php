@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.installer.php 3495 2006-05-15 01:44:00Z stingrey $
+* @version $Id: toolbar.installer.php 3497 2006-05-15 01:44:00Z stingrey $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

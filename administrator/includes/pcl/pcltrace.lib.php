@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pcltrace.lib.php 47 2005-09-15 02:55:27Z rhuk $
+* @version $Id: pcltrace.lib.php 49 2005-09-15 02:55:27Z rhuk $
 * @package Joomla
 */
 

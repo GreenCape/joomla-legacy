@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content_section.class.php 4542 2006-08-15 13:49:12Z predator $
+* @version $Id: content_section.class.php 4544 2006-08-15 13:49:12Z predator $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

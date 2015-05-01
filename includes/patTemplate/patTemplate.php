@@ -2,7 +2,7 @@
 /**
  * patTemplate
  *
- * $Id: patTemplate.php 1544 2005-12-23 07:01:01Z eddieajau $
+ * $Id: patTemplate.php 1546 2005-12-23 07:01:01Z eddieajau $
  *
  * powerful templating engine
  *

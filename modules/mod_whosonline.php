@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_whosonline.php 2726 2006-03-09 14:01:19Z stingrey $
+* @version $Id: mod_whosonline.php 2728 2006-03-09 14:01:19Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

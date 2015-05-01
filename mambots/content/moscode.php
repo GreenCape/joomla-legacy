@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: moscode.php 2411 2006-02-16 17:23:32Z stingrey $
+* @version $Id: moscode.php 2413 2006-02-16 17:23:32Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

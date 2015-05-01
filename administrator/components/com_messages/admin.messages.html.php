@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.messages.html.php 5981 2006-12-12 02:01:34Z friesengeist $
+* @version $Id: admin.messages.html.php 5983 2006-12-12 02:01:34Z friesengeist $
 * @package Joomla
 * @subpackage Messages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

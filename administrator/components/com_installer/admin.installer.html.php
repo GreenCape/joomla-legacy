@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.installer.html.php 5992 2006-12-13 00:18:18Z friesengeist $
+* @version $Id: admin.installer.html.php 5994 2006-12-13 00:18:18Z friesengeist $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

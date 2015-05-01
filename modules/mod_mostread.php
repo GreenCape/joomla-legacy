@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_mostread.php 5069 2006-09-15 16:16:55Z friesengeist $
+* @version $Id: mod_mostread.php 5071 2006-09-15 16:16:55Z friesengeist $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

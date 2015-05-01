@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mosvote.php 3500 2006-05-15 04:31:11Z stingrey $
+* @version $Id: mosvote.php 3502 2006-05-15 04:31:11Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

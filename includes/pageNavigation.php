@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pageNavigation.php 5511 2006-10-19 12:17:15Z friesengeist $
+* @version $Id: pageNavigation.php 5513 2006-10-19 12:17:15Z friesengeist $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

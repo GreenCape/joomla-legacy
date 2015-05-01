@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_logged.php 4500 2006-08-13 22:45:33Z eddiea $
+* @version $Id: mod_logged.php 4502 2006-08-13 22:45:33Z eddiea $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

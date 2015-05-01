@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.statistics.html.php 2760 2006-03-12 18:42:18Z stingrey $
+* @version $Id: admin.statistics.html.php 2762 2006-03-12 18:42:18Z stingrey $
 * @package Joomla
 * @subpackage Statistics
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

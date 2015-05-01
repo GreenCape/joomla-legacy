@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: gacl_api.class.php 5316 2006-10-04 01:40:31Z pasamio $
+* @version $Id: gacl_api.class.php 5318 2006-10-04 01:40:31Z pasamio $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

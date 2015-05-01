@@ -1,4 +1,4 @@
-# $Id: sample_data.sql 6006 2006-12-15 03:05:56Z friesengeist $
+# $Id: sample_data.sql 6008 2006-12-15 03:05:56Z friesengeist $
 
 #
 # Dumping data for table `#__banner`

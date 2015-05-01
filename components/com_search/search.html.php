@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: search.html.php 4953 2006-09-06 13:07:03Z predator $
+* @version $Id: search.html.php 4955 2006-09-06 13:07:03Z predator $
 * @package Joomla
 * @subpackage Search
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: legacybots.php 2695 2006-03-07 20:26:09Z stingrey $
+* @version $Id: legacybots.php 2697 2006-03-07 20:26:09Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

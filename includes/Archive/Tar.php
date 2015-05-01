@@ -16,7 +16,7 @@
 // | Author: Vincent Blavet <vincent@blavet.net>						  |
 // +----------------------------------------------------------------------+
 //
-// $Id: Tar.php 47 2005-09-15 02:55:27Z rhuk $
+// $Id: Tar.php 49 2005-09-15 02:55:27Z rhuk $
 
 // no direct access
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
@@ -29,7 +29,7 @@ define ('ARCHIVE_TAR_ATT_SEPARATOR', 90001);
 * Creates a (compressed) Tar archive
 *
 * @author	Vincent Blavet <vincent@blavet.net>
-* @version  $Revision: 47 $
+* @version  $Revision: 49 $
 * @package  Archive
 */
 class Archive_Tar extends PEAR

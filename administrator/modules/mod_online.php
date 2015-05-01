@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_online.php 5026 2006-09-13 18:45:52Z friesengeist $
+* @version $Id: mod_online.php 5028 2006-09-13 18:45:52Z friesengeist $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

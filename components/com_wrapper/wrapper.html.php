@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: wrapper.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: wrapper.html.php 87 2005-09-15 23:12:03Z eddieajau $
 * @package Joomla
 * @subpackage Wrapper
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

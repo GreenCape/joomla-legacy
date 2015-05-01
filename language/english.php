@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: english.php 6085 2006-12-24 18:59:57Z robs $
+* @version $Id: english.php 6087 2006-12-24 18:59:57Z robs $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

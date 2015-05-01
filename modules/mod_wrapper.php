@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_wrapper.php 5750 2006-11-13 00:17:30Z friesengeist $
+* @version $Id: mod_wrapper.php 5752 2006-11-13 00:17:30Z friesengeist $
 * @package Joomla_1.0.0
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

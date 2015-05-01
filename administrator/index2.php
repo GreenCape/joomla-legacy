@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index2.php 6022 2006-12-18 22:30:07Z friesengeist $
+* @version $Id: index2.php 6024 2006-12-18 22:30:07Z friesengeist $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pdf.php 5073 2006-09-15 23:49:17Z friesengeist $
+* @version $Id: pdf.php 5075 2006-09-15 23:49:17Z friesengeist $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

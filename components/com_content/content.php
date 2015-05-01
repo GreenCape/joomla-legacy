@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.php 6019 2006-12-18 19:50:34Z friesengeist $
+* @version $Id: content.php 7443 2007-05-20 18:02:52Z robs $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -60,6 +60,7 @@ switch ( $task ) {
 
 	case 'category':
 		$selected 	= strval( mosGetParam( $_REQUEST, 'order', '' ) );
+		$selected	= preg_replace( '/[^a-z]/i', '', $selected );
 		$filter 	= stripslashes( strval( mosGetParam( $_REQUEST, 'filter', '' ) ) );
 
 		$cache->call( 'showCategory', $id, $gid, $access, $sectionid, $limit, NULL, $limitstart, 0, $selected, $filter );
@@ -138,7 +139,7 @@ function findKeyItem( $gid, $access, $pop, $option, $now ) {
 
 	$query = "SELECT id"
 	. "\n FROM #__content"
-	. "\n WHERE attribs LIKE '%keyref=" . $database->getEscaped( $keyref ) . "%'"
+	. "\n WHERE attribs LIKE '%keyref=" . $database->getEscaped( $keyref ) . "\n%'"
 	;
 	$database->setQuery( $query );
 	$id = $database->loadResult();
@@ -2176,7 +2177,19 @@ function cancelContent( &$access ) {
 function emailContentForm( $uid, $gid ) {
 	global $database, $mosConfig_hideEmail;
 
-	if ($mosConfig_hideEmail) {
+	$id	= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
+
+	if ( $id ) {
+		$query	= 'SELECT attribs FROM #__content WHERE `id`=' . $id;
+		$database->setQuery( $query );
+		$params = new mosParameters( $database->loadResult() );
+	} else {
+		$params = new mosParameters( '' );
+	}
+
+	$email = intval( $params->get( 'email', 0 ) );
+
+	if ($mosConfig_hideEmail && !$email ) {
 		echo _NOT_AUTH;
 		return;
 	}
@@ -2254,7 +2267,19 @@ function emailContentSend( $uid, $gid ) {
 	global $database, $mainframe;
 	global $mosConfig_live_site, $mosConfig_sitename, $mosConfig_hideEmail;
 
-	if ($mosConfig_hideEmail) {
+	$id	= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
+
+	if ( $id ) {
+		$query	= 'SELECT attribs FROM #__content WHERE `id`=' . $id;
+		$database->setQuery( $query );
+		$params = new mosParameters( $database->loadResult() );
+	} else {
+		$params = new mosParameters( '' );
+	}
+
+	$paramEmail = intval( $params->get( 'email', 0 ) );
+
+	if ($mosConfig_hideEmail && !$paramEmail ) {
 		echo _NOT_AUTH;
 		return;
 	}

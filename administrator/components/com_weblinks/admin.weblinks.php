@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.weblinks.php 5023 2006-09-13 12:36:21Z friesengeist $
+* @version $Id: admin.weblinks.php 5025 2006-09-13 12:36:21Z friesengeist $
 * @package Joomla
 * @subpackage Weblinks
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

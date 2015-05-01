@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: weblinks.html.php 4872 2006-08-31 17:22:48Z predator $
+* @version $Id: weblinks.html.php 4874 2006-08-31 17:22:48Z predator $
 * @package Joomla
 * @subpackage Weblinks
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

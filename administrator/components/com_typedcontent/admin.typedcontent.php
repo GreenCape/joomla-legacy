@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.typedcontent.php 5097 2006-09-19 22:31:33Z Saka $
+* @version $Id: admin.typedcontent.php 5099 2006-09-19 22:31:33Z Saka $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.html.php 6070 2006-12-20 02:09:09Z robs $
+* @version $Id: admin.config.html.php 7424 2007-05-17 15:56:10Z robs $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -395,6 +395,11 @@ class HTML_config {
 				<td><?php echo $lists['item_navigation']; ?></td>
 				<td>&nbsp;</td>
 			</tr>
+			<tr>
+				<td>Itemid Compatibility Mode:</td>
+				<td><?php echo $lists['itemid_compat']; ?></td>
+				<td>&nbsp;</td>
+			</tr>
 			</table>
 			<input type="hidden" name="config_multilingual_support" value="<?php echo $row->config_multilingual_support?>">
 			<?php
@@ -651,7 +656,33 @@ class HTML_config {
 					</fieldset>
 				</td>
 				<td>&nbsp;</td>
-			  </tr>
+			</tr>
+			<tr>
+				<?php
+				$rgmode = 0;
+				if( defined( 'RG_EMULATION' ) ) {
+					$rgmode = RG_EMULATION;
+				}
+				?>
+				<td valign="top">Register Globals Emulation:</td>
+				<td>
+					<fieldset><legend>Register Globals Emulation</legend>
+						<table cellpadding="1" cellspacing="1" border="0">
+							<tr>
+								<td><input type="radio" id="rgemulation" name="rgemulation" value="0"<?php if (!$rgmode) echo ' checked="checked"'; ?>/></td>
+								<td><label for="rgemulation">OFF - more secure and the preferred setting</label></td>
+							</tr>
+							<tr>
+								<td><input type="radio" id="rgemulation" name="rgemulation" value="1"<?php if ($rgmode) echo ' checked="checked"'; ?>/></td>
+								<td><label for="rgemulation">ON - better compatibility but less secure</label></td>
+							</tr>
+							</tr>
+						</table>
+					</fieldset>
+				</td>
+				<td>&nbsp;</td>
+			</tr>
+
 			</table>
 			<?php
 		$tabs->endTab();

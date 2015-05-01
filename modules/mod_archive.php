@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_archive.php 5883 2006-11-29 23:26:33Z predator $
+* @version $Id: mod_archive.php 5885 2006-11-29 23:26:33Z predator $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

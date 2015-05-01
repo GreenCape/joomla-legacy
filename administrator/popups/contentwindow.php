@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contentwindow.php 5862 2006-11-27 22:54:44Z Saka $
+* @version $Id: contentwindow.php 5864 2006-11-27 22:54:44Z Saka $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

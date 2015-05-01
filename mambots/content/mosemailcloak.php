@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mosemailcloak.php 4562 2006-08-18 23:26:32Z stingrey $
+* @version $Id: mosemailcloak.php 4564 2006-08-18 23:26:32Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

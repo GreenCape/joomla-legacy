@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.media.html.php 181 2005-09-19 01:01:12Z stingrey $
+* @version $Id: toolbar.media.html.php 183 2005-09-19 01:01:12Z stingrey $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

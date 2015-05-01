@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.sections.php 5874 2006-11-29 00:21:35Z facedancer $
+* @version $Id: admin.sections.php 5876 2006-11-29 00:21:35Z facedancer $
 * @package Joomla
 * @subpackage Sections
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

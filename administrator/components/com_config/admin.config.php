@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.php 5950 2006-12-06 23:18:11Z facedancer $
+* @version $Id: admin.config.php 7424 2007-05-17 15:56:10Z robs $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -294,6 +294,12 @@ function showconfig( $option) {
 
 	$lists['multipage_toc'] 		= mosHTML::RadioList( $show_hide_r, 'config_multipage_toc', 'class="inputbox"', $row->config_multipage_toc, 'value', 'text' );
 
+	$itemid_compat = array(
+		mosHTML::makeOption( '11', 'Joomla! 1.0.11 and before' ),
+		mosHTML::makeOption( '0', 'Joomla! 1.0.12 and after' ),
+	);
+	$lists['itemid_compat'] 		= mosHTML::selectList( $itemid_compat, 'config_itemid_compat', 'class="inputbox" size="1"', 'value', 'text', $row->config_itemid_compat );
+
 // SHOW EDIT FORM
 
 	HTML_config::showconfig( $row, $lists, $option );
@@ -346,6 +352,11 @@ function saveconfig( $task ) {
 	$row->config_error_message		= str_replace( "'", '&#039;', $row->config_error_message );
 
 	$config = "<?php \n";
+
+	$RGEmulation = intval( mosGetParam( $_POST, 'rgemulation', 0 ) );
+	$config .= "if(!defined('RG_EMULATION')) { define( 'RG_EMULATION', $RGEmulation ); }\n";
+
+
 	$config .= $row->getVarText();
 	$config .= "setlocale (LC_TIME, \$mosConfig_locale);\n";
 	$config .= '?>';

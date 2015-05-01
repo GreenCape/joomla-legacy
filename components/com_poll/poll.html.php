@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: poll.html.php 3163 2006-04-19 23:53:40Z eddieajau $
+* @version $Id: poll.html.php 3165 2006-04-19 23:53:40Z eddieajau $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

@@ -2,7 +2,7 @@
 /**
  * Base class for patTemplate Stat
  *
- * $Id: File.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: File.php 49 2005-09-15 02:55:27Z rhuk $
  *
  * A stat component should be implemented for each reader
  * to support caching. Stats return information about the
@@ -16,7 +16,7 @@
 /**
  * Base class for patTemplate Stat
  *
- * $Id: File.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: File.php 49 2005-09-15 02:55:27Z rhuk $
  *
  * A stat component should be implemented for each reader
  * to support caching. Stats return information about the

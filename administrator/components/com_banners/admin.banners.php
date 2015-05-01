@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.banners.php 4980 2006-09-09 16:10:24Z friesengeist $
+* @version $Id: admin.banners.php 4982 2006-09-09 16:10:24Z friesengeist $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

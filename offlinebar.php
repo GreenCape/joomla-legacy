@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: offlinebar.php 449 2005-10-11 04:58:12Z stingrey $
+* @version $Id: offlinebar.php 451 2005-10-11 04:58:12Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: url.menu.html.php 5539 2006-10-21 18:15:59Z friesengeist $
+* @version $Id: url.menu.html.php 5541 2006-10-21 18:15:59Z friesengeist $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

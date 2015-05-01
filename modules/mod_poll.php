@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_poll.php 5909 2006-12-01 16:22:26Z friesengeist $
+* @version $Id: mod_poll.php 5911 2006-12-01 16:22:26Z friesengeist $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

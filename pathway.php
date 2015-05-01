@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pathway.php 2267 2006-02-10 20:29:27Z stingrey $
+* @version $Id: pathway.php 2269 2006-02-10 20:29:27Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

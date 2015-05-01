@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mambot.class.php 4994 2006-09-10 16:33:55Z friesengeist $
+* @version $Id: mambot.class.php 4996 2006-09-10 16:33:55Z friesengeist $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

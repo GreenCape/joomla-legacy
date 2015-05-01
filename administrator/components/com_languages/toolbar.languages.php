@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.languages.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: toolbar.languages.php 87 2005-09-15 23:12:03Z eddieajau $
 * @package Joomla
 * @subpackage Languages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

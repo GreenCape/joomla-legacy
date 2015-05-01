@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.php 5070 2006-09-15 16:24:06Z friesengeist $
+* @version $Id: contact.php 5072 2006-09-15 16:24:06Z friesengeist $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

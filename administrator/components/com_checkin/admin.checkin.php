@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.checkin.php 5028 2006-09-14 00:03:34Z friesengeist $
+* @version $Id: admin.checkin.php 5030 2006-09-14 00:03:34Z friesengeist $
 * @package Joomla
 * @subpackage Checkin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

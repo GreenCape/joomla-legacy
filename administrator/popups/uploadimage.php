@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: uploadimage.php 5930 2006-12-06 06:27:58Z rmdstudio $
+* @version $Id: uploadimage.php 5932 2006-12-06 06:27:58Z rmdstudio $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

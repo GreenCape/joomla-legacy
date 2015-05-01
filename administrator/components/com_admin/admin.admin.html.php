@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.html.php 5612 2006-11-01 05:01:48Z Saka $
+* @version $Id: admin.admin.html.php 7211 2007-04-29 02:26:51Z robs $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -332,9 +332,12 @@ class HTML_admin_misc {
 						$cf[$k] = '$mosConfig_password = \'xxxxxx\'';
 					} else if (eregi( 'mosConfig_db ', $v)) {
 						$cf[$k] = '$mosConfig_db = \'xxxxxx\'';
-					} else if (eregi( '<?php', $v)) {
-						$cf[$k] = '&lt;?php';
 					}
+				}
+				foreach ($cf as $k=>$v) {
+					$k = htmlspecialchars( $k );
+					$v = htmlspecialchars( $v );
+					$cf[$k]=$v;
 				}
 				echo implode( "<br />", $cf );
 				?>

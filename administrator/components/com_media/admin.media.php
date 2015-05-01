@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.media.php 5874 2006-11-29 00:21:35Z facedancer $
+* @version $Id: admin.media.php 5876 2006-11-29 00:21:35Z facedancer $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

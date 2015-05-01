@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: none.php 3549 2006-05-18 08:24:53Z stingrey $
+* @version $Id: none.php 3551 2006-05-18 08:24:53Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.mambots.php 5074 2006-09-16 11:44:41Z friesengeist $
+* @version $Id: admin.mambots.php 5076 2006-09-16 11:44:41Z friesengeist $
 * @package Joomla
 * @subpackage Mambots
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

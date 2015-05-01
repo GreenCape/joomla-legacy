@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.templates.php 5013 2006-09-11 23:59:27Z friesengeist $
+* @version $Id: admin.templates.php 5015 2006-09-11 23:59:27Z friesengeist $
 * @package Joomla
 * @subpackage Templates
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

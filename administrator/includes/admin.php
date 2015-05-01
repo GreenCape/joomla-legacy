@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.php 5617 2006-11-01 23:05:29Z Saka $
+* @version $Id: admin.php 7832 2007-07-03 01:30:02Z robs $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -323,7 +323,7 @@ function josSecurityCheck($width='95%') {
 		$wrongSettingsTexts[] = 'PHP register_globals setting is `ON` instead of `OFF`';
 	}
 	if ( RG_EMULATION != 0 ) {
-		$wrongSettingsTexts[] = 'Joomla! RG_EMULATION setting is `ON` instead of `OFF` in file globals.php <br /><span style="font-weight: normal; font-style: italic; color: #666;">`ON` by default for compatibility reasons</span>';
+		$wrongSettingsTexts[] = 'Joomla! &quot;Register Globals Emulation&quot; setting is `ON`. &nbsp; To disable Register Globals Emulation, navigate to Site -> Global Configuration -> Server, select `OFF`, and save.<br /><span style="font-weight: normal; font-style: italic; color: #666;">Register Globals Emulation is `ON` by default for backward compatibility.</span>';
 	}
 
 	if ( count($wrongSettingsTexts) ) {

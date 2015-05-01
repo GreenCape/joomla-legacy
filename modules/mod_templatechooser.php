@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_templatechooser.php 1492 2005-12-20 16:07:35Z Jinx $
+* @version $Id: mod_templatechooser.php 1494 2005-12-20 16:07:35Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

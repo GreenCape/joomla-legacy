@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.installer.php 4621 2006-08-21 16:40:39Z stingrey $
+* @version $Id: admin.installer.php 4623 2006-08-21 16:40:39Z stingrey $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

@@ -2,7 +2,7 @@
 /**
  * patTemplate BBCode output filter
  *
- * $Id: BBCode.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: BBCode.php 49 2005-09-15 02:55:27Z rhuk $
  *
  * Uses patBBCode.
  *
@@ -14,7 +14,7 @@
 /**
  * patTemplate BBCode output filter
  *
- * $Id: BBCode.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: BBCode.php 49 2005-09-15 02:55:27Z rhuk $
  *
  * Uses patBBCode. Note that patBBCode's syntax is not
  * entirely the same than the 'official' BBCode. See the

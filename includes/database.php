@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: database.php 5903 2006-12-01 02:01:55Z friesengeist $
+* @version $Id: database.php 5905 2006-12-01 02:01:55Z friesengeist $
 * @package Joomla
 * @subpackage Database
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

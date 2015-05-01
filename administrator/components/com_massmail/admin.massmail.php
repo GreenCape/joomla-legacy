@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.massmail.php 4997 2006-09-10 20:01:47Z friesengeist $
+* @version $Id: admin.massmail.php 4999 2006-09-10 20:01:47Z friesengeist $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

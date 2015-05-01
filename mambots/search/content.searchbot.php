@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.searchbot.php 5484 2006-10-16 12:14:56Z akede $
+* @version $Id: content.searchbot.php 5486 2006-10-16 12:14:56Z akede $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

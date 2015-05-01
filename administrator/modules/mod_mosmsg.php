@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_mosmsg.php 4874 2006-08-31 18:29:19Z predator $
+* @version $Id: mod_mosmsg.php 4876 2006-08-31 18:29:19Z predator $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

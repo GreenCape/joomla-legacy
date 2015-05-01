@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mambot.php 2924 2006-03-27 06:58:11Z akede $
+* @version $Id: mambot.php 2926 2006-03-27 06:58:11Z akede $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

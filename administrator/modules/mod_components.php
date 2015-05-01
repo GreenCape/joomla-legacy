@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_components.php 310 2005-10-02 11:17:00Z stingrey $
+* @version $Id: mod_components.php 7409 2007-05-14 21:10:47Z robs $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -77,15 +77,15 @@ foreach ($comps as $row) {
 								<td align="center" style="text-align: center; font-weight: bold;">
 									<a href="index2.php?option=com_admin&task=listcomponents">Full Component List</a>
 								</td>
-							</tr>		
-							</table>					
+							</tr>
+							</table>
 							</div>
 							<?php
 							$i = 1000;
 						} // if
 					} else {
 						?>
-						<table width="50%" class="adminlist" border="1">						
+						<table width="50%" class="adminlist" border="1" style="text-align: left">
 						<?php
 						if ($i < $topLevelLimit ) {
 							$i++;
@@ -147,12 +147,12 @@ foreach ($comps as $row) {
 							} // if
 						} // if
 						?>
-						</table>											
+						</table>
 						<?php
 					} // if else
 				} // if
 			} // if
-			
+
 			$z++;
 		} // foreach
 		?>

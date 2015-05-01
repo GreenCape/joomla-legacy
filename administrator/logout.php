@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: logout.php 5608 2006-10-30 22:24:43Z facedancer $
+* @version $Id: logout.php 5610 2006-10-30 22:24:43Z facedancer $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

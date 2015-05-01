@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.php 6019 2006-12-18 19:50:34Z friesengeist $
+* @version $Id: admin.content.php 6021 2006-12-18 19:50:34Z friesengeist $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

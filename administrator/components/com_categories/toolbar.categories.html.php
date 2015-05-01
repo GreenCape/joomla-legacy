@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.categories.html.php 4344 2006-07-27 19:43:02Z rmuilwijk $
+* @version $Id: toolbar.categories.html.php 4346 2006-07-27 19:43:02Z rmuilwijk $
 * @package Joomla
 * @subpackage Categories
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

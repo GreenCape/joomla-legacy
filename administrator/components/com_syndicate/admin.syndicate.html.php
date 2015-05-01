@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.syndicate.html.php 2693 2006-03-07 18:13:12Z stingrey $
+* @version $Id: admin.syndicate.html.php 2695 2006-03-07 18:13:12Z stingrey $
 * @package Joomla
 * @subpackage Syndicate
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: messages.class.php 5079 2006-09-16 23:11:24Z friesengeist $
+* @version $Id: messages.class.php 5081 2006-09-16 23:11:24Z friesengeist $
 * @package Joomla
 * @subpackage Messages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

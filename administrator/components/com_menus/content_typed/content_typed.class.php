@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content_typed.class.php 5045 2006-09-14 13:49:01Z friesengeist $
+* @version $Id: content_typed.class.php 5047 2006-09-14 13:49:01Z friesengeist $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

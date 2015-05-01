@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.mambots.html.php 4675 2006-08-23 16:55:24Z stingrey $
+* @version $Id: toolbar.mambots.html.php 4677 2006-08-23 16:55:24Z stingrey $
 * @package Joomla
 * @subpackage Mambots
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

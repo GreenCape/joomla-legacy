@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: COPYRIGHT.php 1642 2006-01-04 01:20:09Z rhuk $
+* @version $Id: COPYRIGHT.php 1644 2006-01-04 01:20:09Z rhuk $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

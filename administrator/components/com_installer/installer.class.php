@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: installer.class.php 5033 2006-09-14 01:22:50Z pasamio $
+* @version $Id: installer.class.php 5035 2006-09-14 01:22:50Z pasamio $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

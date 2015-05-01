@@ -2,7 +2,7 @@
 /**
  * patTemplate HighlightPHP filter
  *
- * $Id: HighlightPhp.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: HighlightPhp.php 49 2005-09-15 02:55:27Z rhuk $
  *
  * Highlights PHP code in the output.
  *
@@ -14,7 +14,7 @@
 /**
  * patTemplate HighlightPHP filter
  *
- * $Id: HighlightPhp.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: HighlightPhp.php 49 2005-09-15 02:55:27Z rhuk $
  *
  * Highlights PHP code in the output.
  *

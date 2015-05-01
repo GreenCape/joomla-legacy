@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: database.mysqli.php 4992 2006-09-10 15:04:50Z friesengeist $
+* @version $Id: database.mysqli.php 4994 2006-09-10 15:04:50Z friesengeist $
 * @package Joomla
 * @subpackage Database
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

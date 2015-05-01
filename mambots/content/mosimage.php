@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mosimage.php 5939 2006-12-06 12:43:29Z predator $
+* @version $Id: mosimage.php 5941 2006-12-06 12:43:29Z predator $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

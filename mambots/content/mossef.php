@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mossef.php 4859 2006-08-31 13:55:47Z predator $
+* @version $Id: mossef.php 4861 2006-08-31 13:55:47Z predator $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

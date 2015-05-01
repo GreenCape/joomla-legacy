@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.poll.html.php 5977 2006-12-11 03:08:31Z friesengeist $
+* @version $Id: toolbar.poll.html.php 5979 2006-12-11 03:08:31Z friesengeist $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

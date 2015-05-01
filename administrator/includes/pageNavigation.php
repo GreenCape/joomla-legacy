@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pageNavigation.php 5830 2006-11-21 18:59:45Z Saka $
+* @version $Id: pageNavigation.php 5832 2006-11-21 18:59:45Z Saka $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

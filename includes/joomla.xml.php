@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.xml.php 5081 2006-09-17 11:18:25Z predator $
+* @version $Id: joomla.xml.php 5083 2006-09-17 11:18:25Z predator $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

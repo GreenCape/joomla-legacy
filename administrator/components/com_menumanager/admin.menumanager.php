@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menumanager.php 5026 2006-09-13 18:45:52Z friesengeist $
+* @version $Id: admin.menumanager.php 5028 2006-09-13 18:45:52Z friesengeist $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

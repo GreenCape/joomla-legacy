@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: offline.php 6018 2006-12-18 19:04:42Z robs $
+* @version $Id: offline.php 6020 2006-12-18 19:04:42Z robs $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

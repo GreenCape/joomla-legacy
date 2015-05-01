@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pathway.php 5748 2006-11-12 22:12:52Z akede $
+* @version $Id: pathway.php 5750 2006-11-12 22:12:52Z akede $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php

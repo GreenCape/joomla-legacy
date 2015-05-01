@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: login.php 4055 2006-06-19 20:00:59Z stingrey $
+* @version $Id: login.php 4057 2006-06-19 20:00:59Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

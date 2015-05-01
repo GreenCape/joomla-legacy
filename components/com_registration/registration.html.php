@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: registration.html.php 5928 2006-12-06 00:49:07Z friesengeist $
+* @version $Id: registration.html.php 5930 2006-12-06 00:49:07Z friesengeist $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

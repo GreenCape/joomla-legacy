@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.php 5993 2006-12-13 00:24:58Z friesengeist $
+* @version $Id: joomla.php 8078 2007-07-19 06:45:54Z robs $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -737,7 +737,7 @@ class mosMainFrame {
 	/*
 	* Function used to conduct admin session duties
 	* Added as of 1.0.8
-	* Deperciated 1.1
+	* Deprecated 1.1
 	*/
 	function initSessionAdmin($option, $task) {
 		global $_VERSION, $mosConfig_admin_expired;
@@ -764,11 +764,11 @@ class mosMainFrame {
 		$my->gid 		= intval( mosGetParam( $_SESSION, 'session_gid', '' ) );
 		$my->params		= mosGetParam( $_SESSION, 'session_user_params', '' );
 
-		$session_id 	= mosGetParam( $_SESSION, 'session_id', '' );
+		$session_id		= mosGetParam( $_SESSION, 'session_id', '' );
 		$logintime 		= mosGetParam( $_SESSION, 'session_logintime', '' );
 
 		// check to see if session id corresponds with correct format
-		if ( $session_id == md5( $my->id . $my->username . $my->usertype . $logintime ) ) {
+		if ($session_id == md5( $my->id . $my->username . $my->usertype . $logintime )) {
 			// if task action is to `save` or `apply` complete action before doing session checks.
 			if ($task != 'save' && $task != 'apply') {
 				// test for session_life_admin
@@ -789,10 +789,25 @@ class mosMainFrame {
 				$this->_db->setQuery( $query );
 				$this->_db->query();
 
+				// destroy the old session
+				$oldSession	= $_SESSION;
+				session_destroy();
+
+				// create a clean session
+				$current_time	= time();
+				$new_session_id = md5( $my->id . $my->username . $my->usertype . $current_time );
+				session_id($new_session_id);
+				session_start();
+
+				// restore the old session state with a new id
+				$_SESSION						= $oldSession;
+				$_SESSION['session_id'] 		= $new_session_id;
+				$_SESSION['session_logintime']	= $current_time;
+
 				// update session timestamp
-				$current_time = time();
 				$query = "UPDATE #__session"
 				. "\n SET time = " . $this->_db->Quote( $current_time )
+				. "\n , session_id = " . $this->_db->Quote( $new_session_id )
 				. "\n WHERE session_id = " . $this->_db->Quote( $session_id )
 				;
 				$this->_db->setQuery( $query );
@@ -804,7 +819,7 @@ class mosMainFrame {
 				// check against db record of session
 				$query = "SELECT COUNT( session_id )"
 				. "\n FROM #__session"
-				. "\n WHERE session_id = " . $this->_db->Quote( $session_id )
+				. "\n WHERE session_id = " . $this->_db->Quote( $new_session_id )
 				. "\n AND username = ". $this->_db->Quote( $my->username )
 				. "\n AND userid = ". intval( $my->id )
 				;
@@ -881,7 +896,7 @@ class mosMainFrame {
 	* Function used to set Session Garbage Cleaning
 	* garbage cleaning set at configured session time + 600 seconds
 	* Added as of 1.0.8
-	* Deperciated 1.1
+	* Deprecated 1.1
 	*/
 	function setSessionGarbageClean() {
 		/** ensure that funciton is only called once */
@@ -896,18 +911,26 @@ class mosMainFrame {
 	/*
 	* Static Function used to generate the Session Cookie Name
 	* Added as of 1.0.8
-	* Deperciated 1.1
+	* Deprecated 1.1
 	*/
 	function sessionCookieName() {
-		global $mainframe;
+		global $mainframe, $mosConfig_live_site;
 
-		return md5( 'site' . $mainframe->getCfg( 'live_site' ) );
+		if( substr( $mosConfig_live_site, 0, 7 ) == 'http://' ) {
+			$hash = md5( 'site' . substr( $mosConfig_live_site, 7 ) );
+		} elseif( substr( $mosConfig_live_site, 0, 8 ) == 'https://' ) {
+			$hash = md5( 'site' . substr( $mosConfig_live_site, 8 ) );
+		} else {
+			$hash = md5( 'site' . $mainframe->getCfg( 'live_site' ) );
+		}
+
+		return $hash;
 	}
 
 	/*
 	* Static Function used to generate the Session Cookie Value
 	* Added as of 1.0.8
-	* Deperciated 1.1
+	* Deprecated 1.1
 	*/
 	function sessionCookieValue( $id=null ) {
 		global $mainframe;
@@ -991,16 +1014,16 @@ class mosMainFrame {
 	* table. A successful validation updates the current session record with
 	* the users details.
 	*/
-	function login( $username=null,$passwd=null, $remember=0, $userid=NULL ) {
+	function login( $username=null, $passwd=null, $remember=0, $userid=NULL ) {
 		global $acl, $_VERSION;
 
 		$bypost = 0;
+		$valid_remember = false;
 
 		// if no username and password passed from function, then function is being called from login module/component
 		if (!$username || !$passwd) {
 			$username 	= stripslashes( strval( mosGetParam( $_POST, 'username', '' ) ) );
 			$passwd 	= stripslashes( strval( mosGetParam( $_POST, 'passwd', '' ) ) );
-			$passwd 	= md5( $passwd );
 
 			$bypost 	= 1;
 
@@ -1018,7 +1041,7 @@ class mosMainFrame {
 			mosErrorAlert( _LOGIN_INCOMPLETE );
 			exit();
 		} else {
-			if ( $remember && strlen($username) == 32 && strlen($passwd) == 32 && $userid ) {
+			if ( $remember && strlen($username) == 32 && $userid ) {
 			// query used for remember me cookie
 				$harden = mosHash( @$_SERVER['HTTP_USER_AGENT'] );
 
@@ -1029,19 +1052,22 @@ class mosMainFrame {
 				$this->_db->setQuery( $query );
 				$this->_db->loadObject($user);
 
+				list($hash, $salt) = explode(':', $user->password);
+
 				$check_username = md5( $user->username . $harden );
-				$check_password = md5( $user->password . $harden );
+				$check_password = md5( $hash . $harden );
 
 				if ( $check_username == $username && $check_password == $passwd ) {
 					$row = $user;
+					$valid_remember = true;
 				}
 			} else {
 			// query used for login via login module
 				$query = "SELECT id, name, username, password, usertype, block, gid"
 				. "\n FROM #__users"
 				. "\n WHERE username = ". $this->_db->Quote( $username )
-				. "\n AND password = ". $this->_db->Quote( $passwd )
 				;
+
 				$this->_db->setQuery( $query );
 				$this->_db->loadObject( $row );
 			}
@@ -1050,6 +1076,37 @@ class mosMainFrame {
 				// user blocked from login
 				if ($row->block == 1) {
 					mosErrorAlert(_LOGIN_BLOCKED);
+				}
+
+				if (!$valid_remember) {
+					// Conversion to new type
+					if ((strpos($row->password, ':') === false) && $row->password == md5($passwd)) {
+						// Old password hash storage but authentic ... lets convert it
+						$salt = mosMakePassword(16);
+						$crypt = md5($passwd.$salt);
+						$row->password = $crypt.':'.$salt;
+
+						// Now lets store it in the database
+						$query	= 'UPDATE #__users'
+								. ' SET password = '.$this->_db->Quote($row->password)
+								. ' WHERE id = '.(int)$row->id;
+						$this->_db->setQuery($query);
+						if (!$this->_db->query()) {
+							// This is an error but not sure what to do with it ... we'll still work for now
+						}
+					}
+
+					list($hash, $salt) = explode(':', $row->password);
+					$cryptpass = md5($passwd.$salt);
+					if ($hash != $cryptpass) {
+						if ( $bypost ) {
+							mosErrorAlert(_LOGIN_INCORRECT);
+						} else {
+							$this->logout();
+							mosRedirect('index.php');
+						}
+						exit();
+					}
 				}
 
 				// fudge the group stuff
@@ -1103,7 +1160,7 @@ class mosMainFrame {
 					// cookie lifetime of 365 days
 					$lifetime 		= time() + 365*24*60*60;
 					$remCookieName 	= mosMainFrame::remCookieName_User();
-					$remCookieValue = mosMainFrame::remCookieValue_User( $row->username ) . mosMainFrame::remCookieValue_Pass( $row->password ) . $row->id;
+					$remCookieValue = mosMainFrame::remCookieValue_User( $row->username ) . mosMainFrame::remCookieValue_Pass( $hash ) . $row->id;
 					setcookie( $remCookieName, $remCookieValue, $lifetime, '/' );
 				}
 				mosCache::cleanCache();
@@ -1512,6 +1569,10 @@ class mosMainFrame {
 	function getItemid( $id, $typed=1, $link=1, $bs=1, $bc=1, $gbs=1 ) {
 		global $Itemid;
 
+		// getItemid compatibility mode, holds maintenance version number
+		$compat = (int) $this->getCfg('itemid_compat');
+		$compat = ($compat == 0)? 12 : $compat;
+
 		$_Itemid = '';
 
 		if ($_Itemid == '' && $typed && $this->getStaticContentCount()) {
@@ -1636,6 +1697,33 @@ class mosMainFrame {
 			}
 		}
 
+		if ( $compat <= 11 && $_Itemid == '') {
+			$exists = 0;
+			foreach( $this->get( '_ContentBlogSection', array() ) as $key => $value ) {
+				// check if id has been tested before, if it is pull from class variable store
+				if ( $key == $id ) {
+					$_Itemid 	= $value;
+					$exists 	= 1;
+					break;
+				}
+			}
+			// if id hasnt been checked before initaite query
+			if ( !$exists ) {
+				if (!isset($content_blog_section)) {
+					$content_blog_section = null;
+				}
+
+				// pull existing query storage into temp variable
+				$ContentBlogSection 		= $this->get( '_ContentBlogSection', array() );
+				// add query result to temp array storage
+				$ContentBlogSection[$id] 	= $content_blog_section;
+				// save temp array to main array storage
+				$this->set( '_ContentBlogSection', $ContentBlogSection );
+
+				$_Itemid = $ContentBlogSection[$id];
+			}
+		}
+
 		if ($_Itemid == '') {
 			$exists = 0;
 			foreach( $this->get( '_ContentBlogCategory', array() ) as $key => $value ) {
@@ -1682,7 +1770,7 @@ class mosMainFrame {
 			$_Itemid = $this->get( '_GlobalBlogSection' );
 		}
 
-		if ($_Itemid == '') {
+		if ($compat >= 12 && $_Itemid == '') {
 			$exists = 0;
 			foreach( $this->get( '_ContentBlogSection', array() ) as $key => $value ) {
 				// check if id has been tested before, if it is pull from class variable store
@@ -1759,7 +1847,10 @@ class mosMainFrame {
 		if ( $_Itemid != '' ) {
 		// if Itemid value discovered by queries, return this value
 			return $_Itemid;
-		} else if ( $Itemid != 99999999 && $Itemid > 0 ) {
+		} else if ( $compat >= 12 && $Itemid != 99999999 && $Itemid > 0 ) {
+		// if queries do not return Itemid value, return Itemid of page - if it is not 99999999
+			return $Itemid;
+		} else if ( $compat <= 11 && $Itemid === 0 ) {
 		// if queries do not return Itemid value, return Itemid of page - if it is not 99999999
 			return $Itemid;
 		}
@@ -2401,6 +2492,9 @@ class mosCategory extends mosDBTable {
 			return false;
 		}
 
+		$ignoreList = array('description');
+		$this->filter($ignoreList);
+
 		// check for existing name
 		$query = "SELECT id"
 		. "\n FROM #__categories "
@@ -2467,6 +2561,10 @@ class mosSection extends mosDBTable {
 			$this->_error = "Your Section must have a name.";
 			return false;
 		}
+
+		$ignoreList = array('description');
+		$this->filter($ignoreList);
+
 		// check for existing name
 		$query = "SELECT id"
 		. "\n FROM #__sections "
@@ -2665,6 +2763,10 @@ class mosMenu extends mosDBTable {
 	function check() {
 		$this->id = (int) $this->id;
 		$this->params = (string) trim( $this->params . ' ' );
+
+		$ignoreList = array( 'link' );
+		$this->filter( $ignoreList );
+
 		return true;
 	}
 }
@@ -2794,7 +2896,7 @@ class mosUser extends mosDBTable {
 			// single group handled at the moment
 			// trivial to expand to multiple groups
 			$groups = $acl->get_object_groups( $section_value, $this->$k, 'ARO' );
-			$acl->del_group_object( $groups[0], $section_value, $this->$k, 'ARO' );
+			if(isset($groups[0])) $acl->del_group_object( $groups[0], $section_value, $this->$k, 'ARO' );
 			$acl->add_group_object( $this->gid, $section_value, $this->$k, 'ARO' );
 
 			$object_id = $acl->get_object_id( $section_value, $this->$k, 'ARO' );
@@ -3074,6 +3176,10 @@ function mosRedirect( $url, $msg='' ) {
 	if (!empty($msg)) {
 		$msg = $iFilter->process( $msg );
 	}
+
+	// Strip out any line breaks and throw away the rest
+	$url = preg_split("/[\r\n]/", $url);
+	$url = $url[0];
 
 	if ($iFilter->badAttributeValue( array( 'href', $url ))) {
 		$url = $GLOBALS['mosConfig_live_site'];
@@ -6011,6 +6117,23 @@ function josSpoofValue($alt=NULL) {
 	$validate 	= 'j' . mosHash( $mainframe->getCfg( 'db' ) . $random );
 
 	return $validate;
+}
+
+/**
+ * A simple helper function to salt and hash a clear-text password.
+ *
+ * @since	1.0.13
+ * @param	string	$password	A plain-text password
+ * @return	string	An md5 hashed password with salt
+ */
+function josHashPassword($password)
+{
+	// Salt and hash the password
+	$salt	= mosMakePassword(16);
+	$crypt	= md5($password.$salt);
+	$hash	= $crypt.':'.$salt;
+
+	return $hash;
 }
 
 // ----- NO MORE CLASSES OR FUNCTIONS PASSED THIS POINT -----

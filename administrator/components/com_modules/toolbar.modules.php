@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.modules.php 5012 2006-09-11 19:35:26Z friesengeist $
+* @version $Id: toolbar.modules.php 5014 2006-09-11 19:35:26Z friesengeist $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

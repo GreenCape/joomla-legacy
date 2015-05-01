@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.php 4801 2006-08-28 16:10:28Z stingrey $
+* @version $Id: admin.admin.php 4803 2006-08-28 16:10:28Z stingrey $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.languages.php 4669 2006-08-23 13:29:47Z stingrey $
+* @version $Id: admin.languages.php 4671 2006-08-23 13:29:47Z stingrey $
 * @package Joomla
 * @subpackage Languages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

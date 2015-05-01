@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: toolbar.contact.html.php 257 2005-09-29 19:06:43Z jick $
+* @version $Id: toolbar.contact.html.php 259 2005-09-29 19:06:43Z jick $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

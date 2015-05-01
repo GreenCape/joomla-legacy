@@ -2,7 +2,7 @@
 /**
  * patTemplate modfifier Translate
  *
- * $Id: Translate.php 1782 2006-01-13 02:29:37Z eddieajau $
+ * $Id: Translate.php 1784 2006-01-13 02:29:37Z eddieajau $
  *
  * @package		patTemplate
  * @subpackage	Modifiers

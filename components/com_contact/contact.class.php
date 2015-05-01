@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.class.php 1325 2005-12-07 03:26:07Z Jinx $
+* @version $Id: contact.class.php 1327 2005-12-07 03:26:07Z Jinx $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
