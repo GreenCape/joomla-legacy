@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: CHANGELOG.php 1837 2006-01-15 13:53:54Z stingrey $
+* @version $Id: CHANGELOG.php 1843 2006-01-15 19:41:35Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -31,6 +31,11 @@ Legend:
 - -> Removed
 ! -> Note
 
+
+---------------- 1.0.7 Released -- [15-Jan-2006 20:00 UTC] ------------------
+
+15-Jan-2006 Rey Gigataras
+ # Fixed : database password being incorrectly overwritten with a blank
 
 ---------------- 1.0.6 Released -- [15-Jan-2006 15:00 UTC] ------------------
 
