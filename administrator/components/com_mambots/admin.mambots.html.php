@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.mambots.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.mambots.html.php 5948 2006-12-06 22:42:31Z facedancer $
 * @package Joomla
 * @subpackage Mambots
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -41,7 +41,7 @@ class HTML_modules {
 			Filter:
 			</td>
 			<td>
-			<input type="text" name="search" value="<?php echo $search;?>" class="text_area" onChange="document.adminForm.submit();" />
+			<input type="text" name="search" value="<?php echo htmlspecialchars( $search );?>" class="text_area" onChange="document.adminForm.submit();" />
 			</td>
 			<td width="right">
 			<?php echo $lists['type'];?>
@@ -61,7 +61,7 @@ class HTML_modules {
 			<th nowrap="nowrap" width="10%">
 	  		Published
 			</th>
-			<th colspan="2" nowrap="true" width="5%">
+			<th colspan="2" nowrap="nowrap" width="5%">
 			Reorder
 			</th>
 			<th width="2%">
@@ -84,7 +84,7 @@ class HTML_modules {
 		$k = 0;
 		for ($i=0, $n=count( $rows ); $i < $n; $i++) {
 			$row 	= &$rows[$i];
-
+			mosMakeHtmlSafe($row);
 			$link = 'index2.php?option=com_mambots&client='. $client .'&task=editA&hidemainmenu=1&id='. $row->id;
 
 			$access 	= mosCommonHTML::AccessProcessing( $row, $i );
@@ -124,10 +124,10 @@ class HTML_modules {
 				<td align="center">
 				<?php echo $access;?>
 				</td>
-				<td align="left" nowrap="true">
+				<td align="left" nowrap="nowrap">
 				<?php echo $row->folder;?>
 				</td>
-				<td align="left" nowrap="true">
+				<td align="left" nowrap="nowrap">
 				<?php echo $row->element;?>
 				</td>
 			</tr>

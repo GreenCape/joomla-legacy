@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_mosmsg.php 4109 2006-06-23 20:50:56Z stingrey $
+* @version $Id: mod_mosmsg.php 4874 2006-08-31 18:29:19Z predator $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -14,7 +14,7 @@
 // no direct access
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
-$mosmsg = strval( ( strip_tags( mosGetParam( $_REQUEST, 'mosmsg', '' ) ) ) );
+$mosmsg = strval( ( stripslashes( strip_tags( mosGetParam( $_REQUEST, 'mosmsg', '' ) ) ) ) );
 
 // Browser Check
 $browserCheck = 0;

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.messages.html.php 2749 2006-03-11 21:59:51Z stingrey $
+* @version $Id: admin.messages.html.php 5981 2006-12-12 02:01:34Z friesengeist $
 * @package Joomla
 * @subpackage Messages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -33,7 +33,7 @@ class HTML_messages {
 				Search:
 			</td>
 			<td> 
-				<input type="text" name="search" value="<?php echo $search;?>" class="inputbox" onChange="document.adminForm.submit();" />
+				<input type="text" name="search" value="<?php echo htmlspecialchars( $search );?>" class="inputbox" onChange="document.adminForm.submit();" />
 			</td>
 		</tr>
 		</table>
@@ -197,7 +197,7 @@ class HTML_messages {
 				Subject:
 			</td>
 			<td bgcolor="#ffffff">
-				<?php echo $row->subject;?>
+				<?php echo htmlspecialchars( $row->subject, ENT_QUOTES );?>
 			</td>
 		</tr>
 		<tr>
@@ -205,7 +205,7 @@ class HTML_messages {
 				Message:
 			</td>
 			<td width="100%" bgcolor="#ffffff">
-				<pre><?php echo htmlspecialchars( $row->message );?></pre>
+				<pre><?php echo htmlspecialchars( $row->message, ENT_QUOTES );?></pre>
 			</td>
 		</tr>
 		</table>
@@ -215,7 +215,7 @@ class HTML_messages {
 		<input type="hidden" name="boxchecked" value="1" />
 		<input type="hidden" name="cid[]" value="<?php echo $row->message_id; ?>" />
 		<input type="hidden" name="userid" value="<?php echo $row->user_id_from; ?>" />
-		<input type="hidden" name="subject" value="Re: <?php echo $row->subject; ?>" />
+		<input type="hidden" name="subject" value="<?php echo ( substr( $row->subject, 0, 4 ) != 'Re: ' ? 'Re: ' : '' ) . htmlspecialchars( $row->subject, ENT_QUOTES ); ?>" />
 		<input type="hidden" name="hidemainmenu" value="0" />
 		</form>
 		<?php 
@@ -268,7 +268,7 @@ class HTML_messages {
 				Subject:
 			</td>
 			<td>
-				<input type="text" name="subject" size="50" maxlength="100" class="inputbox" value="<?php echo $subject; ?>"/>
+				<input type="text" name="subject" size="50" maxlength="100" class="inputbox" value="<?php echo htmlspecialchars( $subject, ENT_QUOTES ); ?>"/>
 			</td>
 		</tr>
 		<tr>

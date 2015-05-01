@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mambot.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mambot.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -67,7 +67,7 @@ class HTML_mambot {
 				Date
 				</th>
 				<th width="15%" align="left">
-				Author Email
+				Author E-mail
 				</th>
 				<th width="15%" align="left">
 				Author URL

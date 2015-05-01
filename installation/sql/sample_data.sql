@@ -1,4 +1,4 @@
-# $Id: sample_data.sql 4067 2006-06-20 15:12:33Z stingrey $
+# $Id: sample_data.sql 6006 2006-12-15 03:05:56Z friesengeist $
 
 #
 # Dumping data for table `#__banner`
@@ -72,7 +72,7 @@ INSERT INTO `#__menu` VALUES (5, 'mainmenu', 'Search', 'index.php?option=com_sea
 INSERT INTO `#__menu` VALUES (6, 'mainmenu', 'Joomla! License', 'index.php?option=com_content&task=view&id=5', 'content_typed', 1, 0, 5, 0, 2, 0, '0000-00-00 00:00:00', 0, 0, 0, 0, '');
 INSERT INTO `#__menu` VALUES (7, 'mainmenu', 'News Feeds', 'index.php?option=com_newsfeeds', 'components', 1, 0, 12, 0, 8, 0, '0000-00-00 00:00:00', 0, 0, 0, 3, 'menu_image=-1\npageclass_sfx=\nback_button=\npage_title=1\nheader=');
 INSERT INTO `#__menu` VALUES (8, 'mainmenu', 'Wrapper', 'index.php?option=com_wrapper', 'wrapper', 1, 0, 0, 0, 10, 0, '0000-00-00 00:00:00', 0, 0, 0, 3, 'menu_image=-1\npageclass_sfx=\nback_button=\npage_title=1\nheader=\nscrolling=auto\nwidth=100%\nheight=600\nheight_auto=0\nurl=www.joomla.org');
-INSERT INTO `#__menu` VALUES (9, 'mainmenu', 'Blog', 'index.php?option=com_content&task=blogsection&id=0', 'content_blog_section', 1, 0, 0, 0, 4, 0, '0000-00-00 00:00:00', 0, 0, 0, 3, 'menu_image=-1\npageclass_sfx=\nback_button=\nheader=A blog of all section with no images\npage_title=1\nleading=0\nintro=6\ncolumns=2\nlink=4\norderby_pri=\norderby_sec=\npagination=2\npagination_results=1\nimage=0\ndescription=0\ndescription_image=0\ncategory=0\ncategory_link=0\nitem_title=1\nlink_titles=\nreadmore=\nrating=\nauthor=\ncreatedate=\nmodifydate=\npdf=\nprint=\nemail=\nsectionid=');
+INSERT INTO `#__menu` VALUES (9, 'mainmenu', 'Blog', 'index.php?option=com_content&task=blogsection&id=0', 'content_blog_section', 1, 0, 0, 0, 4, 0, '0000-00-00 00:00:00', 0, 0, 0, 3, 'menu_image=-1\npageclass_sfx=\nback_button=\nheader=A blog of all sections with no images\npage_title=1\nleading=0\nintro=6\ncolumns=2\nlink=4\norderby_pri=\norderby_sec=\npagination=2\npagination_results=1\nimage=0\ndescription=0\ndescription_image=0\ncategory=0\ncategory_link=0\nitem_title=1\nlink_titles=\nreadmore=\nrating=\nauthor=\ncreatedate=\nmodifydate=\npdf=\nprint=\nemail=\nsectionid=');
 INSERT INTO `#__menu` VALUES (10, 'othermenu', 'Joomla! Home', 'http://www.joomla.org', 'url', 1, 0, 0, 0, 1, 0, '0000-00-00 00:00:00', 0, 0, 0, 3, '');
 INSERT INTO `#__menu` VALUES (11, 'othermenu', 'Joomla! Forums', 'http://forum.joomla.org', 'url', 1, 0, 0, 0, 1, 0, '0000-00-00 00:00:00', 0, 0, 0, 3, '');
 INSERT INTO `#__menu` VALUES (12, 'othermenu', 'OSM Home', 'http://www.opensourcematters.org', 'url', 1, 0, 0, 0, 1, 0, '0000-00-00 00:00:00', 0, 0, 0, 3, '');
@@ -94,7 +94,6 @@ INSERT INTO `#__menu` VALUES (25, 'mainmenu', 'FAQs', 'index.php?option=com_cont
 
 INSERT INTO `#__newsfeeds` VALUES (4, 1, 'Joomla! - Official News', 'http://www.joomla.org/index.php?option=com_rss_xtd&feed=RSS2.0&type=com_frontpage&Itemid=1', '', 1, 5, 3600, 0, '0000-00-00 00:00:00', 8);
 INSERT INTO `#__newsfeeds` VALUES (4, 2, 'Joomla! - Community News', 'http://www.joomla.org/index.php?option=com_rss_xtd&feed=RSS2.0&type=com_content&task=blogcategory&id=0&Itemid=33', '', 1, 5, 3600, 0, '0000-00-00 00:00:00', 9);
-INSERT INTO `#__newsfeeds` VALUES (4, 3, 'OpenSourceMatters', 'http://www.opensourcematters.org/index2.php?option=com_rss&feed=RSS2.0&no_html=1', '', 1, 5, 3600, 0, '0000-00-00 00:00:00', 10);
 INSERT INTO `#__newsfeeds` VALUES (10, 4, 'Linux Today', 'http://linuxtoday.com/backend/my-netscape.rdf', '', 1, 3, 3600, 0, '0000-00-00 00:00:00', 1);
 INSERT INTO `#__newsfeeds` VALUES (5, 5, 'Business News', 'http://headlines.internet.com/internetnews/bus-news/news.rss', '', 1, 3, 3600, 0, '0000-00-00 00:00:00', 2);
 INSERT INTO `#__newsfeeds` VALUES (11, 6, 'Web Developer News', 'http://headlines.internet.com/internetnews/wd-news/news.rss', '', 1, 3, 3600, 0, '0000-00-00 00:00:00', 3);

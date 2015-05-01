@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.sections.html.php 4070 2006-06-20 16:09:29Z stingrey $
+* @version $Id: admin.sections.html.php 5948 2006-12-06 22:42:31Z facedancer $
 * @package Joomla
 * @subpackage Sections
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -65,16 +65,16 @@ class sections_html {
 			<th width="8%">
 			Access
 			</th>
-			<th width="12%" nowrap>
+			<th width="12%" nowrap="nowrap">
 			Section ID
 			</th>
-			<th width="12%" nowrap>
+			<th width="12%" nowrap="nowrap">
 			# Categories
 			</th>
-			<th width="12%" nowrap>
+			<th width="12%" nowrap="nowrap">
 			# Active
 			</th>
-			<th width="12%" nowrap>
+			<th width="12%" nowrap="nowrap">
 			# Trash
 			</th>
 
@@ -83,7 +83,7 @@ class sections_html {
 		$k = 0;
 		for ( $i=0, $n=count( $rows ); $i < $n; $i++ ) {
 			$row = &$rows[$i];
-
+			mosMakeHtmlSafe($row);
 			$link = 'index2.php?option=com_sections&scope=content&task=editA&hidemainmenu=1&id='. $row->id;
 
 			$access 	= mosCommonHTML::AccessProcessing( $row, $i );
@@ -173,7 +173,7 @@ class sections_html {
 	*/
 	function edit( &$row, $option, &$lists, &$menus ) {
 		global $mosConfig_live_site;
-		
+
 		if ( $row->name != '' ) {
 			$name = $row->name;
 		} else {
@@ -182,7 +182,7 @@ class sections_html {
 		if ($row->image == "") {
 			$row->image = 'blank.png';
 		}
-		
+
 		mosMakeHtmlSafe( $row, ENT_QUOTES, 'description' );
 		?>
 		<script language="javascript" type="text/javascript">
@@ -429,8 +429,8 @@ class sections_html {
 					<td colspan="2">
 					<?php echo $lists['folders']; ?>
 					</td>
-				<tr>	
-				</table>		
+				<tr>
+				</table>
 			</td>
 		</tr>
 		</table>

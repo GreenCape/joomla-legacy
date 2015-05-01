@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: login.php 3551 2006-05-18 20:23:01Z stingrey $
+* @version $Id: login.php 5973 2006-12-11 01:26:33Z robs $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -20,7 +20,7 @@ $tstart = mosProfiler::getmicrotime();
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title><?php echo $mosConfig_sitename; ?> - Administration [Joomla]</title>
+<title><?php echo $mosConfig_sitename; ?> - Administration [Joomla!]</title>
 <meta http-equiv="Content-Type" content="text/html; <?php echo _ISO; ?>" />
 <style type="text/css">
 @import url(templates/joomla_admin/css/admin_login.css);
@@ -42,7 +42,7 @@ $tstart = mosProfiler::getmicrotime();
 <div id="ctr" align="center">
 	<?php
 	// handling of mosmsg text in url
-	include_once( $mosConfig_absolute_path .'/administrator/modules/mod_mosmsg.php' ); 
+	include_once( $mosConfig_absolute_path .'/administrator/modules/mod_mosmsg.php' );
 	?>
 	<div class="login">
 		<div class="login-form">

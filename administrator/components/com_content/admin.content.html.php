@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.html.php 4070 2006-06-20 16:09:29Z stingrey $
+* @version $Id: admin.content.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -34,7 +34,7 @@ class HTML_content {
 
 		<table class="adminheading">
 		<tr>
-			<th class="edit" rowspan="2" nowrap>
+			<th class="edit" rowspan="2" nowrap="nowrap">
 			<?php
 			if ( $all ) {
 				?>
@@ -50,16 +50,16 @@ class HTML_content {
 			<?php
 			if ( $all ) {
 				?>
-				<td width="right" rowspan="2" valign="top">
+				<td align="right" rowspan="2" valign="top">
 				<?php echo $lists['sectionid'];?>
 				</td>
 				<?php
 			}
 			?>
-			<td width="right" valign="top">
+			<td align="right" valign="top">
 			<?php echo $lists['catid'];?>
 			</td>
-			<td width="right" valign="top">
+			<td valign="top">
 			<?php echo $lists['authorid'];?>
 			</td>
 		</tr>
@@ -68,7 +68,7 @@ class HTML_content {
 			Filter:
 			</td>
 			<td>
-			<input type="text" name="search" value="<?php echo $search;?>" class="text_area" onChange="document.adminForm.submit();" />
+			<input type="text" name="search" value="<?php echo htmlspecialchars( $search );?>" class="text_area" onChange="document.adminForm.submit();" />
 			</td>
 		</tr>
 		</table>
@@ -130,6 +130,8 @@ class HTML_content {
 		for ($i=0, $n=count( $rows ); $i < $n; $i++) {
 			$row = &$rows[$i];
 
+			mosMakeHtmlSafe($row);
+
 			$link 	= 'index2.php?option=com_content&sectionid='. $redirect .'&task=edit&hidemainmenu=1&id='. $row->id;
 
 			$row->sect_link 	= 'index2.php?option=com_sections&task=editA&hidemainmenu=1&id='. $row->sectionid;
@@ -153,13 +155,13 @@ class HTML_content {
 				$img = 'publish_x.png';
 				$alt = 'Unpublished';
 			}
-			
+
 			// correct times to include server offset info
-			$row->publish_up 	= mosFormatDate( $row->publish_up, _CURRENT_SERVER_TIME_FORMAT );			
+			$row->publish_up 	= mosFormatDate( $row->publish_up, _CURRENT_SERVER_TIME_FORMAT );
 			if (trim( $row->publish_down ) == $nullDate || trim( $row->publish_down ) == '' || trim( $row->publish_down ) == '-' ) {
 				$row->publish_down = 'Never';
 			}
-			$row->publish_down 	= mosFormatDate( $row->publish_down, _CURRENT_SERVER_TIME_FORMAT );		
+			$row->publish_down 	= mosFormatDate( $row->publish_down, _CURRENT_SERVER_TIME_FORMAT );
 
 			$times = '';
 			if ($row->publish_up == $nullDate) {
@@ -207,7 +209,7 @@ class HTML_content {
 				} else {
 					?>
 					<a href="<?php echo $link; ?>" title="Edit Content">
-					<?php echo htmlspecialchars($row->title, ENT_QUOTES); ?>
+					<?php echo $row->title; ?>
 					</a>
 					<?php
 				}
@@ -328,16 +330,16 @@ class HTML_content {
 			<?php
 			if ( $all ) {
 				?>
-				<td width="right" rowspan="2" valign="top">
+				<td align="right" rowspan="2" valign="top">
 				<?php echo $lists['sectionid'];?>
 				</td>
 				<?php
 			}
 			?>
-			<td width="right">
+			<td align="right" valign="top">
 			<?php echo $lists['catid'];?>
 			</td>
-			<td width="right">
+			<td valign="top">
 			<?php echo $lists['authorid'];?>
 			</td>
 		</tr>
@@ -346,7 +348,7 @@ class HTML_content {
 			Filter:
 			</td>
 			<td>
-			<input type="text" name="search" value="<?php echo $search;?>" class="text_area" onChange="document.adminForm.submit();" />
+			<input type="text" name="search" value="<?php echo htmlspecialchars( $search );?>" class="text_area" onChange="document.adminForm.submit();" />
 			</td>
 		</tr>
 		</table>
@@ -459,10 +461,10 @@ class HTML_content {
 		global $database;
 
 		mosMakeHtmlSafe( $row );
-		
+
 		$nullDate 		= $database->getNullDate();
 		$create_date 	= null;
-		
+
 		if ( $row->created != $nullDate ) {
 			$create_date 	= mosFormatDate( $row->created, '%A, %d %B %Y %H:%M', '0' );
 		}
@@ -470,7 +472,7 @@ class HTML_content {
 		if ( $row->modified != $nullDate ) {
 			$mod_date 		= mosFormatDate( $row->modified, '%A, %d %B %Y %H:%M', '0' );
 		}
-		
+
 		$tabs = new mosTabs(1);
 
 		// used to hide "Reset Hits" when hits = 0
@@ -641,7 +643,7 @@ class HTML_content {
 				</tr>
 				<tr>
 					<td valign="top" align="right" width="120">
-					Show on Frontpage:
+					Show on Front Page:
 					</td>
 					<td>
 					<input type="checkbox" name="frontpage" value="1" <?php echo $row->frontpage ? 'checked="checked"' : ''; ?> />
@@ -660,7 +662,7 @@ class HTML_content {
 					Access Level:
 					</td>
 					<td>
-					<?php echo $lists['access']; ?> 
+					<?php echo $lists['access']; ?>
 					</td>
 				</tr>
 				<tr>
@@ -676,13 +678,13 @@ class HTML_content {
 					Change Creator:
 					</td>
 					<td>
-					<?php echo $lists['created_by']; ?> 
+					<?php echo $lists['created_by']; ?>
 					</td>
 				</tr>
 				<tr>
 					<td valign="top" align="right">Ordering:</td>
 					<td>
-					<?php echo $lists['ordering']; ?> 
+					<?php echo $lists['ordering']; ?>
 					</td>
 				</tr>
 				<tr>

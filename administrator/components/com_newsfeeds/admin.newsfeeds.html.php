@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.newsfeeds.html.php 2693 2006-03-07 18:13:12Z stingrey $
+* @version $Id: admin.newsfeeds.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Newsfeeds
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -30,7 +30,7 @@ class HTML_newsfeeds {
 		<table class="adminheading">
 		<tr>
 			<th>
-			Newsfeed Manager
+			News Feed Manager
 			</th>
 			<td width="right">
 			<?php echo $lists['category'];?>
@@ -69,7 +69,7 @@ class HTML_newsfeeds {
 		$k = 0;
 		for ($i=0, $n=count( $rows ); $i < $n; $i++) {
 			$row = &$rows[$i];
-
+			mosMakeHtmlSafe($row);
 			$link 	= 'index2.php?option=com_newsfeeds&task=editA&hidemainmenu=1&id='. $row->id;
 
 			$img 	= $row->published ? 'tick.png' : 'publish_x.png';
@@ -96,7 +96,7 @@ class HTML_newsfeeds {
 					<?php
 				} else {
 					?>
-					<a href="<?php echo $link; ?>" title="Edit Newsfeed">
+					<a href="<?php echo $link; ?>" title="Edit News Feed">
 					<?php echo $row->name; ?>
 					</a>
 					<?php
@@ -132,7 +132,7 @@ class HTML_newsfeeds {
 		?>
 		</table>
 		<?php echo $pageNav->getListFooter(); ?>
-		
+
 		<table class="adminform">
 		<tr>
 			<td>
@@ -193,7 +193,7 @@ class HTML_newsfeeds {
 		<table class="adminheading">
 		<tr>
 			<th class="edit">
-			Newsfeed: <small><?php echo $row->id ? 'Edit' : 'New';?></small> <small><small>[ <?php echo $row->name;?> ]</small></small>
+			News Feed: <small><?php echo $row->id ? 'Edit' : 'New';?></small> <small><small>[ <?php echo $row->name;?> ]</small></small>
 			</th>
 		</tr>
 		</table>

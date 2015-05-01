@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: components.menu.html.php 266 2005-09-30 04:44:59Z Levis $
+* @version $Id: components.menu.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -101,7 +101,7 @@ class components_menu_html {
 					</td>
 				</tr>
 				<tr>
-					<td width="10%" align="right">Url:</td>
+					<td width="10%" align="right">URL:</td>
 					<td width="80%">
                     <?php echo ampReplace($lists['link']); ?>
 					</td>

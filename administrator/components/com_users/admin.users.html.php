@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.users.html.php 3513 2006-05-15 20:52:25Z stingrey $
+* @version $Id: admin.users.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -34,7 +34,7 @@ class HTML_users {
 			Filter:
 			</td>
 			<td>
-			<input type="text" name="search" value="<?php echo $search;?>" class="inputbox" onChange="document.adminForm.submit();" />
+			<input type="text" name="search" value="<?php echo htmlspecialchars( $search );?>" class="inputbox" onChange="document.adminForm.submit();" />
 			</td>
 			<td width="right">
 			<?php echo $lists['type'];?>
@@ -76,7 +76,7 @@ class HTML_users {
 			</th>
 			<th width="1%" class="title">
 			ID
-			</th>			
+			</th>
 		</tr>
 		<?php
 		$k = 0;
@@ -144,6 +144,9 @@ class HTML_users {
 	function edituser( &$row, &$contact, &$lists, $option, $uid, &$params ) {
 		global $my, $acl;
 		global $mosConfig_live_site;
+
+		mosMakeHtmlSafe( $row );
+
 		$tabs = new mosTabs( 0 );
 
 		mosCommonHTML::loadOverlib();
@@ -167,15 +170,15 @@ class HTML_users {
 			} else if (r.exec(form.username.value) || form.username.value.length < 3) {
 				alert( "You login name contains invalid characters or is too short." );
 			} else if (trim(form.email.value) == "") {
-				alert( "You must provide an email address." );
+				alert( "You must provide an e-mail address." );
 			} else if (form.gid.value == "") {
 				alert( "You must assign user to a group." );
 			} else if (trim(form.password.value) != "" && form.password.value != form.password2.value){
 				alert( "Password do not match." );
 			} else if (form.gid.value == "29") {
-				alert( "Please Select another group as `Public Frontend` is not a selectable option" );
+				alert( "Please Select another group as `Public Front-end` is not a selectable option" );
 			} else if (form.gid.value == "30") {
-				alert( "Please Select another group as `Public Backend` is not a selectable option" );
+				alert( "Please Select another group as `Public Back-end` is not a selectable option" );
 			} else {
 				submitform( pressbutton );
 			}
@@ -223,7 +226,7 @@ class HTML_users {
 					</td>
 				<tr>
 					<td>
-					Email:
+					E-mail:
 					</td>
 					<td>
 					<input class="inputbox" type="text" name="email" size="40" value="<?php echo $row->email; ?>" />
@@ -270,7 +273,7 @@ class HTML_users {
 					?>
 					<tr>
 						<td>
-						Receive System Emails
+						Receive System E-mails
 						</td>
 						<td>
 						<?php echo $lists['sendEmail']; ?>

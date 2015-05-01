@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content_blog_category.class.php 4555 2006-08-18 18:11:33Z stingrey $
+* @version $Id: content_blog_category.class.php 5045 2006-09-14 13:49:01Z friesengeist $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -42,11 +42,14 @@ class content_blog_category {
 			$params = new mosParameters( $menu->params );
 			$catids = $params->def( 'categoryid', '' );
 			if ( $catids ) {
+				$catidsArray = explode( ',', $catids );
+				mosArrayToInts( $catidsArray );
+				$catids = 'c.id=' . implode( ' OR c.id=', $catidsArray );
 				$query = "SELECT c.id AS `value`, c.section AS `id`, CONCAT_WS( ' / ', s.title, c.title) AS `text`"
 				. "\n FROM #__sections AS s"
 				. "\n INNER JOIN #__categories AS c ON c.section = s.id"
 				. "\n WHERE s.scope = 'content'"
-				. "\n AND c.id IN ( $catids )"
+				. "\n AND ( $catids )"
 				. "\n ORDER BY s.name,c.name"
 				;
 				$database->setQuery( $query );

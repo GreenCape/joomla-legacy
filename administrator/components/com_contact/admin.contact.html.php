@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.contact.html.php 1815 2006-01-14 18:58:18Z stingrey $
+* @version $Id: admin.contact.html.php 5948 2006-12-06 22:42:31Z facedancer $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -36,7 +36,7 @@ class HTML_contact {
 			Filter:
 			</td>
 			<td>
-			<input type="text" name="search" value="<?php echo $search;?>" class="inputbox" onChange="document.adminForm.submit();" />
+			<input type="text" name="search" value="<?php echo htmlspecialchars( $search );?>" class="inputbox" onChange="document.adminForm.submit();" />
 			</td>
 			<td width="right">
 			<?php echo $lists['catid'];?>
@@ -55,7 +55,7 @@ class HTML_contact {
 			<th class="title">
 			Name
 			</th>
-			<th width="5%" class="title" nowrap="true">
+			<th width="5%" class="title" nowrap="nowrap">
 			Published
 			</th>
 			<th colspan="2" nowrap="nowrap" width="5%">
@@ -72,7 +72,7 @@ class HTML_contact {
 		$k = 0;
 		for ($i=0, $n=count($rows); $i < $n; $i++) {
 			$row = $rows[$i];
-
+			mosMakeHtmlSafe($row);
 			$link 	= 'index2.php?option=com_contact&task=editA&hidemainmenu=1&id='. $row->id;
 
 			$img 	= $row->published ? 'tick.png' : 'publish_x.png';
@@ -173,7 +173,7 @@ class HTML_contact {
 		}
 		//-->
 		</script>
-		
+
 		<form action="index2.php" method="post" name="adminForm">
 		<table class="adminheading">
 		<tr>
@@ -299,7 +299,6 @@ class HTML_contact {
 					<textarea name="misc" rows="5" cols="50" class="inputbox"><?php echo $row->misc; ?></textarea>
 					</td>
 				</tr>
-				<tr>
 				</table>
 			</td>
 			<td width="40%" valign="top">

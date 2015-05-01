@@ -1,4 +1,4 @@
-# $Id: joomla.sql 677 2005-10-27 02:13:29Z spacemonkey $
+# $Id: joomla.sql 6070 2006-12-20 02:09:09Z robs $
 
 #
 # Table structure for table `#__banner`
@@ -113,12 +113,12 @@ INSERT INTO `#__components` VALUES (1, 'Banners', '', 0, 0, '', 'Banner Manageme
 INSERT INTO `#__components` VALUES (2, 'Manage Banners', '', 0, 1, 'option=com_banners', 'Active Banners', 'com_banners', 1, 'js/ThemeOffice/edit.png', 0, '');
 INSERT INTO `#__components` VALUES (3, 'Manage Clients', '', 0, 1, 'option=com_banners&task=listclients', 'Manage Clients', 'com_banners', 2, 'js/ThemeOffice/categories.png', 0, '');
 INSERT INTO `#__components` VALUES (4, 'Web Links', 'option=com_weblinks', 0, 0, '', 'Manage Weblinks', 'com_weblinks', 0, 'js/ThemeOffice/globe2.png', 0, '');
-INSERT INTO `#__components` VALUES (5, 'Weblink Items', '', 0, 4, 'option=com_weblinks', 'View existing weblinks', 'com_weblinks', 1, 'js/ThemeOffice/edit.png', 0, '');
-INSERT INTO `#__components` VALUES (6, 'Weblink Categories', '', 0, 4, 'option=categories&section=com_weblinks', 'Manage weblink categories', '', 2, 'js/ThemeOffice/categories.png', 0, '');
+INSERT INTO `#__components` VALUES (5, 'Web Link Items', '', 0, 4, 'option=com_weblinks', 'View existing weblinks', 'com_weblinks', 1, 'js/ThemeOffice/edit.png', 0, '');
+INSERT INTO `#__components` VALUES (6, 'Web Link Categories', '', 0, 4, 'option=categories&section=com_weblinks', 'Manage weblink categories', '', 2, 'js/ThemeOffice/categories.png', 0, '');
 INSERT INTO `#__components` VALUES (7, 'Contacts', 'option=com_contact', 0, 0, '', 'Edit contact details', 'com_contact', 0, 'js/ThemeOffice/user.png', 1, '');
 INSERT INTO `#__components` VALUES (8, 'Manage Contacts', '', 0, 7, 'option=com_contact', 'Edit contact details', 'com_contact', 0, 'js/ThemeOffice/edit.png', 1, '');
 INSERT INTO `#__components` VALUES (9, 'Contact Categories', '', 0, 7, 'option=categories&section=com_contact_details', 'Manage contact categories', '', 2, 'js/ThemeOffice/categories.png', 1, '');
-INSERT INTO `#__components` VALUES (10, 'FrontPage', 'option=com_frontpage', 0, 0, '', 'Manage Front Page Items', 'com_frontpage', 0, 'js/ThemeOffice/component.png', 1, '');
+INSERT INTO `#__components` VALUES (10, 'Front Page', 'option=com_frontpage', 0, 0, '', 'Manage Front Page Items', 'com_frontpage', 0, 'js/ThemeOffice/component.png', 1, '');
 INSERT INTO `#__components` VALUES (11, 'Polls', 'option=com_poll', 0, 0, 'option=com_poll', 'Manage Polls', 'com_poll', 0, 'js/ThemeOffice/component.png', 0, '');
 INSERT INTO `#__components` VALUES (12, 'News Feeds', 'option=com_newsfeeds', 0, 0, '', 'News Feeds Management', 'com_newsfeeds', 0, 'js/ThemeOffice/component.png', 0, '');
 INSERT INTO `#__components` VALUES (13, 'Manage News Feeds', '', 0, 12, 'option=com_newsfeeds', 'Manage News Feeds', 'com_newsfeeds', 1, 'js/ThemeOffice/edit.png', 0, '');
@@ -227,7 +227,7 @@ CREATE TABLE `#__content_rating` (
 #
 # Table structure for table `#__core_log_items`
 #
-# To be implemented in Version 4.6
+# To be implemented
 
 CREATE TABLE `#__core_log_items` (
   `time_stamp` date NOT NULL default '0000-00-00',
@@ -239,7 +239,7 @@ CREATE TABLE `#__core_log_items` (
 #
 # Table structure for table `#__core_log_searches`
 #
-# To be implemented in Version 4.6
+# To be implemented
 
 CREATE TABLE `#__core_log_searches` (
   `search_term` varchar(128) NOT NULL default '',
@@ -495,7 +495,7 @@ CREATE TABLE `#__newsfeeds` (
 CREATE TABLE `#__poll_data` (
   `id` int(11) NOT NULL auto_increment,
   `pollid` int(4) NOT NULL default '0',
-  `text` text NOT NULL default '',
+  `text` text NOT NULL,
   `hits` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `pollid` (`pollid`,`text`(1))

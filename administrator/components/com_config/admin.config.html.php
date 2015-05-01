@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.html.php 4802 2006-08-28 16:18:33Z stingrey $
+* @version $Id: admin.config.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -23,7 +23,7 @@ class HTML_config {
 
 	function showconfig( &$row, &$lists, $option) {
 		global $mosConfig_absolute_path, $mosConfig_live_site, $mosConfig_session_type, $mainframe;
-		
+
 		$tabs = new mosTabs(0);
 		?>
 		<script type="text/javascript">
@@ -98,10 +98,10 @@ class HTML_config {
 		}
 		function submitbutton(pressbutton) {
 			var form = document.adminForm;
-			
+
 			// do field validation
 			if (form.config_session_type.value != <?php echo $row->config_session_type; ?> ){
-				if ( confirm('Are you sure you wish to change the `Session Authentication Method`? \n\n This will cause all existing frontend sessions to be deleted \n\n') ) {
+				if ( confirm('Are you sure you wish to change the `Session Authentication Method`? \n\n This will cause all existing front-end sessions to be deleted \n\n') ) {
 					submitform( pressbutton );
 				} else {
 					return;
@@ -116,7 +116,7 @@ class HTML_config {
 		<div id="overDiv" style="position:absolute; visibility:hidden; z-index:10000;"></div>
 		<table cellpadding="1" cellspacing="1" border="0" width="100%">
 		<tr>
-			<td width="250"><table class="adminheading"><tr><th nowrap class="config">Global Configuration</th></tr></table></td>
+			<td width="250"><table class="adminheading"><tr><th nowrap="nowrap" class="config">Global Configuration</th></tr></table></td>
 			<td width="270">
 				<span class="componentheading">configuration.php is :
 				<?php echo is_writable( '../configuration.php' ) ? '<b><font color="green"> Writeable</font></b>' : '<b><font color="red"> Unwriteable</font></b>' ?>
@@ -171,7 +171,7 @@ class HTML_config {
 				<td><input class="text_area" type="text" name="config_sitename" size="50" value="<?php echo $row->config_sitename; ?>"/></td>
 			</tr>
 			<tr>
-				<td>Show UnAuthorized Links:</td>
+				<td>Show Unauthorised Links:</td>
 				<td><?php echo $lists['shownoauth']; ?><?php
 					$tip = 'If yes, will show links to content to registered content even if you are not logged in.  The user will need to login to see the item in full.';
 					echo mosToolTip( $tip );
@@ -193,28 +193,28 @@ class HTML_config {
 				?></td>
 			</tr>
 			<tr>
-				<td>Require Unique Email:</td>
+				<td>Require Unique E-mail:</td>
 				<td><?php echo $lists['uniquemail']; ?><?php
-					$tip = 'If yes, users cannot share the same email address';
+					$tip = 'If yes, users cannot share the same e-mail address';
 					echo mosToolTip( $tip );
 				?></td>
 			</tr>
 			<tr>
-				<td>Frontend Login:</td>
+				<td>Front-end Login:</td>
 				<td>
 					<?php echo $lists['frontend_login']; ?>
 					<?php
-					$tip = 'If `No`, disables the Frontend login page even when not associated with a menu item. Will also disable Registration functionality';
+					$tip = 'If `No`, disables the Front-end login page and module even when associated with a menu item. Will also disable Registration functionality';
 					echo mosToolTip( $tip );
 					?>
 				</td>
 			</tr>
 			<tr>
-				<td>Frontend User Params:</td>
+				<td>Front-end User Params:</td>
 				<td>
 					<?php echo $lists['frontend_userparams']; ?>
 					<?php
-					$tip = 'If `No`, disables the frontend User params functionality';
+					$tip = 'If `No`, disables the front-end User params functionality';
 					echo mosToolTip( $tip );
 					?>
 				</td>
@@ -250,7 +250,7 @@ class HTML_config {
 				<?php
 				$tip = 'If left blank or the file cannot be found, the default favicon.ico will be used.';
 				echo mosToolTip( $tip, 'Favourite Icon' );
-				?>			
+				?>
 				</td>
 			</tr>
 			</table>
@@ -270,13 +270,13 @@ class HTML_config {
 				<?php
 				$tip = "Current date/time configured to display: " . mosCurrentDate(_DATE_FORMAT_LC2);
 				echo mosToolTip($tip);
-				?>			
+				?>
 				</td>
 			</tr>
 			<tr>
 				<td width="185">Server Offset:</td>
 				<td>
-				<input class="text_area" type="text" name="config_offset" size="15" value="<?php echo $row->config_offset; ?>" disabled="true"/>
+				<input class="text_area" type="text" name="config_offset" size="15" value="<?php echo $row->config_offset; ?>" disabled="disabled" />
 				</td>
 			</tr>
 			<tr>
@@ -359,11 +359,11 @@ class HTML_config {
 					echo mosToolTip('Option not available as /media directory not writable');
 					echo "</td>";
 				} else {
-					?>				
+					?>
 					<td>&nbsp;</td>
 					<?php
 				}
-				?>		
+				?>
 			</tr>
 			<tr>
 				<td>Print Icon:</td>
@@ -371,14 +371,14 @@ class HTML_config {
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td>Email Icon:</td>
+				<td>E-mail Icon:</td>
 				<td><?php echo $lists['hideEmail']; ?></td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
 				<td>Icons:</td>
 				<td><?php echo $lists['icons']; ?></td>
-				<td><?php echo mosToolTip('Print, PDF and Email will utilise Icons or Text'); ?></td>
+				<td><?php echo mosToolTip('Print, PDF and E-mail will utilise Icons or Text'); ?></td>
 			</tr>
 			<tr>
 				<td>Table of Contents on multi-page items:</td>
@@ -396,7 +396,7 @@ class HTML_config {
 				<td>&nbsp;</td>
 			</tr>
 			</table>
-			<input type="hidden" name="config_ml_support" value="<?php echo $row->config_ml_support?>">
+			<input type="hidden" name="config_multilingual_support" value="<?php echo $row->config_multilingual_support?>">
 			<?php
 		$tabs->endTab();
 		$tabs->startTab("Database","db-page");
@@ -455,7 +455,7 @@ class HTML_config {
 				<td>
 				<input class="text_area" type="text" name="config_lifetime" size="10" value="<?php echo $row->config_lifetime; ?>"/>
 				&nbsp;seconds&nbsp;
-				<?php echo mosWarning('Auto logout after this time of inactivity for <strong>site/frontend</strong> users. The higher the value the greater the security risk!'); ?>
+				<?php echo mosWarning('Auto logout after this time of inactivity for <strong>site/front-end</strong> users. The higher the value the greater the security risk!'); ?>
 				</td>
 				<td>&nbsp;</td>
 			</tr>
@@ -464,7 +464,7 @@ class HTML_config {
 				<td>
 				<input class="text_area" type="text" name="config_session_life_admin" size="10" value="<?php echo $row->config_session_life_admin; ?>"/>
 				&nbsp;seconds&nbsp;
-				<?php echo mosWarning('Auto logout after this time of inactivity for <strong>admin/backend</strong> users. The higher the value the greater the security risk!'); ?>
+				<?php echo mosWarning('Auto logout after this time of inactivity for <strong>admin/back-end</strong> users. The higher the value the greater the security risk!'); ?>
 				</td>
 				<td>&nbsp;</td>
 			</tr>
@@ -747,7 +747,7 @@ class HTML_config {
 				} else {
 					echo mosWarning('The cache directory is UNWRITEABLE - please set this directory to CHMOD755 before turning on the cache');
 				}
-				?>			
+				?>
 				</td>
 				<td>&nbsp;</td>
 			</tr>
@@ -802,14 +802,11 @@ class HTML_config {
 			<?php
 		$tabs->endTab();
 		$tabs->endPane();
-		
-		// show version check
-		josVersionCheck();
-		
+
 		// show security setting check
 		josSecurityCheck();
 		?>
-		
+
 		<input type="hidden" name="option" value="<?php echo $option; ?>"/>
 		<input type="hidden" name="config_absolute_path" value="<?php echo $row->config_absolute_path; ?>"/>
 		<input type="hidden" name="config_live_site" value="<?php echo $row->config_live_site; ?>"/>

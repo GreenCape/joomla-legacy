@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.modules.html.php 3037 2006-04-05 14:03:52Z stingrey $
+* @version $Id: admin.modules.html.php 5948 2006-12-06 22:42:31Z facedancer $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -49,7 +49,7 @@ class HTML_modules {
 			Filter:
 			</td>
 			<td>
-			<input type="text" name="search" value="<?php echo $search;?>" class="text_area" onChange="document.adminForm.submit();" />
+			<input type="text" name="search" value="<?php echo htmlspecialchars( $search );?>" class="text_area" onChange="document.adminForm.submit();" />
 			</td>
 		</tr>
 		</table>
@@ -101,6 +101,7 @@ class HTML_modules {
 		$k = 0;
 		for ($i=0, $n=count( $rows ); $i < $n; $i++) {
 			$row 	= &$rows[$i];
+			mosMakeHtmlSafe($row);
 
 			$link = 'index2.php?option=com_modules&client='. $client .'&task=editA&hidemainmenu=1&id='. $row->id;
 
@@ -203,6 +204,8 @@ class HTML_modules {
 	*/
 	function editModule( &$row, &$orders2, &$lists, &$params, $option ) {
 		global $mosConfig_live_site, $mosConfig_cachepath, $my;
+
+		$row->title = htmlspecialchars( $row->title );
 
 		$row->titleA = '';
 		if ( $row->id ) {
@@ -346,7 +349,7 @@ class HTML_modules {
 					</td>
 				</tr>
 				</table>
-				
+
 				<?php
 				if ($row->module == "") {
 					?>
@@ -368,7 +371,7 @@ class HTML_modules {
 					</table>
 					<?php
 				}
-				?>				
+				?>
 			</td>
 			<td width="40%" >
 				<table width="100%" class="adminform">

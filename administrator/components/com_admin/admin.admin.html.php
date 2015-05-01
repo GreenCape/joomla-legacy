@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.html.php 4801 2006-08-28 16:10:28Z stingrey $
+* @version $Id: admin.admin.html.php 5612 2006-11-01 05:01:48Z Saka $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -46,17 +46,17 @@ class HTML_admin_misc {
 
 	function get_php_setting($val, $colour=0, $yn=1) {
 		$r =  (ini_get($val) == '1' ? 1 : 0);
-		
+
 		if ($colour) {
 			if ($yn) {
 				$r = $r ? '<span style="color: green;">ON</span>' : '<span style="color: red;">OFF</span>';
 			} else {
-				$r = $r ? '<span style="color: red;">ON</span>' : '<span style="color: green;">OFF</span>';			
+				$r = $r ? '<span style="color: red;">ON</span>' : '<span style="color: green;">OFF</span>';
 			}
-			
-			return $r; 
+
+			return $r;
 		} else {
-			return $r ? 'ON' : 'OFF';			
+			return $r ? 'ON' : 'OFF';
 		}
 	}
 
@@ -84,7 +84,7 @@ class HTML_admin_misc {
 			</th>
 		</tr>
 		</table>
-		
+
 		<?php
 		$tabs->startPane("sysinfo");
 		$tabs->startTab("System Info","system-page");
@@ -102,7 +102,7 @@ class HTML_admin_misc {
 					josSecurityCheck();
 					?>
 				</td>
-			</tr>			
+			</tr>
 			<tr>
 				<td valign="top" width="250">
 					<strong>PHP built On:</strong>
@@ -160,17 +160,9 @@ class HTML_admin_misc {
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2">
-					<?php
-					// show version check
-					josVersionCheck('95%');
-					?>
-				</td>
-			</tr>
-			<tr>
 				<td colspan="2" style="height: 10px;">
 				</td>
-			</tr>			
+			</tr>
 			<tr>
 				<td valign="top">
 					<strong>Relevant PHP Settings:</strong>
@@ -213,7 +205,7 @@ class HTML_admin_misc {
 							<img src="../images/<?php echo $img; ?>" />
 						</td>
 					</tr>
-					<tr>					
+					<tr>
 						<td>
 							Safe Mode:
 						</td>
@@ -323,7 +315,7 @@ class HTML_admin_misc {
 			<tr>
 				<td colspan="2" style="height: 10px;">
 				</td>
-			</tr>			
+			</tr>
 			<tr>
 				<td valign="top">
 					<strong>Configuration File:</strong>
@@ -391,7 +383,7 @@ class HTML_admin_misc {
 					<strong>For all Joomla! functions and features to work ALL of the following directories should be writeable:</strong>
 					<?php
 					$sp = ini_get('session.save_path');
-										
+
 					mosHTML::writableCell( 'administrator/backups' );
 					mosHTML::writableCell( 'administrator/components' );
 					mosHTML::writableCell( 'administrator/modules' );
@@ -412,7 +404,7 @@ class HTML_admin_misc {
 					mosHTML::writableCell( 'templates' );
 					mosHTML::writableCell( $mosConfig_cachepath, 0, '<strong>Cache Directory</strong> ' );
 					mosHTML::writableCell( $sp, 0, '<strong>Session Directory</strong> ' );
-					?>					
+					?>
 				</td>
 			</tr>
 			</table>
@@ -425,7 +417,7 @@ class HTML_admin_misc {
 
 	function ListComponents() {
 		global $database;
-		
+
 		$query = "SELECT params"
 		. "\n FROM #__modules "
 		. "\n WHERE module = 'mod_components'"
@@ -433,7 +425,7 @@ class HTML_admin_misc {
 		$database->setQuery( $query );
 		$row = $database->loadResult();
 		$params = new mosParameters( $row );
-		
+
 		mosLoadAdminModule( 'components', $params );
 	}
 
@@ -443,11 +435,11 @@ class HTML_admin_misc {
 	function help() {
 		global $mosConfig_live_site;
 		$helpurl 	= strval( mosGetParam( $GLOBALS, 'mosConfig_helpurl', '' ) );
-		
+
 		if ( $helpurl == 'http://help.mamboserver.com' ) {
 			$helpurl = 'http://help.joomla.org';
 		}
-		
+
 		$fullhelpurl = $helpurl . '/index2.php?option=com_content&amp;task=findkey&pop=1&keyref=';
 
 		$helpsearch = strval( mosGetParam( $_REQUEST, 'helpsearch', '' ) );
@@ -458,7 +450,7 @@ class HTML_admin_misc {
 		if (!eregi( '\.html$', $page )) {
 			$page .= '.xml';
 		}
-		
+
 		echo $helpsearch;
 		?>
 		<style type="text/css">
@@ -536,10 +528,7 @@ class HTML_admin_misc {
 							<a href="<?php echo $mosConfig_live_site;?>/administrator/index3.php?option=com_admin&task=sysinfo" target="helpFrame">
 								System Info</a>
 							|
-							<a href="<?php echo $mosConfig_live_site;?>/administrator/index3.php?option=com_admin&task=versioncheck" target="helpFrame">
-								Version Check</a>
-							|
-							<a href="http://www.joomla.org/content/blogcategory/32/66/" target="_blank">
+							<a href="http://www.joomla.org/latest10" target="_blank">
 								Latest Version Info</a>
 						</td>
 					</tr>

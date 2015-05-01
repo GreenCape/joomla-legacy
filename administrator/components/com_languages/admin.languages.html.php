@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.languages.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.languages.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Languages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -57,7 +57,7 @@ class HTML_languages {
 			Author
 			</th>
 			<th width="25%">
-			Author Email
+			Author E-mail
 			</th>
 		</tr>
 		<?php

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: uploadimage.php 4805 2006-08-28 17:15:48Z stingrey $
+* @version $Id: uploadimage.php 5930 2006-12-06 06:27:58Z rmdstudio $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -30,35 +30,36 @@ function limitDirectory( &$directory ) {
 	if ( strpos($directory, '..\\') !== false ) {
 		$directory = str_replace('..\\', '', $directory);
 	}
-	
+
 	if ( strpos($directory, ':') !== false ) {
 		$directory = str_replace(':', '', $directory);
 	}
-	
+
 	return $directory;
 }
 
 // limit access to functionality
 $option = strval( mosGetParam( $_SESSION, 'option', '' ) );
 $task 	= strval( mosGetParam( $_SESSION, 'task', '' ) );
+
 switch ($option) {
 	case 'com_banners':
-		break;		
-		
+		break;
+
 	case 'com_categories':
 	case 'com_content':
 	case 'com_sections':
 	case 'com_typedcontent':
-		if ( $task != 'edit' && $task != 'editA'  ) {
+		if ( $task != 'edit' && $task != 'editA' && $task != 'new' ) {
 			echo _NOT_AUTH;
 			return;
 		}
-		break;		
-		
+		break;
+
 	default:
 		echo _NOT_AUTH;
 		return;
-		break;		
+		break;
 }
 
 $directory	= mosGetParam( $_REQUEST, 'directory', '');
@@ -72,10 +73,12 @@ $userfile_name	= (isset($_FILES['userfile']['name']) ? $_FILES['userfile']['name
 limitDirectory( $directory );
 
 // check to see if directory exists
-if ( $directory != '' && !is_dir($mosConfig_absolute_path .'/images/stories/'. $directory)) {
+if ( $directory != 'banners' && $directory != '' && !is_dir($mosConfig_absolute_path .'/images/stories/'. $directory)) {
 	$directory 	= '';
 }
-	
+
+$action = "window.location.href = 'uploadimage.php?directory=$directory&amp;t=$css'";
+
 if (isset($_FILES['userfile'])) {
 	if ($directory == 'banners') {
 		$base_Dir = "../../images/banners/";
@@ -91,32 +94,32 @@ if (isset($_FILES['userfile'])) {
 	}
 
 	if (empty($userfile_name)) {
-		echo "<script>alert('Please select an image to upload'); document.location.href='uploadimage.php';</script>";
+		mosErrorAlert("Please select an image to upload", $action);
 	}
 
 	$filename = split("\.", $userfile_name);
 
 	if (eregi("[^0-9a-zA-Z_]", $filename[0])) {
-		mosErrorAlert('File must only contain alphanumeric characters and no spaces please.');
+		mosErrorAlert('File must only contain alphanumeric characters and no spaces please.', $action );
 	}
 
 	if (file_exists($base_Dir.$userfile_name)) {
-		mosErrorAlert('Image '.$userfile_name.' already exists.');
+		mosErrorAlert('Image '.$userfile_name.' already exists.', $action );
 	}
 
 	if ((strcasecmp(substr($userfile_name,-4),'.gif')) && (strcasecmp(substr($userfile_name,-4),'.jpg')) && (strcasecmp(substr($userfile_name,-4),'.png')) && (strcasecmp(substr($userfile_name,-4),'.bmp')) &&(strcasecmp(substr($userfile_name,-4),'.doc')) && (strcasecmp(substr($userfile_name,-4),'.xls')) && (strcasecmp(substr($userfile_name,-4),'.ppt')) && (strcasecmp(substr($userfile_name,-4),'.swf')) && (strcasecmp(substr($userfile_name,-4),'.pdf'))) {
-		mosErrorAlert('The file must be gif, png, jpg, bmp, swf, doc, xls or ppt');
+		mosErrorAlert('The file must be gif, png, jpg, bmp, swf, doc, xls or ppt', $action);
 	}
 
 
 	if (eregi('.pdf', $userfile_name) || eregi('.doc', $userfile_name) || eregi('.xls', $userfile_name) || eregi('.ppt', $userfile_name)) {
 		if (!move_uploaded_file ($_FILES['userfile']['tmp_name'],$media_path.$_FILES['userfile']['name']) || !mosChmod($media_path.$_FILES['userfile']['name'])) {
-			mosErrorAlert('Upload of '.$userfile_name.' failed');
+			mosErrorAlert('Upload of '.$userfile_name.' failed', $action);
 		} else {
 			mosErrorAlert('Upload of '.$userfile_name.' to '.$base_Dir.' successful', "window.close()");
 		}
 	} elseif (!move_uploaded_file ($_FILES['userfile']['tmp_name'],$base_Dir.$_FILES['userfile']['name']) || !mosChmod($base_Dir.$_FILES['userfile']['name'])) {
-		mosErrorAlert('Upload of '.$userfile_name.' failed');
+		mosErrorAlert('Upload of '.$userfile_name.' failed', $action);
 	} else {
 		mosErrorAlert('Upload of '.$userfile_name.' to '.$base_Dir.' successful', "window.close()");
 	}
@@ -139,6 +142,7 @@ echo '<?xml version="1.0" encoding="'. $iso[1] .'"?' .'>';
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Upload a file</title>
+<meta http-equiv="Content-Type" content="text/html; <?php echo _ISO; ?>" />
 </head>
 <body>
 
@@ -147,7 +151,7 @@ echo '<?xml version="1.0" encoding="'. $iso[1] .'"?' .'>';
 
 <table class="adminform">
 <tr>
-	<th class="title"> 
+	<th class="title">
 		File Upload : <?php echo $directory; ?>
 	</th>
 </tr>

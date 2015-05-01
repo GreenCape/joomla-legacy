@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: newsfeed_link.menu.html.php 266 2005-09-30 04:44:59Z Levis $
+* @version $Id: newsfeed_link.menu.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -38,7 +38,7 @@ class newsfeed_link_menu_html {
 			if (trim(form.name.value) == ""){
 				alert( "Link must have a name" );
 			} else if (trim(form.newsfeed_link.value) == ""){
-				alert( "You must select a Newsfeed to link to" );
+				alert( "You must select a News Feed to link to" );
 			} else {
 				form.link.value = "index.php?option=com_newsfeeds&task=view&feedid=" + form.newsfeed_link.value;
 				form.componentid.value = form.newsfeed_link.value;
@@ -51,7 +51,7 @@ class newsfeed_link_menu_html {
 		<table class="adminheading">
 		<tr>
 			<th>
-			<?php echo $menu->id ? 'Edit' : 'Add';?> Menu Item :: Link - Newsfeed
+			<?php echo $menu->id ? 'Edit' : 'Add';?> Menu Item :: Link - News Feed
 			</th>
 		</tr>
 		</table>
@@ -70,19 +70,19 @@ class newsfeed_link_menu_html {
 					Name:
 					</td>
 					<td width="80%">
-					<input class="inputbox" type="text" name="name" size="50" maxlength="100" value="<?php echo $menu->name; ?>" />
+					<input class="inputbox" type="text" name="name" size="50" maxlength="100" value="<?php echo htmlspecialchars( $menu->name, ENT_QUOTES ); ?>" />
 					</td>
 				</tr>
 				<tr>
 					<td width="10%" align="right" valign="top">
-					Newsfeed to Link:
+					News Feed to Link:
 					</td>
 					<td width="80%">
 					<?php echo $lists['newsfeed']; ?>
 					</td>
 				</tr>
 				<tr>
-					<td width="10%" align="right">Url:</td>
+					<td width="10%" align="right">URL:</td>
 					<td width="80%">
                     <?php echo ampReplace($lists['link']); ?>
 					</td>

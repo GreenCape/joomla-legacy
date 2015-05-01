@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content_blog_category.menu.html.php 266 2005-09-30 04:44:59Z Levis $
+* @version $Id: content_blog_category.menu.html.php 6070 2006-12-20 02:09:09Z robs $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -82,7 +82,7 @@ class content_blog_category_html {
 				<tr>
 					<td width="10%" align="right">Name:</td>
 					<td width="200px">
-					<input class="inputbox" type="text" name="name" size="30" maxlength="100" value="<?php echo $menu->name; ?>" />
+					<input class="inputbox" type="text" name="name" size="30" maxlength="100" value="<?php echo htmlspecialchars( $menu->name, ENT_QUOTES ); ?>" />
 					</td>
 					<td>
 					</td>
@@ -101,7 +101,7 @@ class content_blog_category_html {
 			  		</td>
 				</tr>
 				<tr>
-					<td align="right">Url:</td>
+					<td align="right">URL:</td>
 					<td colspan="2">
                     <?php echo ampReplace($lists['link']); ?>
 					</td>
