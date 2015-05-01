@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.media.php 3494 2006-05-14 23:51:02Z stingrey $
+* @version $Id: admin.media.php 4555 2006-08-18 18:11:33Z stingrey $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -33,13 +33,10 @@ function makeSafe( $file ) {
 	return str_replace( '..', '', urldecode( $file ) );
 }
 
-$cid = mosGetParam( $_POST, 'cid', array(0) );
-if (!is_array( $cid )) {
-	$cid = array(0);
-}
+$cid 		= josGetArrayInts( 'cid' );
 
-$listdir = makeSafe( mosGetParam( $_REQUEST, 'listdir', '' ) );
-$dirPath = makeSafe( mosGetParam( $_POST, 'dirPath', '' ) );
+$listdir 	= makeSafe( mosGetParam( $_REQUEST, 'listdir', '' ) );
+$dirPath 	= makeSafe( mosGetParam( $_POST, 'dirPath', '' ) );
 
 if (is_int(strpos ($listdir, "..")) && $listdir != '') {
 	mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], "NO HACKING PLEASE" );
@@ -166,7 +163,7 @@ function do_upload($file, $dest_dir) {
 	global $clearUploads;
 
 	if (file_exists($dest_dir.$file['name'])) {
-		mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], "Upload FAILED.File allready exists" );
+		mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], "Upload FAILED.File already exists" );
 	}
 	
 	$format = substr( $file['name'], -3 );

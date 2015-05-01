@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.admin.html.php 4086 2006-06-21 16:36:16Z stingrey $
+* @version $Id: admin.admin.html.php 4801 2006-08-28 16:10:28Z stingrey $
 * @package Joomla
 * @subpackage Admin
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -44,9 +44,20 @@ class HTML_admin_misc {
 		}
 	}
 
-	function get_php_setting($val) {
+	function get_php_setting($val, $colour=0, $yn=1) {
 		$r =  (ini_get($val) == '1' ? 1 : 0);
-		return $r ? 'ON' : 'OFF';
+		
+		if ($colour) {
+			if ($yn) {
+				$r = $r ? '<span style="color: green;">ON</span>' : '<span style="color: red;">OFF</span>';
+			} else {
+				$r = $r ? '<span style="color: red;">ON</span>' : '<span style="color: green;">OFF</span>';			
+			}
+			
+			return $r; 
+		} else {
+			return $r ? 'ON' : 'OFF';			
+		}
 	}
 
 	function get_server_software() {
@@ -60,7 +71,7 @@ class HTML_admin_misc {
 	}
 
 	function system_info( $version ) {
-		global $mosConfig_absolute_path, $database, $mosConfig_cachepath, $my;
+		global $mosConfig_absolute_path, $database, $mosConfig_cachepath, $mainframe;
 
 		$width 	= 400;	// width of 100%
 		$tabs 	= new mosTabs(0);
@@ -84,6 +95,14 @@ class HTML_admin_misc {
 					System Information
 				</th>
 			</tr>
+			<tr>
+				<td colspan="2">
+					<?php
+					// show security setting check
+					josSecurityCheck();
+					?>
+				</td>
+			</tr>			
 			<tr>
 				<td valign="top" width="250">
 					<strong>PHP built On:</strong>
@@ -141,24 +160,128 @@ class HTML_admin_misc {
 				</td>
 			</tr>
 			<tr>
+				<td colspan="2">
+					<?php
+					// show version check
+					josVersionCheck('95%');
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="height: 10px;">
+				</td>
+			</tr>			
+			<tr>
 				<td valign="top">
 					<strong>Relevant PHP Settings:</strong>
 				</td>
 				<td>
 					<table cellspacing="1" cellpadding="1" border="0">
 					<tr>
+						<td width="250">
+							Joomla! Register Globals Emulation:
+						</td>
+						<td style="font-weight: bold;" width="50">
+							<?php echo ((RG_EMULATION) ? '<span style="color: red;">ON</span>' : '<span style="color: green;">OFF</span>'); ?>
+						</td>
+						<td>
+							<?php $img = ((RG_EMULATION) ? 'publish_x.png' : 'tick.png'); ?>
+							<img src="../images/<?php echo $img; ?>" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Register Globals:
+						</td>
+						<td style="font-weight: bold;">
+							<?php echo HTML_admin_misc::get_php_setting('register_globals',1,0); ?>
+						</td>
+						<td>
+							<?php $img = ((ini_get('register_globals')) ? 'publish_x.png' : 'tick.png'); ?>
+							<img src="../images/<?php echo $img; ?>" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Magic Quotes:
+						</td>
+						<td style="font-weight: bold;">
+							<?php echo HTML_admin_misc::get_php_setting('magic_quotes_gpc',1,1); ?>
+						</td>
+						<td>
+							<?php $img = (!(ini_get('magic_quotes_gpc')) ? 'publish_x.png' : 'tick.png'); ?>
+							<img src="../images/<?php echo $img; ?>" />
+						</td>
+					</tr>
+					<tr>					
 						<td>
 							Safe Mode:
 						</td>
+						<td style="font-weight: bold;">
+							<?php echo HTML_admin_misc::get_php_setting('safe_mode',1,0); ?>
+						</td>
 						<td>
-							<?php echo HTML_admin_misc::get_php_setting('safe_mode'); ?>
+							<?php $img = ((ini_get('safe_mode')) ? 'publish_x.png' : 'tick.png'); ?>
+							<img src="../images/<?php echo $img; ?>" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							File Uploads:
+						</td>
+						<td style="font-weight: bold;">
+							<?php echo HTML_admin_misc::get_php_setting('file_uploads',1,1); ?>
+						</td>
+						<td>
+							<?php $img = ((!ini_get('file_uploads')) ? 'publish_x.png' : 'tick.png'); ?>
+							<img src="../images/<?php echo $img; ?>" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Session auto start:
+						</td>
+						<td style="font-weight: bold;">
+							<?php echo HTML_admin_misc::get_php_setting('session.auto_start',1,0); ?>
+						</td>
+						<td>
+							<?php $img = ((ini_get('session.auto_start')) ? 'publish_x.png' : 'tick.png'); ?>
+							<img src="../images/<?php echo $img; ?>" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Session save path:
+						</td>
+						<td style="font-weight: bold;" colspan="2">
+							<?php echo (($sp=ini_get('session.save_path'))?$sp:'none'); ?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Short Open Tags:
+						</td>
+						<td style="font-weight: bold;">
+							<?php echo HTML_admin_misc::get_php_setting('short_open_tag'); ?>
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Output Buffering:
+						</td>
+						<td style="font-weight: bold;">
+							<?php echo HTML_admin_misc::get_php_setting('output_buffering'); ?>
+						</td>
+						<td>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							Open basedir:
 						</td>
-						<td>
+						<td style="font-weight: bold;" colspan="2">
 							<?php echo (($ob = ini_get('open_basedir')) ? $ob : 'none'); ?>
 						</td>
 					</tr>
@@ -166,71 +289,15 @@ class HTML_admin_misc {
 						<td>
 							Display Errors:
 						</td>
-						<td>
+						<td style="font-weight: bold;" colspan="2">
 							<?php echo HTML_admin_misc::get_php_setting('display_errors'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Short Open Tags:
-						</td>
-						<td>
-							<?php echo HTML_admin_misc::get_php_setting('short_open_tag'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							File Uploads:
-						</td>
-						<td>
-							<?php echo HTML_admin_misc::get_php_setting('file_uploads'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Magic Quotes:
-						</td>
-						<td>
-							<?php echo HTML_admin_misc::get_php_setting('magic_quotes_gpc'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Register Globals:
-						</td>
-						<td>
-							<?php echo HTML_admin_misc::get_php_setting('register_globals'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Output Buffering:
-						</td>
-						<td>
-							<?php echo HTML_admin_misc::get_php_setting('output_buffering'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Session save path:
-						</td>
-						<td>
-							<?php echo (($sp=ini_get('session.save_path'))?$sp:'none'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Session auto start:
-						</td>
-						<td>
-							<?php echo intval( ini_get( 'session.auto_start' ) ); ?>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							XML enabled:
 						</td>
-						<td>
+						<td style="font-weight: bold;" colspan="2">
 						<?php echo extension_loaded('xml')?'Yes':'No'; ?>
 						</td>
 					</tr>
@@ -238,7 +305,7 @@ class HTML_admin_misc {
 						<td>
 							Zlib enabled:
 						</td>
-						<td>
+						<td style="font-weight: bold;" colspan="2">
 							<?php echo extension_loaded('zlib')?'Yes':'No'; ?>
 						</td>
 					</tr>
@@ -246,28 +313,17 @@ class HTML_admin_misc {
 						<td>
 							Disabled Functions:
 						</td>
-						<td>
+						<td style="font-weight: bold;" colspan="2">
 							<?php echo (($df=ini_get('disable_functions'))?$df:'none'); ?>
-						</td>
-					</tr>
-					<?php
-					$query = "SELECT name FROM #__mambots"
-					. "\nWHERE folder='editors' AND published='1'"
-					. "\nLIMIT 1";
-					$database->setQuery( $query );
-					$editor = $database->loadResult();
-					?>
-					<tr>
-						<td>
-							WYSIWYG Editor:
-						</td>
-						<td>
-							<?php echo $editor; ?>
 						</td>
 					</tr>
 					</table>
 				</td>
 			</tr>
+			<tr>
+				<td colspan="2" style="height: 10px;">
+				</td>
+			</tr>			
 			<tr>
 				<td valign="top">
 					<strong>Configuration File:</strong>
@@ -395,11 +451,15 @@ class HTML_admin_misc {
 		$fullhelpurl = $helpurl . '/index2.php?option=com_content&amp;task=findkey&pop=1&keyref=';
 
 		$helpsearch = strval( mosGetParam( $_REQUEST, 'helpsearch', '' ) );
+		$helpsearch = addslashes(htmlspecialchars($helpsearch));
+
 		$page 		= strval( mosGetParam( $_REQUEST, 'page', 'joomla.whatsnew100.html' ) );
 		$toc 		= getHelpToc( $helpsearch );
 		if (!eregi( '\.html$', $page )) {
 			$page .= '.xml';
 		}
+		
+		echo $helpsearch;
 		?>
 		<style type="text/css">
 		.helpIndex {
@@ -476,8 +536,11 @@ class HTML_admin_misc {
 							<a href="<?php echo $mosConfig_live_site;?>/administrator/index3.php?option=com_admin&task=sysinfo" target="helpFrame">
 								System Info</a>
 							|
+							<a href="<?php echo $mosConfig_live_site;?>/administrator/index3.php?option=com_admin&task=versioncheck" target="helpFrame">
+								Version Check</a>
+							|
 							<a href="http://www.joomla.org/content/blogcategory/32/66/" target="_blank">
-								Latest Version Check</a>
+								Latest Version Info</a>
 						</td>
 					</tr>
 				</table>

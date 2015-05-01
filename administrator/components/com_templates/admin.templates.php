@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.templates.php 3495 2006-05-15 01:44:00Z stingrey $
+* @version $Id: admin.templates.php 4569 2006-08-19 12:24:04Z stingrey $
 * @package Joomla
 * @subpackage Templates
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -26,6 +26,7 @@ require_once( $mosConfig_absolute_path .'/administrator/components/com_templates
 require_once( $mosConfig_absolute_path .'/includes/domit/xml_domit_lite_include.php' );
 
 $client = strval( mosGetParam( $_REQUEST, 'client', '' ) );
+
 $cid 	= mosGetParam( $_REQUEST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
@@ -445,7 +446,8 @@ function assignTemplate( $p_tname, $option, $client ) {
 function saveTemplateAssign( $option, $client ) {
 	global $database;
 
-	$menus 		= mosGetParam( $_POST, 'selections', array() );
+	$menus 		= josGetArrayInts( 'selections' );
+	
 	$template 	= strval( mosGetParam( $_POST, 'template', '' ) );
 
 	$query = "DELETE FROM #__templates_menu"

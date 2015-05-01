@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.languages.php 3495 2006-05-15 01:44:00Z stingrey $
+* @version $Id: admin.languages.php 4669 2006-08-23 13:29:47Z stingrey $
 * @package Joomla
 * @subpackage Languages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -27,6 +27,10 @@ require_once( "$mosConfig_absolute_path/includes/domit/xml_domit_lite_include.ph
 $cid 	= mosGetParam( $_REQUEST, 'cid', array(0) );
 if (!is_array( $cid )) {
 	$cid = array(0);
+} else {
+	foreach ( $cid as $key => $value ) {
+	        $key = preg_replace( '#\W#', '', $value );
+	}
 }
 
 switch ($task) {
@@ -152,7 +156,7 @@ function publishLanguage( $p_lname, $option ) {
 
 	$config = '';
 
-	$fp = fopen("../configuration.php","r");
+	$fp = fopen('../configuration.php','r');
 	while(!feof($fp)){
 		$buffer = fgets($fp,4096);
 		if (strstr($buffer,"\$mosConfig_lang")){
@@ -163,12 +167,12 @@ function publishLanguage( $p_lname, $option ) {
 	}
 	fclose($fp);
 
-	if ($fp = fopen("../configuration.php","w")){
+	if ($fp = fopen('../configuration.php','w')){
 		fputs($fp, $config, strlen($config));
 		fclose($fp);
-		mosRedirect("index2.php","Configuration successfully updated!");
+		mosRedirect('index2.php?option=com_languages',"Language successfully changed! $p_lname");
 	} else {
-		mosRedirect("index2.php","Error! Make sure that configuration.php is writeable.");
+		mosRedirect('index2.php?option=com_languages','Error!');
 	}
 
 }

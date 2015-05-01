@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install1.php 2796 2006-03-15 14:58:05Z stingrey $
+* @version $Id: install1.php 4675 2006-08-23 16:55:24Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -10,6 +10,9 @@
 * other free or open source software licenses.
 * See COPYRIGHT.php for copyright notices and details.
 */
+
+// Set flag that this is a parent file
+define( "_VALID_MOS", 1 );
 
 /** Include common.php */
 require_once( 'common.php' );

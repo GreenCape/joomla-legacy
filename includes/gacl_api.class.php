@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: gacl_api.class.php 1334 2005-12-07 05:32:52Z eddieajau $
+* @version $Id: gacl_api.class.php 4796 2006-08-28 05:06:27Z eddiea $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -677,7 +677,7 @@ class gacl_api extends gacl {
 		$this->db->setQuery( '
 			SELECT		g.group_id,o.'. $group_type .'_id,gm.group_id AS member
 			FROM		'. $object_table .' o
-			LEFT JOIN	'. $group_table .' g ON g.group_id='. $group_id .'
+			LEFT JOIN	'. $group_table .' g ON g.group_id='. (int) $group_id .'
 			LEFT JOIN	'. $table .' gm ON (gm.group_id=g.group_id AND gm.'. $group_type .'_id=o.'. $group_type .'_id)
 			WHERE		(o.section_value=\''. $this->db->getEscaped($object_section_value) .'\' AND o.value=\''. $this->db->getEscaped($object_value) .'\')'
 		);
@@ -703,7 +703,7 @@ class gacl_api extends gacl {
 
 		$object_id = $row[1];
 
-		$this->db->setQuery( 'INSERT INTO '. $table .' (group_id,'. $group_type .'_id) VALUES ('. $group_id .','. $object_id .')' );
+		$this->db->setQuery( 'INSERT INTO '. $table .' (group_id,'. $group_type .'_id) VALUES ('. (int) $group_id .','. $object_id .')' );
 
 		if (!$this->db->query()) {
 			$this->debug_db('add_group_object');

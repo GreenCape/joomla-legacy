@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: config.class.php 3754 2006-05-31 12:08:37Z stingrey $
+* @version $Id: config.class.php 4802 2006-08-28 16:18:33Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.

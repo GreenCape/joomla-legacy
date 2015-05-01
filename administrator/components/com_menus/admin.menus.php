@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menus.php 3876 2006-06-05 14:08:05Z stingrey $
+* @version $Id: admin.menus.php 4555 2006-08-18 18:11:33Z stingrey $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -22,10 +22,8 @@ $path 		= $mosConfig_absolute_path .'/administrator/components/com_menus/';
 $menutype 	= strval( mosGetParam( $_REQUEST, 'menutype', 'mainmenu' ) );
 $type 		= strval( mosGetParam( $_REQUEST, 'type', false ) );
 $menu 		= strval( mosGetParam( $_POST, 'menu', '' ) );
-$cid 		= mosGetParam( $_POST, 'cid', array(0) );
-if (!is_array( $cid )) {
-	$cid = array(0);
-}
+
+$cid 		= josGetArrayInts( 'cid' );
 
 switch ($task) {
 	case 'new':
@@ -377,7 +375,7 @@ function saveMenu( $option, $task='save' ) {
 		exit();
 	}
 	$row->checkin();
-	$row->updateOrder( "menutype = '$row->menutype' AND parent = $row->parent" );
+	$row->updateOrder( 'menutype = ' . $database->Quote( $row->menutype ) . ' AND parent = ' . (int) $row->parent );
 
 	$msg = 'Menu item Saved';
 	switch ( $task ) {
@@ -650,7 +648,7 @@ function moveMenuSave( $option, $cid, $menu, $menutype ) {
 
 	if ($firstroot) {
 		$row->load( $firstroot );
-		$row->updateOrder( "menutype = '$row->menutype' AND parent = $row->parent" );
+		$row->updateOrder( 'menutype = ' . $database->Quote( $row->menutype ) . ' AND parent = ' . (int) $row->parent );
 	} // if
 
 	// clean any existing cache files
@@ -727,7 +725,7 @@ function copyMenuSave( $option, $cid, $menu, $menutype ) {
 			echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 			exit();
 		}
-		$curr->updateOrder( "menutype = '$curr->menutype' AND parent = $curr->parent" );
+		$curr->updateOrder( 'menutype = ' . $database->Quote( $curr->menutype ) . ' AND parent = ' . (int) $curr->parent );
 	} // foreach
 	
 	// clean any existing cache files
@@ -778,13 +776,14 @@ function saveOrder( &$cid, $menutype ) {
 	global $database;
 
 	$total		= count( $cid );
-	$order 		= mosGetParam( $_POST, 'order', array(0) );
+	$order 		= josGetArrayInts( 'order' );
+	
 	$row		= new mosMenu( $database );
 	$conditions = array();
 
 	// update ordering values
 	for( $i=0; $i < $total; $i++ ) {
-		$row->load( $cid[$i] );
+		$row->load( (int) $cid[$i] );
 		if ($row->ordering != $order[$i]) {
 			$row->ordering = $order[$i];
 			if (!$row->store()) {
@@ -792,7 +791,7 @@ function saveOrder( &$cid, $menutype ) {
 				exit();
 			}
 			// remember to updateOrder this group
-			$condition = "menutype = '$menutype' AND parent = $row->parent AND published >= 0";
+			$condition = "menutype = " . $database->Quote( $menutype ) . " AND parent = $row->parent AND published >= 0";
 			$found = false;
 			foreach ( $conditions as $cond )
 				if ($cond[1]==$condition) {

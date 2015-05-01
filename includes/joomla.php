@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.php 4127 2006-06-25 20:00:22Z stingrey $
+* @version $Id: joomla.php 4801 2006-08-28 16:10:28Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -854,6 +854,10 @@ class mosMainFrame {
 
 					echo "<script>document.location.href='index.php?mosmsg=Admin Session Expired'</script>\n";
 					exit();
+				} else {
+					// load variables into session, used to help secure /popups/ functionality
+					$_SESSION['option'] = $option;
+					$_SESSION['task'] 	= $task;					
 				}
 			}
 		} else if ($session_id == '') {
@@ -1211,9 +1215,8 @@ class mosMainFrame {
 			. "\n WHERE client_id = 0"
 			. "\n AND ( menuid = 0 $assigned )"
 			. "\n ORDER BY menuid DESC"
-			. "\n LIMIT 1"
 			;
-			$this->_db->setQuery( $query );
+			$this->_db->setQuery( $query, 0, 1 );
 			$cur_template = $this->_db->loadResult();
 
 			// TemplateChooser Start
@@ -1251,34 +1254,45 @@ class mosMainFrame {
 	* @param string The base path from which to load the configuration file
 	*/
 	function _setAdminPaths( $option, $basePath='.' ) {
-		$option = strtolower( $option );
-		$this->_path = new stdClass();
-
+		$option 		= strtolower( $option );
+		
+		$this->_path 	= new stdClass();
+		
+		// security check to disable use of `/`, `\\` and `:` in $options variable 
+		if (strpos($option, '/') !== false || strpos($option, '\\') !== false || strpos($option, ':') !== false) {
+			mosErrorAlert( 'Restricted access' );
+			return;
+		}
+			
 		$prefix = substr( $option, 0, 4 );
-		if ($prefix != 'com_') {
+		if ($prefix != 'com_' && $prefix != 'mod_') {
 			// ensure backward compatibility with existing links
-			$name = $option;
+			$name 	= $option;
 			$option = "com_$option";
 		} else {
-			$name = substr( $option, 4 );
+			$name 	= substr( $option, 4 );
 		}
+		
 		// components
 		if (file_exists( "$basePath/templates/$this->_template/components/$name.html.php" )) {
-			$this->_path->front = "$basePath/components/$option/$name.php";
-			$this->_path->front_html = "$basePath/templates/$this->_template/components/$name.html.php";
+			$this->_path->front 		= "$basePath/components/$option/$name.php";
+			$this->_path->front_html 	= "$basePath/templates/$this->_template/components/$name.html.php";
 		} else if (file_exists( "$basePath/components/$option/$name.php" )) {
-			$this->_path->front = "$basePath/components/$option/$name.php";
-			$this->_path->front_html = "$basePath/components/$option/$name.html.php";
+			$this->_path->front 		= "$basePath/components/$option/$name.php";
+			$this->_path->front_html 	= "$basePath/components/$option/$name.html.php";
 		}
+		
 		if (file_exists( "$basePath/administrator/components/$option/admin.$name.php" )) {
-			$this->_path->admin = "$basePath/administrator/components/$option/admin.$name.php";
-			$this->_path->admin_html = "$basePath/administrator/components/$option/admin.$name.html.php";
+			$this->_path->admin 		= "$basePath/administrator/components/$option/admin.$name.php";
+			$this->_path->admin_html 	= "$basePath/administrator/components/$option/admin.$name.html.php";
 		}
+		
 		if (file_exists( "$basePath/administrator/components/$option/toolbar.$name.php" )) {
-			$this->_path->toolbar = "$basePath/administrator/components/$option/toolbar.$name.php";
-			$this->_path->toolbar_html = "$basePath/administrator/components/$option/toolbar.$name.html.php";
-			$this->_path->toolbar_default = "$basePath/administrator/includes/toolbar.html.php";
+			$this->_path->toolbar 			= "$basePath/administrator/components/$option/toolbar.$name.php";
+			$this->_path->toolbar_html 		= "$basePath/administrator/components/$option/toolbar.$name.html.php";
+			$this->_path->toolbar_default 	= "$basePath/administrator/includes/toolbar.html.php";
 		}
+		
 		if (file_exists( "$basePath/components/$option/$name.class.php" )) {
 			$this->_path->class = "$basePath/components/$option/$name.class.php";
 		} else if (file_exists( "$basePath/administrator/components/$option/$name.class.php" )) {
@@ -1286,13 +1300,17 @@ class mosMainFrame {
 		} else if (file_exists( "$basePath/includes/$name.php" )) {
 			$this->_path->class = "$basePath/includes/$name.php";
 		}
-		if (file_exists("$basePath/administrator/components/$option/admin.$name.php" )) {
-			$this->_path->admin = "$basePath/administrator/components/$option/admin.$name.php";
-			$this->_path->admin_html = "$basePath/administrator/components/$option/admin.$name.html.php";
+
+		if ($prefix == 'mod_' && file_exists("$basePath/administrator/modules/$option.php")) {
+			$this->_path->admin 		= "$basePath/administrator/modules/$option.php";
+			$this->_path->admin_html 	= "$basePath/administrator/modules/mod_$name.html.php";
+		} else if (file_exists("$basePath/administrator/components/$option/admin.$name.php" )) {
+			$this->_path->admin 		= "$basePath/administrator/components/$option/admin.$name.php";
+			$this->_path->admin_html 	= "$basePath/administrator/components/$option/admin.$name.html.php";
 		} else {
-			$this->_path->admin = "$basePath/administrator/components/com_admin/admin.admin.php";
-			$this->_path->admin_html = "$basePath/administrator/components/com_admin/admin.admin.html.php";
-		}
+			$this->_path->admin 		= "$basePath/administrator/components/com_admin/admin.admin.php";
+			$this->_path->admin_html 	= "$basePath/administrator/components/com_admin/admin.admin.html.php";
+		}		
 	}
 	/**
 	* Returns a stored path variable
@@ -2937,8 +2955,8 @@ function mosGetParam( &$arr, $name, $def=null, $mask=0 ) {
 				}
 				$return = $noHtmlFilter->process( $return );
 				
-				if (is_numeric($def)) {
-				// if default value is numeric set variable type to integer
+				if (empty($return) && is_numeric($def)) {
+				// if value is defined and default value is numeric set variable type to integer
 					$return = intval($return);
 				}				
 			}
@@ -3778,9 +3796,16 @@ function mosCreateMail( $from='', $fromname='', $subject, $body ) {
 * @param string/array Attachment file name(s)
 * @param string/array ReplyTo e-mail address(es)
 * @param string/array ReplyTo name(s)
+* @return boolean
 */
 function mosMail( $from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NULL, $bcc=NULL, $attachment=NULL, $replyto=NULL, $replytoname=NULL ) {
 	global $mosConfig_debug;
+
+	// Filter from, fromname and subject
+	if (!JosIsValidEmail( $from ) || !JosIsValidName( $fromname ) || !JosIsValidName( $subject )) {
+		return false;
+	}
+
 	$mail = mosCreateMail( $from, $fromname, $subject, $body );
 
 	// activate HTML formatted emails
@@ -3790,26 +3815,44 @@ function mosMail( $from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NU
 
 	if (is_array( $recipient )) {
 		foreach ($recipient as $to) {
+			if (!JosIsValidEmail( $to )) {
+				return false;
+			}
 			$mail->AddAddress( $to );
 		}
 	} else {
+		if (!JosIsValidEmail( $recipient )) {
+			return false;
+		}
 		$mail->AddAddress( $recipient );
 	}
 	if (isset( $cc )) {
 		if (is_array( $cc )) {
 			foreach ($cc as $to) {
+				if (!JosIsValidEmail( $to )) {
+					return false;
+				}
 				$mail->AddCC($to);
 			}
 		} else {
+			if (!JosIsValidEmail( $cc )) {
+				return false;
+			}
 			$mail->AddCC($cc);
 		}
 	}
 	if (isset( $bcc )) {
 		if (is_array( $bcc )) {
 			foreach ($bcc as $to) {
+				if (!JosIsValidEmail( $to )) {
+					return false;
+				}
 				$mail->AddBCC( $to );
 			}
 		} else {
+			if (!JosIsValidEmail( $bcc )) {
+				return false;
+			}
 			$mail->AddBCC( $bcc );
 		}
 	}
@@ -3828,9 +3871,15 @@ function mosMail( $from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NU
 			reset( $replytoname );
 			foreach ($replyto as $to) {
 				$toname = ((list( $key, $value ) = each( $replytoname )) ? $value : '');
+				if (!JosIsValidEmail( $to ) || !JosIsValidName( $toname )) {
+					return false;
+				}
 				$mail->AddReplyTo( $to, $toname );
 			}
         } else {
+			if (!JosIsValidEmail( $replyto ) || !JosIsValidName( $replytoname )) {
+				return false;
+			}
 			$mail->AddReplyTo($replyto, $replytoname);
 		}
     }
@@ -3846,6 +3895,43 @@ function mosMail( $from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NU
 	}
 	return $mailssend;
 } // mosMail
+
+/**
+ * Checks if a given string is a valid email address
+ *
+ * @param	string	$email	String to check for a valid email address
+ * @return	boolean
+ */
+function JosIsValidEmail( $email ) {
+	$valid = preg_match( '/^[\w\.\-]+@\w+[\w\.\-]*?\.\w{1,4}$/', $email );
+	
+	return $valid;
+}
+
+/**
+ * Checks if a given string is a valid (from-)name or subject for an email
+ *
+ * @since		1.0.11
+ * @deprecated	1.5
+ * @param		string		$string		String to check for validity
+ * @return		boolean
+ */
+function JosIsValidName( $string ) {
+	/*
+	 * The following regular expression blocks all strings containing any low control characters:
+	 * 0x00-0x1F, 0x7F
+	 * These should be control characters in almost all used charsets.
+	 * The high control chars in ISO-8859-n (0x80-0x9F) are unused (e.g. http://en.wikipedia.org/wiki/ISO_8859-1)
+	 * Since they are valid UTF-8 bytes (e.g. used as the second byte of a two byte char),
+	 * they must not be filtered.
+	 */
+	$invalid = preg_match( '/[\x00-\x1F\x7F]/', $string );
+	if ($invalid) {
+		return false;
+	} else {
+		return true;
+	}
+}
 
 /**
  * Initialise GZIP
@@ -5692,6 +5778,26 @@ function mosArrayToInts( &$array, $default=null ) {
 	}
 }
 
+/*
+* Function to handle an array of integers
+* Added 1.0.11
+*/
+function josGetArrayInts( $name, $type=NULL ) {
+	if ( $type == NULL ) {
+		$type = $_POST;
+	}
+	
+	$array = mosGetParam( $type, $name, array(0) );
+	
+	mosArrayToInts( $array );
+	
+	if (!is_array( $array )) {
+		$array = array(0);
+	}
+	
+	return $array;
+}
+
 /**
  * Utility class for helping with patTemplate
  */
@@ -5800,7 +5906,7 @@ function mosBackTrace() {
 
 function josSpoofCheck( $header=NULL, $alt=NULL ) {	
 	$validate 	= mosGetParam( $_POST, josSpoofValue($alt), 0 );
-	
+
 	// probably a spoofing attack
 	if (!$validate) {
 		header( 'HTTP/1.0 403 Forbidden' );
@@ -5853,15 +5959,27 @@ function josSpoofCheck( $header=NULL, $alt=NULL ) {
 	}
 }
 
+/**
+ * Method to determine a hash for anti-spoofing variable names
+ *
+ * @return	string	Hashed var name
+ * @static	 
+ */
 function josSpoofValue($alt=NULL) {
 	global $mainframe;
 	
 	if ($alt) {
-		$random		= date( 'Ymd' );
+		if ( $alt == 1 ) {
+			$random		= date( 'Ymd' );
+		} else {
+			$random		= $alt . date( 'Ymd' );
+		}
 	} else {		
 		$random		= date( 'dmY' );
 	}
-	$validate 	= mosHash( $mainframe->getCfg( 'db' ) . $random );
+	// the prefix ensures that the hash is non-numeric
+	// otherwise it will be intercepted by globals.php
+	$validate 	= 'j' . mosHash( $mainframe->getCfg( 'db' ) . $random );
 	
 	return $validate;
 }

@@ -18,10 +18,7 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 require_once( $mainframe->getPath( 'admin_html' ) );
 require_once( $mainframe->getPath( 'class' ) );
 
-$cid	= mosGetParam( $_REQUEST, 'cid', array( 0 ) );
-if (!is_array( $cid )) {
-	$cid = array ( 0 );
-}
+$cid = josGetArrayInts( 'cid' );
 
 switch ($task) {
 	case 'view':
@@ -186,9 +183,8 @@ function showMessages( $option ) {
 	. "\n INNER JOIN #__users AS u ON u.id = a.user_id_from"
 	. ($wheres ? "\n WHERE " . implode( " AND ", $wheres ) : "" )
 	. "\n ORDER BY date_time DESC"
-	. "\n LIMIT $pageNav->limitstart, $pageNav->limit"
 	;
-	$database->setQuery( $query );
+	$database->setQuery( $query, $pageNav->limitstart, $pageNav->limit );
 
 	$rows = $database->loadObjectList();
 	if ($database->getErrorNum()) {
