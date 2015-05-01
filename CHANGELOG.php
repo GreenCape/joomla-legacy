@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: CHANGELOG.php 10003 2008-02-08 11:16:37Z willebil $
+* @version $Id: CHANGELOG.php 10052 2008-02-21 16:04:13Z willebil $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -36,6 +36,14 @@ code fixes.
 ^ -> Change
 - -> Removed
 ! -> Note
+
+
+--------------- 1.0.15 Stable Released -- [22-February-2008 23:00 UTC] ---------------------
+
+06-Feb-2008 Andrew Eddie
+* SECURITY [HIGH level]: Fixed remote file inclusion vulnerability
+
+--------------- 1.0.14 Stable Released -- [11-February-2008 23:00 UTC] ---------------------
 
 09-Feb-2008 Wilco Jansen
  # Fixed [9249] Unable to delete mambots

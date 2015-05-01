@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 9937 2008-01-13 23:22:26Z eddieajau $
+* @version $Id: index.php 10041 2008-02-15 21:48:13Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -22,7 +22,7 @@ if (!file_exists( 'configuration.php' ) || filesize( 'configuration.php' ) < 10)
 }
 
 require( 'globals.php' );
-require_once( 'configuration.php' );
+require( 'configuration.php' );
 
 // SSL check - $http_host returns <live site url>:<port number if it is 443>
 $http_host = explode(':', $_SERVER['HTTP_HOST'] );

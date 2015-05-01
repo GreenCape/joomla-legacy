@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index2.php 6024 2006-12-18 22:30:07Z friesengeist $
+* @version $Id: index2.php 10041 2008-02-15 21:48:13Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -15,7 +15,7 @@
 define( '_VALID_MOS', 1 );
 
 require( 'globals.php' );
-require_once( 'configuration.php' );
+require( 'configuration.php' );
 
 // SSL check - $http_host returns <live site url>:<port number if it is 443>
 $http_host = explode(':', $_SERVER['HTTP_HOST'] );
