@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: registration.php 652 2005-10-25 22:23:27Z Jinx $
+* @version $Id: registration.php 1489 2005-12-20 15:14:54Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -88,7 +88,7 @@ function sendNewPass( $option ) {
 		die("SQL error" . $database->stderr(true));
 	}
 
-	mosRedirect( "index.php?Itemid=$Itemid&mosmsg="._NEWPASS_SENT );
+	mosRedirect( "index.php?option=com_registration&mosmsg="._NEWPASS_SENT );
 }
 
 function registerForm( $option, $useractivation ) {

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_search.php 463 2005-10-12 16:29:37Z stingrey $
+* @version $Id: mod_search.php 1357 2005-12-07 21:49:00Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -64,7 +64,7 @@ if ( count( $rows ) ) {
 ?>
 
 <form action="<?php echo sefRelToAbs( $link ); ?>" method="get">
-	<div align="left" class="search<?php echo $moduleclass_sfx; ?>">
+	<div class="search<?php echo $moduleclass_sfx; ?>">
 		<?php echo $output; ?>
 	</div>
 

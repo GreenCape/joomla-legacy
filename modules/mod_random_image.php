@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_random_image.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mod_random_image.php 1327 2005-12-07 03:41:21Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -63,10 +63,6 @@ if (is_dir($abspath_folder)) {
   	}
 
   	$image = $mosConfig_live_site .'/'. $folder .'/'. $image_name;
-
-	if ($link) {
-  		echo '<a href="'. $link .'" target="_self">';
-  	}
 
 	}
   	?>

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.html.php 478 2005-10-12 19:36:02Z predator $
+* @version $Id: admin.content.html.php 1332 2005-12-07 04:23:24Z Jinx $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -194,7 +194,7 @@ class HTML_content {
 				</td>
 				<td>
 				<?php
-				if ( $row->checked_out ) {
+				if ( $row->checked_out && ( $row->checked_out != $my->id )) {
 					echo $row->title;
 				} else {
 					?>

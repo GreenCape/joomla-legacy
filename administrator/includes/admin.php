@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.php 1501 2005-12-20 20:11:18Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -270,7 +270,7 @@ function mosMakePath($base, $path='', $mode = NULL) {
 		for ($i = 0; $i < $n; $i++) {
 			$path .= $parts[$i] . '/';
 			if (!file_exists( $path )) {
-				if (!@mkdir( $path, $mode )) {
+				if (!@mkdir(substr($path,0,-1),$mode)) {
 					$ret = false;
 					break;
 				}

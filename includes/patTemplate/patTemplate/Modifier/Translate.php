@@ -2,7 +2,7 @@
 /**
  * patTemplate modfifier Translate
  *
- * $Id: Translate.php 154 2005-09-18 02:03:25Z eddieajau $
+ * $Id: Translate.php 1544 2005-12-23 07:01:01Z eddieajau $
  *
  * @package		patTemplate
  * @subpackage	Modifiers
@@ -31,6 +31,9 @@ class patTemplate_Modifier_Translate extends patTemplate_Modifier
 		if (is_object( $_LANG )) {
 			return $_LANG->_( $value );
 		} else {
+			if (defined( $value )) {
+				$value = constant( $value );
+			}
 			return $value;
 		}
 	}

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.php 1002 2005-11-13 16:32:29Z stingrey $
+* @version $Id: contact.php 1347 2005-12-07 19:51:49Z Jinx $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -23,9 +23,9 @@ $mainframe->setPageTitle( _CONTACT_TITLE );
 
 //Load Vars
 $op			= mosGetParam( $_REQUEST, 'op' );
-$con_id 	= intval( mosGetParam( $_REQUEST ,'con_id', 0 ) );
-$contact_id = intval( mosGetParam( $_REQUEST ,'contact_id', 0 ) );
-$catid 		= intval( mosGetParam( $_REQUEST ,'catid', 0 ) );
+$con_id 	= (int) mosGetParam( $_REQUEST ,'con_id', 0 );
+$contact_id = (int) mosGetParam( $_REQUEST ,'contact_id', 0 );
+$catid 		= (int) mosGetParam( $_REQUEST ,'catid', 0 );
 
 switch( $task ) {
 	case 'view':
@@ -305,11 +305,11 @@ function contactpage( $contact_id ) {
 				break;
 			default:
 			// icons
-				$image1 = mosAdminMenus::ImageCheck( 'con_address.png', '/images/M_images/', $params->get( 'icon_address' ), NULL, _CONTACT_ADDRESS, _CONTACT_ADDRESS );
-				$image2 = mosAdminMenus::ImageCheck( 'emailButton.png', '/images/M_images/', $params->get( 'icon_email' ), NULL, _CONTACT_EMAIL, _CONTACT_EMAIL );
-				$image3 = mosAdminMenus::ImageCheck( 'con_tel.png', '/images/M_images/', $params->get( 'icon_telephone' ), NULL, _CONTACT_TELEPHONE, _CONTACT_TELEPHONE );
-				$image4 = mosAdminMenus::ImageCheck( 'con_fax.png', '/images/M_images/', $params->get( 'icon_fax' ), NULL, _CONTACT_FAX, _CONTACT_FAX );
-				$image5 = mosAdminMenus::ImageCheck( 'con_info.png', '/images/M_images/', $params->get( 'icon_misc' ), NULL, _CONTACT_MISC, _CONTACT_MISC );
+				$image1 = mosAdminMenus::ImageCheck( 'con_address.png', '/images/M_images/', $params->get( 'icon_address' ), '/images/M_images/', _CONTACT_ADDRESS, _CONTACT_ADDRESS );
+				$image2 = mosAdminMenus::ImageCheck( 'emailButton.png', '/images/M_images/', $params->get( 'icon_email' ), '/images/M_images/', _CONTACT_EMAIL, _CONTACT_EMAIL );
+				$image3 = mosAdminMenus::ImageCheck( 'con_tel.png', '/images/M_images/', $params->get( 'icon_telephone' ), '/images/M_images/', _CONTACT_TELEPHONE, _CONTACT_TELEPHONE );
+				$image4 = mosAdminMenus::ImageCheck( 'con_fax.png', '/images/M_images/', $params->get( 'icon_fax' ), '/images/M_images/', _CONTACT_FAX, _CONTACT_FAX );
+				$image5 = mosAdminMenus::ImageCheck( 'con_info.png', '/images/M_images/', $params->get( 'icon_misc' ), '/images/M_images/', _CONTACT_MISC, _CONTACT_MISC );
 				$params->set( 'marker_address', $image1 );
 				$params->set( 'marker_email', $image2 );
 				$params->set( 'marker_telephone', $image3 );
@@ -341,6 +341,13 @@ function sendmail( $con_id, $option ) {
 	global $database, $Itemid;
 	global $mosConfig_sitename, $mosConfig_live_site, $mosConfig_mailfrom, $mosConfig_fromname;
 
+	$validate = mosGetParam( $_POST, mosHash( 'validate' ), 0 );
+	if (!$validate) {
+		// probably a spoofing attack
+		echo _NOT_AUTH;
+		return;
+	}
+
 	$query = "SELECT *"
 	. "\n FROM #__contact_details"
 	. "\n WHERE id = $con_id"
@@ -348,33 +355,35 @@ function sendmail( $con_id, $option ) {
 	$database->setQuery( $query );
 	$contact 	= $database->loadObjectList();
 
-	$default 	= $mosConfig_sitename.' '. _ENQUIRY;
-	$email 		= mosGetParam( $_POST, 'email', '' );
-	$text 		= mosGetParam( $_POST, 'text', '' );
-	$name 		= mosGetParam( $_POST, 'name', '' );
-	$subject 	= mosGetParam( $_POST, 'subject', $default );
-	$email_copy = mosGetParam( $_POST, 'email_copy', 0 );
-
-	if ( !$email || !$text || ( is_email( $email )==false ) ) {
-		mosErrorAlert( _CONTACT_FORM_NC );
-	}
-	$prefix = sprintf( _ENQUIRY_TEXT, $mosConfig_live_site );
-	$text 	= $prefix ."\n". $name. ' <'. $email .'>' ."\n\n". stripslashes( $text );
-
-	mosMail( $email, $name , $contact[0]->email_to, $mosConfig_fromname .': '. $subject, $text );
-
-	if ( $email_copy ) {
-		$copy_text = sprintf( _COPY_TEXT, $contact[0]->name, $mosConfig_sitename );
-		$copy_text = $copy_text ."\n\n". $text .'';
-		$copy_subject = _COPY_SUBJECT . $subject;
-		mosMail( $mosConfig_mailfrom, $mosConfig_fromname, $email, $copy_subject, $copy_text );
-	}
-	?>
-	<script>
-	alert( "<?php echo _THANK_MESSAGE; ?>" );
-	document.location.href='<?php echo sefRelToAbs( 'index.php?option='. $option .'&Itemid='. $Itemid ); ?>';
-	</script>
+	if (count( $contact ) > 0) {
+		$default 	= $mosConfig_sitename.' '. _ENQUIRY;
+		$email 		= mosGetParam( $_POST, 'email', '' );
+		$text 		= mosGetParam( $_POST, 'text', '' );
+		$name 		= mosGetParam( $_POST, 'name', '' );
+		$subject 	= mosGetParam( $_POST, 'subject', $default );
+		$email_copy = mosGetParam( $_POST, 'email_copy', 0 );
+	
+		if ( !$email || !$text || ( is_email( $email )==false ) ) {
+			mosErrorAlert( _CONTACT_FORM_NC );
+		}
+		$prefix = sprintf( _ENQUIRY_TEXT, $mosConfig_live_site );
+		$text 	= $prefix ."\n". $name. ' <'. $email .'>' ."\n\n". stripslashes( $text );
+	
+		mosMail( $email, $name , $contact[0]->email_to, $mosConfig_fromname .': '. $subject, $text );
+	
+		if ( $email_copy ) {
+			$copy_text = sprintf( _COPY_TEXT, $contact[0]->name, $mosConfig_sitename );
+			$copy_text = $copy_text ."\n\n". $text .'';
+			$copy_subject = _COPY_SUBJECT . $subject;
+			mosMail( $mosConfig_mailfrom, $mosConfig_fromname, $email, $copy_subject, $copy_text );
+		}
+		?>
+		<script>
+		alert( "<?php echo _THANK_MESSAGE; ?>" );
+		document.location.href='<?php echo sefRelToAbs( 'index.php?option='. $option .'&Itemid='. $Itemid ); ?>';
+		</script>
 	<?php
+	}
 }
 
 

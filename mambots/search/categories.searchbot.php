@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: categories.searchbot.php 890 2005-11-06 15:56:30Z stingrey $
+* @version $Id: categories.searchbot.php 1490 2005-12-20 15:53:29Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -41,7 +41,6 @@ function botSearchCategories( $text, $phrase='', $ordering='' ) {
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit = $botParams->def( 'search_limit', 50 );
-	$limit = "\n LIMIT $limit";	
 	
 	$text = trim( $text );
 	if ( $text == '' ) {
@@ -79,10 +78,10 @@ function botSearchCategories( $text, $phrase='', $ordering='' ) {
 	. "\n AND a.access <= $my->gid"
 	. "\n AND ( m.type = 'content_section' OR m.type = 'content_blog_section'"
 	. "\n OR m.type = 'content_category' OR m.type = 'content_blog_category')"
+	. "\n GROUP BY a.id" 
 	. "\n ORDER BY $order"
-	. $limit
 	;
-	$database->setQuery( $query );
+	$database->setQuery( $query, 0, $limit );
 	$rows = $database->loadObjectList();
 
 	$count = count( $rows );

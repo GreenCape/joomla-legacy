@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.banners.html.php 765 2005-10-31 10:02:25Z stingrey $
+* @version $Id: admin.banners.html.php 1305 2005-12-06 18:29:41Z Jinx $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -386,7 +386,7 @@ class HTML_bannerClient {
 		</table>
 		<?php echo $pageNav->getListFooter(); ?>
 		<input type="hidden" name="option" value="<?php echo $option; ?>">
-		<input type="hidden" name="task" value="">
+		<input type="hidden" name="task" value="listclients">
 		<input type="hidden" name="boxchecked" value="0">
 		<input type="hidden" name="hidemainmenu" value="0">
 		</form>

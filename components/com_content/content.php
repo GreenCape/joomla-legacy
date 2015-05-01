@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.php 1016 2005-11-13 20:05:17Z stingrey $
+* @version $Id: content.php 1495 2005-12-20 18:11:19Z Jinx $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -37,7 +37,8 @@ $cache =& mosCache::getCache( 'com_content' );
 
 // loads function for frontpage component
 if ( $option == 'com_frontpage' ) {
-	$cache->call( 'frontpage', $gid, $access, $pop, $now );
+	//$cache->call( 'frontpage', $gid, $access, $pop, $now );
+	frontpage($gid, $access, $pop, $now );
 	return;
 }
 
@@ -107,7 +108,9 @@ switch ( strtolower( $task ) ) {
 		break;
 
 	default:
-		$cache->call('showBlogSection', 0, $gid, $access, $pop, $now );
+		//$cache->call('showBlogSection', 0, $gid, $access, $pop, $now );
+		header("HTTP/1.0 404 Not Found");
+		echo _NOT_EXIST;
 		break;
 }
 
@@ -157,7 +160,7 @@ function frontpage( $gid, &$access, $pop, $now ) {
 	// query records
 //	$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
 	$query = "SELECT a.id, a.title, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
-	. "\n a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, a.images, a.urls, a.ordering, a.metakey, a.metadesc, a.access,"
+	. "\n a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, a.images, a.urls, a.ordering, a.metakey, a.metadesc, a.access, a.hits,"
 	. "\n CHAR_LENGTH( a.fulltext ) AS readmore,"
 	. "\n ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
 	. "\n FROM #__content AS a"
@@ -241,7 +244,7 @@ function showSection( $id, $gid, &$access, $now ) {
 		if ( !$params->get( 'empty_cat' ) ) {
 			$empty = "\n HAVING numitems > 0";
 		}
-	}	
+	}
 	if ( $params->get( 'type' ) == 'section' ) {
 		// show/hide empty categories in section
 		if ( !$params->get( 'empty_cat_section' ) ) {
@@ -490,7 +493,7 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limi
 
 function showBlogSection( $id=0, $gid, &$access, $pop, $now=NULL ) {
 	global $database, $mainframe, $Itemid;
-
+	
 	$noauth = !$mainframe->getCfg( 'shownoauth' );
 
 	// Parameters
@@ -1048,12 +1051,12 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 	if ( $database->loadObject( $row ) ) {
 		if ( !$row->cat_pub && $row->catid ) {
 		// check whether category is published
-			mosNotAuth();
+			mosNotAuth();  
 			return;
 		}
 		if ( !$row->sec_pub && $row->sectionid ) {
 		// check whether section is published
-			mosNotAuth();
+			mosNotAuth(); 
 			return;
 		}
 
@@ -1073,6 +1076,7 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 			. "\n AND a.state = $row->state"
 			. "\n AND ordering < $row->ordering"
 			. ($access->canEdit ? '' : "\n AND a.access <= $gid" )
+			. $xwhere
 			. "\n ORDER BY a.ordering DESC"
 			. "\n LIMIT 1"
 			;
@@ -1085,6 +1089,7 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 			. "\n AND a.state = $row->state"
 			. "\n AND ordering > $row->ordering"
 			. ($access->canEdit ? '' : "\n AND a.access <= $gid" )
+			. $xwhere
 			. "\n ORDER BY a.ordering"
 			. "\n LIMIT 1"
 			;
@@ -1167,11 +1172,11 @@ function show( $row, $params, $gid, &$access, $pop, $option, $ItemidCount=NULL )
 		;
 		$database->setQuery( $query );
 		$_Itemid = $database->loadResult();
-		
+
 		if ( $_Itemid ) {
 			$_Itemid = '&amp;Itemid='. $_Itemid;
 		}
-		
+
 		$link 			= sefRelToAbs( 'index.php?option=com_content&amp;task=section&amp;id='. $row->sectionid . $_Itemid );
 		$row->section 	= '<a href="'. $link .'">'. $row->section .'</a>';
 	}
@@ -1184,11 +1189,11 @@ function show( $row, $params, $gid, &$access, $pop, $option, $ItemidCount=NULL )
 		;
 		$database->setQuery( $query );
 		$_Itemid = $database->loadResult();
-		
+
 		if ( $_Itemid ) {
 			$_Itemid = '&amp;Itemid='. $_Itemid;
 		}
-		
+
 		$link 			= sefRelToAbs( 'index.php?option=com_content&amp;task=category&amp;sectionid='. $row->sectionid .'&amp;id='. $row->catid . $_Itemid );
 		$row->category 	= '<a href="'. $link .'">'. $row->category .'</a>';
 	}
@@ -1218,7 +1223,7 @@ function show( $row, $params, $gid, &$access, $pop, $option, $ItemidCount=NULL )
 	$page = intval( mosGetParam( $_REQUEST, 'limitstart', 0 ) );
 
 	// record the hit
-	if ( !$params->get( 'intro_only' ) ) {
+	if ( !$params->get( 'intro_only' ) && ($page == 0)) {
 		$obj = new mosContent( $database );
 		$obj->hit( $row->id );
 	}
@@ -1393,7 +1398,7 @@ function saveContent( &$access, $task ) {
 	if ( trim( $row->publish_down ) == 'Never' ) {
 		$row->publish_down = $nullDate;
 	}
-	
+
 	// code cleaner for xhtml transitional compliance
 	$row->introtext = str_replace( '<br>', '<br />', $row->introtext );
 	$row->fulltext 	= str_replace( '<br>', '<br />', $row->fulltext );
@@ -1404,7 +1409,7 @@ function saveContent( &$access, $task ) {
  	if ( $length && $search ) {
  		$row->fulltext = NULL;
  	}
-	
+
 	$row->title = ampReplace( $row->title );
 
 	if (!$row->check()) {
@@ -1516,7 +1521,7 @@ function cancelContent( &$access ) {
 
 	$row = new mosContent( $database );
 	$row->bind( $_POST );
-	
+
 	if ( $access->canEdit || ( $access->canEditOwn && $row->created_by == $my->id ) ) {
 		$row->checkin();
 	}
@@ -1527,11 +1532,11 @@ function cancelContent( &$access ) {
 	$parts 		= parse_url( $referer );
 	parse_str( $parts['query'], $query );
 
-	if ( $task == 'edit' ) {
+	if ( $task == 'edit' || $task == 'cancel' ) {
 		$Itemid  = mosGetParam( $_POST, 'Returnid', '' );
 		$referer = 'index.php?option=com_content&task=view&id='. $row->id.'&Itemid='. $Itemid;
 	}
-	
+
 	if ( $referer && !( $task == 'new' ) ) {
 		mosRedirect( $referer );
 	} else {
@@ -1739,7 +1744,7 @@ function _orderby_sec( $orderby ) {
 */
 function _where( $type=1, &$access, &$noauth, $gid, $id, $now=NULL, $year=NULL, $month=NULL ) {
 	global $database;
-	
+
 	$nullDate = $database->getNullDate();
 	$where = array();
 

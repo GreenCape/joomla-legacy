@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: banners.class.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: banners.class.php 1334 2005-12-07 05:32:52Z eddieajau $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -51,6 +51,7 @@ class mosBannerClient extends mosDBTable {
 			$this->_error = _BNR_VALID_EMAIL;
 			return false;
 		}
+
 		return true;
 	}
 }
@@ -124,6 +125,7 @@ class mosBanner extends mosDBTable {
 			$this->_error = _BNR_URL;
 			return false;
 		}
+		$this->imptotal = (int) $this->imptotal;
 
 		return true;
 	}

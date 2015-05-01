@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_whosonline.php 445 2005-10-11 03:37:23Z stingrey $
+* @version $Id: mod_whosonline.php 1462 2005-12-16 22:55:18Z rhuk $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -95,11 +95,11 @@ if ($showmode==1 || $showmode==2) {
 	;
 	$database->setQuery($query);
 	$rows = $database->loadObjectList();
+	$content .= "<ul>\n";
 	foreach($rows as $row) {
-		$content .= "<ul>\n";
 		$content .= "<li><strong>" . $row->username . "</strong></li>\n";
-		$content .= "</ul>\n";
 	}
+	$content .= "</ul>\n";
 
 	if ( !$content ) {
 		echo _NONE ."\n";

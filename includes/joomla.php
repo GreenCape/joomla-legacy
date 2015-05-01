@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.php 1124 2005-11-19 05:54:21Z eddieajau $
+* @version $Id: joomla.php 1484 2005-12-20 14:12:51Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -389,7 +389,7 @@ class mosMainFrame {
 		$this->_head['title'] 	= $GLOBALS['mosConfig_sitename'];
 		$this->_head['meta'] 	= array();
 		$this->_head['custom'] 	= array();
-		
+
 		//set the admin check
 		$this->_isAdmin 		= (boolean) $isAdmin;
 	}
@@ -444,18 +444,18 @@ class mosMainFrame {
 			case 'site':
 			case 'front':
 			default:
-				return JFile::getNativePath( $mosConfig_absolute_path, $addTrailingSlash );
+				return mosPathName( $mosConfig_absolute_path, $addTrailingSlash );
 				break;
 
 			case '2':
 			case 'installation':
-				return JFile::getNativePath( $mosConfig_absolute_path . '/installation', $addTrailingSlash );
+				return mosPathName( $mosConfig_absolute_path . '/installation', $addTrailingSlash );
 				break;
 
 			case '1':
 			case 'admin':
 			case 'administrator':
-				return JFile::getNativePath( $mosConfig_absolute_path . '/administrator', $addTrailingSlash );
+				return mosPathName( $mosConfig_absolute_path . '/administrator', $addTrailingSlash );
 				break;
 
 		}
@@ -839,7 +839,7 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 			}
 		} else {
 			$assigned = ( !empty( $Itemid ) ? " OR menuid = $Itemid" : '' );
-			
+
 			$query = "SELECT template"
 			. "\n FROM #__templates_menu"
 			. "\n WHERE client_id = 0"
@@ -849,7 +849,7 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 			;
 			$this->_db->setQuery( $query );
 			$cur_template = $this->_db->loadResult();
-			
+
 			// TemplateChooser Start
 			$jos_user_template 		= mosGetParam( $_COOKIE, 'jos_user_template', '' );
 			$jos_change_template 	= mosGetParam( $_REQUEST, 'jos_change_template', $jos_user_template );
@@ -1033,7 +1033,7 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 				} else {
 					$agent = 'Unknown';
 				}
-				
+
 				$domain = gethostbyaddr( $_SERVER['REMOTE_ADDR'] );
 			}
 
@@ -1215,7 +1215,7 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 			$this->_db->setQuery( $query );
 			$_Itemid = $this->_db->loadResult();
 		}
-		
+
 		if ( $_Itemid != '' ) {
 			return $_Itemid;
 		} else {
@@ -1227,12 +1227,10 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 	* @return number of Published Blog Sections
 	*/
 	function getBlogSectionCount( ) {
-		$query = "SELECT COUNT( m.id )"
-		."\n FROM #__content AS i"
-		."\n LEFT JOIN #__sections AS s ON i.sectionid = s.id"
-		."\n LEFT JOIN #__menu AS m ON m.componentid = s.id "
-		."\n WHERE m.type = 'content_blog_section'"
-		."\n AND m.published = 1"
+		$query = "SELECT COUNT( id )"
+		."\n FROM #__menu "
+		."\n WHERE type = 'content_blog_section'"
+		."\n AND published = 1"
 		;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
@@ -1243,12 +1241,10 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 	* @return number of Published Blog Categories
 	*/
 	function getBlogCategoryCount( ) {
-		$query = "SELECT COUNT( m.id )"
-		. "\n FROM #__content AS i"
-		. "\n LEFT JOIN #__categories AS c ON i.catid = c.id"
-		. "\n LEFT JOIN #__menu AS m ON m.componentid = c.id "
-		. "\n WHERE m.type = 'content_blog_category'"
-		. "\n AND m.published = 1"
+		$query = "SELECT COUNT( id )"
+		."\n FROM #__menu "
+		. "\n WHERE type = 'content_blog_category'"
+		. "\n AND published = 1"
 		;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
@@ -1318,7 +1314,7 @@ http://developer.joomla.org/sf/go/artf1710?nav=1
 			return $default;
 		}
 	}
-	
+
 	/** Is admin interface?
 	 * @return boolean
 	 * @since 1.0.2
@@ -1698,7 +1694,7 @@ class mosHTML {
 				// Print Preview button - used when viewing page
 				?>
 				<td align="right" width="100%" class="buttonheading">
-				<a href="#" onclick="javascript:window.print(); return false" title="<?php echo _CMN_PRINT;?>">
+				<a href="javascript: void(0)" onclick="javascript:window.print(); return false" title="<?php echo _CMN_PRINT;?>">
 				<?php echo $image;?>
 				</a>
 				</td>
@@ -1707,7 +1703,7 @@ class mosHTML {
 				// Print Button - used in pop-up window
 				?>
 				<td align="right" width="100%" class="buttonheading">
-				<a href="#" onclick="window.open('<?php echo $link; ?>','win2','<?php echo $status; ?>');" title="<?php echo _CMN_PRINT;?>">
+				<a href="javascript: void(0)" onclick="window.open('<?php echo $link; ?>','win2','<?php echo $status; ?>');" title="<?php echo _CMN_PRINT;?>">
 				<?php echo $image;?>
 				</a>
 				</td>
@@ -2172,7 +2168,7 @@ class mosUser extends mosDBTable {
 		$query = "SELECT id"
 		. "\n FROM #__users "
 		. "\n WHERE username = '$this->username'"
-		. "\n AND id != $this->id"
+		. "\n AND id != " . (int)$this->id
 		;
 		$this->_db->setQuery( $query );
 		$xid = intval( $this->_db->loadResult() );
@@ -2186,7 +2182,7 @@ class mosUser extends mosDBTable {
 			$query = "SELECT id"
 			. "\n FROM #__users "
 			. "\n WHERE email = '$this->email'"
-			. "\n AND id != $this->id"
+			. "\n AND id != " . (int)$this->id
 			;
 			$this->_db->setQuery( $query );
 			$xid = intval( $this->_db->loadResult() );
@@ -2421,7 +2417,7 @@ function mosBindArrayToObject( $array, &$obj, $ignore='', $prefix=NULL, $checkSl
 					$ak = $k;
 				}
 				if (isset($array[$ak])) {
-					$obj->$k = ($checkSlashes && get_magic_quotes_gpc()) ? mosStripslashes( $array[$ak] ) : $array[$k];
+					$obj->$k = ($checkSlashes && get_magic_quotes_gpc()) ? mosStripslashes( $array[$ak] ) : $array[$ak];
 				}
 			}
 		}
@@ -2474,20 +2470,20 @@ function mosReadDirectory( $path, $filter='.', $recurse=false, $fullpath=false  
 * @param string A filter for the names
 */
 function mosRedirect( $url, $msg='' ) {
-   
+
    global $mainframe;
-   
+
     // specific filters
 	$iFilter = new InputFilter();
 	$url = $iFilter->process( $url );
 	if (!empty($msg)) {
 		$msg = $iFilter->process( $msg );
 	}
-	
+
 	if ($iFilter->badAttributeValue( array( 'href', $url ))) {
 		$url = $GLOBALS['mosConfig_live_site'];
 	}
-	
+
 	if (trim( $msg )) {
 	 	if (strpos( $url, '?' )) {
 			$url .= '&mosmsg=' . urlencode( $msg );
@@ -2495,7 +2491,7 @@ function mosRedirect( $url, $msg='' ) {
 			$url .= '?mosmsg=' . urlencode( $msg );
 		}
 	}
-	
+
 	if (headers_sent()) {
 		echo "<script>document.location.href='$url';</script>\n";
 	} else {
@@ -2718,6 +2714,46 @@ class mosSession extends mosDBTable {
 		$this->mosDBTable( '#__session', 'session_id', $db );
 	}
 
+	/**
+	 * @param string Key search for
+	 * @param mixed Default value if not set
+	 * @return mixed
+	 */
+	function get( $key, $default=null ) {
+		return mosGetParam( $_SESSION, $key, $default );
+	}
+
+	/**
+	 * @param string Key to set
+	 * @param mixed Value to set
+	 * @return mixed The new value
+	 */
+	function set( $key, $value ) {
+		$_SESSION[$key] = $value;
+		return $value;
+	}
+
+	/**
+	 * Sets a key from a REQUEST variable, otherwise uses the default
+	 * @param string The variable key
+	 * @param string The REQUEST variable name
+	 * @param mixed The default value
+	 * @return mixed
+	 */
+	function setFromRequest( $key, $varName, $default=null ) {
+		if (isset( $_REQUEST[$varName] )) {
+			return mosSession::set( $key, $_REQUEST[$varName] );
+		} else if (isset( $_SESSION[$key] )) {
+			return $_SESSION[$key];
+		} else {
+			return mosSession::set( $key, $default );
+		}
+	}
+
+	/**
+	 * Insert a new row
+	 * @return boolean
+	 */
 	function insert() {
 		$ret = $this->_db->insertObject( $this->_tbl, $this );
 
@@ -2729,6 +2765,10 @@ class mosSession extends mosDBTable {
 		}
 	}
 
+	/**
+	 * Update an existing row
+	 * @return boolean
+	 */
 	function update( $updateNulls=false ) {
 		$ret = $this->_db->updateObject( $this->_tbl, $this, 'session_id', $updateNulls );
 
@@ -2740,6 +2780,10 @@ class mosSession extends mosDBTable {
 		}
 	}
 
+	/**
+	 * Generate a unique session id
+	 * @return string
+	 */
 	function generateId() {
 		$failsafe = 20;
 		$randnum = 0;
@@ -2765,10 +2809,17 @@ class mosSession extends mosDBTable {
 		$this->session_id = md5( $randnum . $_SERVER['REMOTE_ADDR'] );
 	}
 
+	/**
+	 * @return string The name of the session cookie
+	 */
 	function getCookie() {
 		return $this->_session_cookie;
 	}
 
+	/**
+	 * Purge lapsed sessions
+	 * @return boolean
+	 */
 	function purge( $inc=1800 ) {
 		$past = time() - $inc;
 		$query = "DELETE FROM $this->_tbl"
@@ -3004,17 +3055,17 @@ function mosToolTip( $tooltip, $title='', $width='', $image='tooltip.png', $text
 	$style = 'style="text-decoration: none; color: #333;"';
 	if ( $href ) {
 		$style = '';
-	} else{ 
-		$href = '#'; 
+	} else{
+		$href = '#';
 	}
 
 	$mousover = 'return overlib(\''. $tooltip .'\''. $title .', BELOW, RIGHT'. $width .');';
-	
+
 	$tip = "<!-- Tooltip -->\n";
 	if ( $link ) {
 		$tip .= '<a href="'. $href .'" onmouseover="'. $mousover .'" onmouseout="return nd();" '. $style .'>'. $text .'</a>';
 	} else {
-		$tip .= '<span onmouseover="" onmouseout="return nd();" '. $style .'>'. $text .'</span>';
+		$tip .= '<span onmouseover="'. $mousover .'" onmouseout="return nd();" '. $style .'>'. $text .'</span>';
 	}
 
 	return $tip;
@@ -3028,13 +3079,13 @@ function mosToolTip( $tooltip, $title='', $width='', $image='tooltip.png', $text
 */
 function mosWarning($warning, $title='Joomla! Warning') {
 	global $mosConfig_live_site;
-	
+
 	$mouseover 	= 'return overlib(\''. $warning .'\', CAPTION, \'$title\', BELOW, RIGHT);';
-	
+
 	$tip 		= "<!-- Warning -->\n";
-	$tip 		.= '<a href="#" onmouseover="'. $mouseover .'" onmouseout="return nd();">';
+	$tip 		.= '<a href="javascript: void(0)" onmouseover="'. $mouseover .'" onmouseout="return nd();">';
 	$tip 		.= '<img src="'. $mosConfig_live_site .'/includes/js/ThemeOffice/warning.png" border="0"  alt="warning"/></a>';
-	
+
 	return $tip;
 }
 
@@ -3109,8 +3160,10 @@ function mosCreateMail( $from='', $fromname='', $subject, $body ) {
 * @param string/array CC e-mail address(es)
 * @param string/array BCC e-mail address(es)
 * @param string/array Attachment file name(s)
+* @param string/array ReplyTo e-mail address(es)
+* @param string/array ReplyTo name(s)
 */
-function mosMail($from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NULL, $bcc=NULL, $attachment=NULL ) {
+function mosMail( $from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NULL, $bcc=NULL, $attachment=NULL, $replyto=NULL, $replytoname=NULL ) {
 	global $mosConfig_debug;
 	$mail = mosCreateMail( $from, $fromname, $subject, $body );
 
@@ -3119,31 +3172,53 @@ function mosMail($from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NUL
 		$mail->IsHTML(true);
 	}
 
-	if( is_array($recipient) ) {
+	if (is_array( $recipient )) {
 		foreach ($recipient as $to) {
-			$mail->AddAddress($to);
+			$mail->AddAddress( $to );
 		}
 	} else {
-		$mail->AddAddress($recipient);
+		$mail->AddAddress( $recipient );
 	}
-	if (isset($cc)) {
-		if( is_array($cc) )
-			foreach ($cc as $to) $mail->AddCC($to);
-		else
+	if (isset( $cc )) {
+		if (is_array( $cc )) {
+			foreach ($cc as $to) {
+				$mail->AddCC($to);
+			}
+		} else {
 			$mail->AddCC($cc);
+		}
 	}
-	if (isset($bcc)) {
-		if( is_array($bcc) )
-			foreach ($bcc as $to) $mail->AddBCC($to);
-		else
-			$mail->AddBCC($bcc);
+	if (isset( $bcc )) {
+		if (is_array( $bcc )) {
+			foreach ($bcc as $to) {
+				$mail->AddBCC( $to );
+			}
+		} else {
+			$mail->AddBCC( $bcc );
+		}
 	}
 	if ($attachment) {
-		if ( is_array($attachment) )
-			foreach ($attachment as $fname) $mail->AddAttachment($fname);
-		else
+		if (is_array( $attachment )) {
+			foreach ($attachment as $fname) {
+				$mail->AddAttachment( $fname );
+			}
+		} else {
 			$mail->AddAttachment($attachment);
-	} // if
+		}
+	}
+	//Important for being able to use mosMail without spoofing...
+	if ($replyto) {
+		if (is_array( $replyto )) {
+			reset( $replytoname );
+			foreach ($replyto as $to) {
+				$toname = ((list( $key, $value ) = each( $replytoname )) ? $value : '');
+				$mail->AddReplyTo( $to, $toname );
+			}
+        } else {
+			$mail->AddReplyTo($replyto, $replytoname);
+		}
+    }
+
 	$mailssend = $mail->Send();
 
 	if( $mosConfig_debug ) {
@@ -3157,10 +3232,11 @@ function mosMail($from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NUL
 } // mosMail
 
 /**
-* Initialise GZIP
-*/
+ * Initialise GZIP
+ */
 function initGzip() {
 	global $mosConfig_gzip, $do_gzip_compress;
+
 	$do_gzip_compress = FALSE;
 	if ($mosConfig_gzip == 1) {
 		$phpver = phpversion();
@@ -3172,10 +3248,10 @@ function initGzip() {
 				  strpos($useragent,'Gecko')	  !== false
 				)
 			) {
-			if ( extension_loaded('zlib') ) {
-				// You cannot specify additional output handlers if 
+			if ( extension_loaded('zlib') && !ini_get('zlib.output_compression')) {
+				// You cannot specify additional output handlers if
 				// zlib.output_compression is activated here
-				ob_start();
+				ob_start("ob_gzhandler");
 				return;
 			}
 		} else if ( $phpver > '4.0' ) {
@@ -3297,7 +3373,7 @@ class mosMambotHandler {
 		}
 
 		$group = trim( $group );
-		
+
 		switch ( $group ) {
 			case 'content':
 				$query = "SELECT folder, element, published, params"
@@ -3307,7 +3383,7 @@ class mosMambotHandler {
 				. "\n ORDER BY ordering"
 				;
 				break;
-			
+
 			default:
 				$query = "SELECT folder, element, published, params"
 				. "\n FROM #__mambots"
@@ -3454,15 +3530,15 @@ class mosTabs {
 	*/
 	function mosTabs( $useCookies, $xhtml=NULL ) {
 		global $mosConfig_live_site, $mainframe;
-		
+
 		if ( $xhtml ) {
-			$mainframe->addCustomHeadTag( '<link rel="stylesheet" type="text/css" media="all" href="includes/js/tabs/tabpane.css" id="luna-tab-style-sheet" />' );	
+			$mainframe->addCustomHeadTag( '<link rel="stylesheet" type="text/css" media="all" href="includes/js/tabs/tabpane.css" id="luna-tab-style-sheet" />' );
 		} else {
 			echo "<link id=\"luna-tab-style-sheet\" type=\"text/css\" rel=\"stylesheet\" href=\"" . $mosConfig_live_site. "/includes/js/tabs/tabpane.css\" />";
 		}
-		
+
 		echo "<script type=\"text/javascript\" src=\"". $mosConfig_live_site . "/includes/js/tabs/tabpane_mini.js\"></script>";
-		
+
 		$this->useCookies = $useCookies;
 	}
 
@@ -3647,7 +3723,7 @@ class mosAdminMenus {
 // Change adds Itemid support for Link - Urls without `index.php` or `Itemid=` in their url
 		. "\n WHERE m.type != 'separator'"
 		. "\n AND NOT ("
-			. "\n ( m.type = 'url' )" 
+			. "\n ( m.type = 'url' )"
 			. "\n AND ( m.link LIKE '%index.php%' )"
 			. "\n AND ( m.link LIKE '%Itemid=%' )"
 		. "\n )"
@@ -4003,8 +4079,11 @@ class mosAdminMenus {
 	}
 
 	/**
-	* Select list of menus
-	*/
+	 * Select list of menus
+	 * @param string The control name
+	 * @param string Additional javascript
+	 * @return string A select list
+	 */
 	function MenuSelect( $name='menuselect', $javascript=NULL ) {
 		global $database;
 
@@ -4015,6 +4094,7 @@ class mosAdminMenus {
 		$database->setQuery( $query );
 		$menus = $database->loadObjectList();
 		$total = count( $menus );
+		$menuselect = array();
 		for( $i = 0; $i < $total; $i++ ) {
 			$params = mosParseParams( $menus[$i]->params );
 			$menuselect[$i]->value 	= $params->menutype;
@@ -4463,7 +4543,7 @@ class mosCommonHTML {
 	*/
 	function loadOverlib() {
 		global  $mosConfig_live_site, $mainframe;
-		
+
 		if ( !$mainframe->get( 'loadOverlib' ) ) {
 		// check if this function is already loaded
 			?>
@@ -4515,7 +4595,7 @@ class mosCommonHTML {
 	function CheckedOutProcessing( &$row, $i ) {
 		global $my;
 
-		if ( $row->checked_out ) {
+		if ( $row->checked_out && $row->checked_out != $my->id) {
 			$checked = mosCommonHTML::checkedOut( $row );
 		} else {
 			$checked = mosHTML::idBox( $i, $row->id, ($row->checked_out && $row->checked_out != $my->id ) );
@@ -4614,14 +4694,15 @@ function mosNotAuth() {
 * Needed to handle unicode conflicts due to unicode conflicts
 */
 function ampReplace( $text ) {
+	$text = str_replace( '&&', '*--*', $text );
 	$text = str_replace( '&#', '*-*', $text );
+	$text = str_replace( '&amp;', '&', $text );
 	$text = preg_replace( '|&(?![\w]+;)|', '&amp;', $text );
-    $text = str_replace( '&amp;amp;', '&amp;', $text );
 	$text = str_replace( '*-*', '&#', $text );
+	$text = str_replace( '*--*', '&&', $text );
 
 	return $text;
 }
-
 /**
 * Prepares results from search for display
 * @param string The source string
@@ -4651,7 +4732,7 @@ function mosSmartSubstr($text, $length=200, $searchword) {
   $wordpos = strpos(strtolower($text), strtolower($searchword));
   $halfside = intval($wordpos - $length/2 - strlen($searchword));
   if ($wordpos && $halfside > 0) {
-	  return '...' . substr($text, $halfside, $length);
+	return '...' . substr($text, $halfside, $length) . '...';
   } else {
 	return substr( $text, 0, $length);
   }
@@ -4822,6 +4903,22 @@ class patHTML {
  */
 function mosHash( $seed ) {
 	return md5( $GLOBALS['mosConfig_secret'] . md5( $seed ) );
+}
+
+/**
+ * Format a backtrace error
+ * @since 1.0.5
+ */
+function mosBackTrace() {
+	if (function_exists( 'debug_backtrace' )) {
+		echo '<div align="left">';
+		foreach( debug_backtrace() as $back) {
+			if (@$back['file']) {
+				echo '<br />' . str_replace( $GLOBALS['mosConfig_absolute_path'], '', $back['file'] ) . ':' . $back['line'];
+			}
+		}
+		echo '</div>';
+	}
 }
 
 // ----- NO MORE CLASSES OR FUNCTIONS PASSED THIS POINT -----

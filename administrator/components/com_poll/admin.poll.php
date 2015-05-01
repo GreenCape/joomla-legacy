@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.poll.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: admin.poll.php 1516 2005-12-21 02:16:16Z eddieajau $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -171,21 +171,16 @@ function savePoll( $option ) {
 	$options = mosGetParam( $_POST, 'polloption', array() );
 
 	foreach ($options as $i=>$text) {
-		// 'slash' the options
-		if (!get_magic_quotes_gpc()) {
-			$text = addslashes( $text );
-		}
-
 		if ($isNew) {
 			$query = "INSERT INTO #__poll_data"
 			. "\n ( pollid, text )"
-			. "\n VALUES ( $row->id, '$text' )"
+			. "\n VALUES ( $row->id, " . $database->Quote( $text ) . " )"
 			;
 			$database->setQuery( $query );
 			$database->query();
 		} else {
 			$query = "UPDATE #__poll_data"
-			. "\n SET text = '$text'"
+			. "\n SET text = " . $database->Quote( $text )
 			. "\n WHERE id = $i"
 			. "\n AND pollid = $row->id"
 			;

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: newsfeeds.searchbot.php 890 2005-11-06 15:56:30Z stingrey $
+* @version $Id: newsfeeds.searchbot.php 1268 2005-11-30 22:55:50Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -41,7 +41,6 @@ function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit = $botParams->def( 'search_limit', 50 );
-	$limit = "\n LIMIT $limit";	
 	
 	$text = trim( $text );
 	if ($text == '') {
@@ -100,9 +99,8 @@ function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 	. "\n WHERE ( $where )"
 	. "\n AND a.published = 1"
 	. "\n ORDER BY $order"
-	. $limit
 	;
-	$database->setQuery( $query );
+	$database->setQuery( $query, 0, $limit );
 	$rows = $database->loadObjectList();
 	
 	return $rows;

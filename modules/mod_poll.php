@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_poll.php 917 2005-11-07 18:52:52Z stingrey $
+* @version $Id: mod_poll.php 1334 2005-12-07 05:32:52Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -25,12 +25,10 @@ if (!defined( '_JOS_POLL_MODULE' )) {
 	function show_poll_vote_form( $Itemid, $moduleclass_sfx ) {
 		global $database;
 
-		$Itemid = intval( mosGetParam( $_REQUEST, 'Itemid', 0 ) );
-
 		$query = "SELECT p.id, p.title"
-		. "\n FROM #__polls AS p, #__poll_menu AS pm"
-		. "\n WHERE ( pm.menuid = $Itemid OR pm.menuid = 0 )"
-		. "\n AND p.id = pm.pollid"
+		. "\n FROM #__polls AS p"
+		. "\n INNER JOIN #__poll_menu AS pm ON  pm.pollid = p.id"
+		. "\n WHERE ( pm.menuid = " . (int) $Itemid . " OR pm.menuid = 0 )"
 		. "\n AND p.published = 1";
 
 		$database->setQuery( $query );

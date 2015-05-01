@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.banners.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: admin.banners.php 1389 2005-12-09 02:36:01Z eddieajau $
 * @package Joomla
 * @subpackage Banners
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -318,7 +318,7 @@ function saveBannerClient( $option ) {
 		exit();
 	}
 	if (!$row->check()) {
-		mosRedirect( "index2.php?option=$option&task=editclient&cid[]=$row->id", $row->getError() );
+		mosRedirect( "index2.php?option=$option&task=editclient&cid[]=$row->cid", $row->getError() );
 	}
 
 	if (!$row->store()) {

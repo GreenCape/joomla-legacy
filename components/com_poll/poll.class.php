@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: poll.class.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: poll.class.php 1329 2005-12-07 03:53:37Z Jinx $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -66,11 +66,6 @@ class mosPoll extends mosDBTable {
 		if ( $xid && $xid != intval( $this->id ) ) {
 			$this->_error = 'There is a module already with that name, please try again.';
 			return false;
-		}
-
-		// sanitise some data
-		if ( !get_magic_quotes_gpc() ) {
-			$this->title = addslashes( $this->title );
 		}
 
 		return true;

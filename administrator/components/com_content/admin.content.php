@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.php 782 2005-11-01 12:09:01Z stingrey $
+* @version $Id: admin.content.php 1516 2005-12-21 02:16:16Z eddieajau $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -641,6 +641,7 @@ function saveContent( $sectionid, $task ) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
 	}
+
 	$row->version++;
 	if (!$row->store()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
@@ -731,7 +732,7 @@ function changeContent( $cid=null, $state=0, $option ) {
 	$cids = implode( ',', $cid );
 
 	$query = "UPDATE #__content"
-	. "\n SET state = $state"
+	. "\n SET state = $state, modified = " . $database->Quote( date( 'Y-m-d H:i:s' ) )
 	. "\n WHERE id IN ( $cids ) AND ( checked_out = 0 OR (checked_out = $my->id ) )"
 	;
 	$database->setQuery( $query );

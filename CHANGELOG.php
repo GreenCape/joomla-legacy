@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: CHANGELOG.php 1136 2005-11-20 21:29:00Z Levis $
+* @version $Id: CHANGELOG.php 1550 2005-12-23 16:54:11Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -30,6 +30,129 @@ Legend:
 ^ -> Change
 - -> Removed
 ! -> Note
+
+---------------- 1.0.5 Released -- [24-Nov-2005 10:00 UTC] ------------------
+
+21-Dec-2005 Andrew Eddie
+ # Fixed slow query in com_content (Author text in a content item is now set to Written By)
+ # Fixed bug in backend poll entry with ' is in option name
+ # Fixed bug where content modified date is not updated on a bluck publish/archive operation
+ + Added TEMPLATEURL to patTemplate preloaded variables
+ ^ patTemplate Translate now recognises 1.0 version language constants
+
+20-Dec-2005 Emir Sakic
+ # Fixed artf2432 : Apostrophe in paths isn't escaped properly
+
+20-Dec-2005 Johan Janssens
+ # Fixed artf2389 : gzip compression not operational
+ # Fixed artf2599 : loosing Itemid afet submitting "ask for new password"
+ # Fixed artf1712 : Search Mambots return duplicate results
+ # Fixed artf2534 : Template chooser no longer able to manage SEF urls / XHTML validation
+ # Fixed artf1410 : 'Special' access menu locks out 'public' menu's articles "read more" content
+ # Fixed artf2595 : Deleted "mass mail" item menu in component menu
+ # Fixed artf2518 : mod_latestnews problem
+ # Fixed artf2591 : mosMakePath problem with mkdir on strato
+ # Fixed artf2665 : Most Read module generates incorrect class for <li> statement
+ # Fixed artf2666 : Pagination Error in Category Manager
+ # Fixed artf2407 : parameter type=mos_category show only "- Select Content Category -"
+
+16-Dec-2005 Andy Miller
+ # Fixed mod_whosonline not rendering list properly
+
+07-Dec-2005 Andrew Eddie
+ + Added database::getAffectedRows to db connectors
+
+10-Dec-2005 Emir Sakic
+ # Fixed artf2517 : "Cancel" the editing of content after "apply" not possible
+
+09-Dec-2005 Emir Sakic
+ # Fixed artf2324 : SEF for components assumes option is always first part of query
+ # Fixed artf1955 : Search results bug
+
+07-Dec-2005 Andrew Eddie
+ # Fixed unitialised array in mosHTML::MenuSelect method
+ + Added mosBackTrace debugging function
+ # Fixed bug in mosDBTable::load where null table values don't overwrite properly
+
+07-Dec-2005 Johan Janssens
+ # Fixed artf2430 : invalid values in tabpane.css
+ # Fixed artf2457 : VCard bug IS a bug
+ # Fixed artf2218 : RSS Newsfeed module generates wrong rendering output
+ # Fixed artf2453 : Random Image Module
+ # Fixed artf2251 : Poll title error
+ # Fixed artf2393 : Original editor cannot open content item if checked out
+ # Fixed artf2323 : overlib_hideform_mini.js parse error
+ # Fixed artf2248 : Incorrect hits count on multipage articles
+ # Fixed artf2342 : getBlogCategoryCount
+ # Fixed artf2464 : Contacts Component image path error
+ # Fixed artf2404 : Contact detail html bug
+ ^ Replaced install.png with transparent image - contributed by joomlashack
+ # Fixed artf2245 : RSS not showing enclosure tags
+ # Fixed artf2247 : RSS newsfeed on Frontend missing link
+ # Fixed bug in Domit lite parser
+ # Fixed mosMail() is missing "ReplyTo:" field to avoid anti-spam rules (SPF)
+ # Fixed Small typo in mosBindArrayToObject
+
+06-Dec-2005 Alex Kempkens
+ # Fixed artf2434: Typo in database.php checkout function line 1050
+ # Fixed artf2398 : Parameter Text Area field name
+
+06-Dec-2005 Johan Janssens
+ # Fixed artf2418 : Banners Client Manager Next Page Issue: Joomla 1.04
+ # Fixed artf2156 : memory exhastion error in joomla.xml.php
+ # Fixed artf2378 : mosCommonHTML::CheckedOutProcessing not checking if the current user
+                    has checked out the document
+ # Fixed artf1948 : Pagination problem still exists
+ ^ Upgraded TinyMCE Compressor [1.0.4]
+ ^ Upgraded TinyMCE [2.0.1]
+
+01-Dec-2005 Andrew Eddie
+ # Fixed nullDate error in mosDBTable::checkin method
+ # Removed $migrate global in mosDBTable::store method
+ # Fixed some MySQL 5 issues (still very unreliable)
+ + Component may force frontend application to include joomla.javascript.js by:
+   $mainframe->set( 'joomlaJavascript', 1 );
+
+01-Dec-2005 Andrew Eddie
+ # Fixed limit error in sections search bot
+ # Bug in gacl_api::add_group query [c/o Mambo bug #8199]
+ # Search highlighting fails when a "?" is entered [c/o Mambo bug #8260]
+
+30-Nov-2005 Emir Sakic
+ + Added 404 handling for missing content and components
+ + Added 404 handling to SEF for unknown files
+
+30-Nov-2005 Andrew Eddie
+ # Site templates allowed to have custom index2.php (fixes problems where custom code is required in index2)
+
+29-Nov-2005 Andrew Eddie
+ # Fixed artf2258 : Parameter tooltips missing in 1.0.4
+
+28-Nov-2005 Andrew Eddie
+ # Fixed artf2329 : mosMainFrame::getBasePath refers to non-existant JFile class.
+ # Fixed artf2246 : Error in frontend.html.php
+ # Fixed artf2190 : mod_poll.php modification
+ # Fixed artf2292 : [WITH FIX] Sql query missing hits
+
+24-Nov-2005 Emir Sakic
+ # Fixed artf2225 : Email / Print redirects to homepage
+ # Fixed artf1705 : Not same URL for same item : duplicate content
+
+23-Nov-2005 Johan Janssens
+ # Fixed : Content Finish Publishing & not authorized
+
+22-Nov-2005 Marko Schmuck
+ # Fixed artf2240 : 1.0.4 URL encoding entire frontend?
+ # Fixed artf2222 : ampReplace in content.html.php
+ + Versioncheck for new_link parameter for mysql_connect.
+
+22-Nov-2005 Levis Bisson
+ # Fixed artf2221 : 1.0.4: includes/database.php faulty on PHP < 4.2.0
+ # Fixed artf2219 : Bug in pageNavigation.php - added "if not define _PN_LT or _PN_RT"
+
+22-Nov-2005 Johan Janssens
+ # Fixed artf2224 : Problem with Media Manager
+ # Fixed : Can't create new folders in media manager
 
 ---------------- 1.0.4 Released -- [21-Nov-2005 10:00 UTC] ------------------
 

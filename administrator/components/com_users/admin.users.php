@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.users.php 421 2005-10-09 18:18:00Z stingrey $
+* @version $Id: admin.users.php 1389 2005-12-09 02:36:01Z eddieajau $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -320,10 +320,10 @@ function saveUser( $option, $task ) {
 	session_write_close();
 
 	// update the ACL
-	if ( !$isNew ) {
+	if (!$isNew) {
 		$query = "SELECT aro_id"
 		. "\n FROM #__core_acl_aro"
-		. "\n WHERE value = '$row->id'"
+		. "\n WHERE value = " . (int) $row->id
 		;
 		$database->setQuery( $query );
 		$aro_id = $database->loadResult();
@@ -340,7 +340,7 @@ function saveUser( $option, $task ) {
 	if ($isNew) {
 		$query = "SELECT email"
 		. "\n FROM #__users"
-		. "\n WHERE id = $my->id"
+		. "\n WHERE id = " . (int) $my->id
 		;
 		$database->setQuery( $query );
 		$adminEmail = $database->loadResult();

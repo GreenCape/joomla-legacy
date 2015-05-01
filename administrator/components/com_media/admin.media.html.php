@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.media.html.php 911 2005-11-07 04:41:06Z eddieajau $
+* @version $Id: admin.media.html.php 1230 2005-11-28 10:13:57Z eddieajau $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -50,7 +50,7 @@ class HTML_Media {
 				<tr>
 					<th class="mediamanager">
 						Media Manager
-					</td>
+					</th>
 					<td>
 						<table border="0" align="right" cellpadding="0" cellspacing="4" width="600">
 						<tr>

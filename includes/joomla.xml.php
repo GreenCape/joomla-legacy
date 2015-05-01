@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.xml.php 1110 2005-11-18 23:51:32Z eddieajau $
+* @version $Id: joomla.xml.php 1511 2005-12-20 22:31:53Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -366,7 +366,7 @@ class mosParameters {
 		;
 		$database->setQuery( $query );
 		$options = $database->loadObjectList();
-		array_unshift( $options, mosHTML::makeOption( '0', '- Select Content Section -', 'id', 'title' ) );
+		array_unshift( $options, mosHTML::makeOption( '0', '- Select Section -', 'id', 'title' ) );
 
 		return mosHTML::selectList( $options, ''. $control_name .'['. $name .']', 'class="inputbox"', 'id', 'title', $value );
 	}
@@ -404,7 +404,7 @@ class mosParameters {
 		}
 		$database->setQuery( $query );
 		$options = $database->loadObjectList();
-		array_unshift( $options, mosHTML::makeOption( '0', '- Select Content Category -', 'id', 'title' ) );
+		array_unshift( $options, mosHTML::makeOption( '0', '- Select Category -', 'id', 'title' ) );
 
 		return mosHTML::selectList( $options, ''. $control_name .'['. $name .']', 'class="inputbox"', 'id', 'title', $value );
 	}
@@ -479,7 +479,7 @@ class mosParameters {
  		// convert <br /> tags so they are not visible when editing
  		$value 	= str_replace( '<br />', "\n", $value );
 
- 		return '<textarea name="params['. $name .']" cols="'. $cols .'" rows="'. $rows .'" class="text_area">'. $value .'</textarea>';
+ 		return '<textarea name="' .$control_name.'['. $name .']" cols="'. $cols .'" rows="'. $rows .'" class="text_area">'. $value .'</textarea>';
 	}
 
 	/**

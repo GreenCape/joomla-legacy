@@ -1,5 +1,5 @@
 <mos:comment>
-@version $Id: adminlists.html 1110 2005-11-18 23:51:32Z eddieajau $
+@version $Id: adminlists.html 1202 2005-11-25 06:52:11Z eddieajau $
 @package Joomla
 @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -57,7 +57,7 @@ See COPYRIGHT.php for copyright notices and details.
 
 <mos:tmpl name="item-select-box" type="condition" conditionvar="item_checked_out" varscope="list-items">
 	<mos:sub condition="0">
-    	<input type="checkbox" name="cid[]" id="cb{ITEM_ID}" value="{ITEM_ID}" />
+    	<input type="checkbox" name="cid[]" id="cb{ITEM_ID}" value="{ITEM_ID}" onclick="isChecked(this);" />
 	</mos:sub>
 	<mos:sub condition="__default">
 		<a href="javascript:submitbutton('checkin');" onmouseover="return escape('{ITEM_EDITOR}<br/>{ITEM_CHECKED_OUT_TIME}<br/><mos:Translate>Click to check in</mos:Translate>')">

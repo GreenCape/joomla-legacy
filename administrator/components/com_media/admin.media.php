@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.media.php 911 2005-11-07 04:41:06Z eddieajau $
+* @version $Id: admin.media.php 1230 2005-11-28 10:13:57Z eddieajau $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -31,8 +31,7 @@ require_once( $mainframe->getPath( 'admin_html' ) );
  * @return string The sanitised string
  */
 function makeSafe( $file ) {
-	$regex = '#\.\.|[^A-Za-z0-9\.\_\- ]#';
-	return preg_replace( $regex, '', $file );
+	return str_replace( '..', '', urldecode( $file ) );
 }
 
 $cid = mosGetParam( $_POST, 'cid', array(0) );
@@ -41,7 +40,7 @@ if (!is_array( $cid )) {
 }
 
 $listdir = makeSafe( mosGetParam( $_REQUEST, 'listdir', '' ) );
-$dirPath = makeSafe( mosGetParam( $_POST, 'dirpath', '' ) );
+$dirPath = makeSafe( mosGetParam( $_POST, 'dirPath', '' ) );
 
 if (is_int(strpos ($listdir, "..")) && $listdir != '') {
 	mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], "NO HACKING PLEASE" );
@@ -234,7 +233,7 @@ function recursive_listdir( $base ) {
 * Show media manager
 * @param string The image directory to display
 */
-function showMedia($listdir) {
+function showMedia( $listdir ) {
 	global $mosConfig_live_site;
 
 	// get list of directories
@@ -290,7 +289,7 @@ function listImages($listdir) {
 					//$docs[$entry] = $img_file;
 					$docs[$entry] = $file_details;
 				}
-			} else if(is_dir( COM_MEDIA_BASE ."/".$listdir.'/'.$img_file) && substr($entry,0,1) != '.' && strtolower($entry) !== 'cvs') {
+			} else if(is_dir( COM_MEDIA_BASE .'/'.$listdir.'/'.$img_file) && substr($entry,0,1) != '.' && strtolower($entry) !== 'cvs') {
 				$folders[$entry] = $img_file;
 			}
 		}

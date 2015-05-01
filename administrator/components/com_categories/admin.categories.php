@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.categories.php 555 2005-10-19 12:04:23Z eddieajau $
+* @version $Id: admin.categories.php 1513 2005-12-21 00:10:07Z Jinx $
 * @package Joomla
 * @subpackage Categories
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -153,7 +153,7 @@ function showCategories( $section, $option ) {
 		$where 	= "\n WHERE c.section = '$section'";
 		$type 	= 'other';
 	}
-
+	
 	// get the total number of records
 	$query = "SELECT COUNT(*)"
 	. "\n FROM #__categories"
@@ -161,7 +161,7 @@ function showCategories( $section, $option ) {
 	;
 	$database->setQuery( $query );
 	$total = $database->loadResult();
-
+	
 	// allows for viweing of all content categories
 	if ( $section == 'content' ) {
 		$table 			= 'content';
@@ -174,8 +174,10 @@ function showCategories( $section, $option ) {
 		// get the total number of records
 		$query = "SELECT COUNT(*)"
 		. "\n FROM #__categories"
-		. "\n INNER JOIN #__sections AS s ON s.id = section"
-		;
+		. "\n INNER JOIN #__sections AS s ON s.id = section";
+		if ( $sectionid > 0 ) {
+			$query .= "\n WHERE section = '$sectionid'";
+		}
 		$database->setQuery( $query );
 		$total = $database->loadResult();
 		$type 			= 'content';
@@ -493,7 +495,7 @@ function saveCategory( $task ) {
 			break;
 
 		case 'apply':
-			$msg = 'Changes to Category saved'.$row->section;
+			$msg = 'Changes to Category saved';
 			mosRedirect( 'index2.php?option=com_categories&section='. $redirect .'&task=editA&hidemainmenu=1&id='. $row->id, $msg );
 			break;
 

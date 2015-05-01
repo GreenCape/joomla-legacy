@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_mostread.php 306 2005-10-02 10:12:28Z stingrey $
+* @version $Id: mod_mostread.php 1504 2005-12-20 20:26:40Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -136,7 +136,7 @@ foreach ($rows as $row) {
 
  	$link = sefRelToAbs( 'index.php?option=com_content&amp;task=view&amp;id='. $row->id . $Itemid );
  	?>
- 	<li class="latestnews<?php echo $moduleclass_sfx; ?>">
+ 	<li class="mostread<?php echo $moduleclass_sfx; ?>">
 		<a href="<?php echo $link; ?>" class="mostread<?php echo $moduleclass_sfx; ?>">
 			<?php echo $row->title; ?></a>
  	</li>

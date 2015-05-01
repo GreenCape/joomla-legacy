@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_templatechooser.php 149 2005-09-17 21:49:44Z Levis $
+* @version $Id: mod_templatechooser.php 1492 2005-12-20 16:07:35Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -73,7 +73,7 @@ if ($show_preview) {
 <?php
 }
 ?>
-<form action="<?php echo $_SERVER['REQUEST_URI'];?>" name='templateform' method="post">
+<form action="index.php" name="templateform" method="post">
 	<?php
 	echo mosHTML::selectList( $darray, 'jos_change_template', "id=\"mod_templatechooser_jos_change_template\" class=\"button\" onchange=\"$onchange\"",'value', 'text', $cur_template );
 	?>

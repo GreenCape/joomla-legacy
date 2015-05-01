@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.searchbot.php 892 2005-11-06 16:08:11Z stingrey $
+* @version $Id: content.searchbot.php 1490 2005-12-20 15:53:29Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -42,7 +42,6 @@ function botSearchContent( $text, $phrase='', $ordering='' ) {
 	$botParams = new mosParameters( $mambot->params );
 	
 	$limit 		= $botParams->def( 'search_limit', 50 );
-	$limit 		= "\n LIMIT $limit";	
 
 	$nullDate 	= $database->getNullDate();
 	$now 		= date( 'Y-m-d H:i:s', time()+$mosConfig_offset*60*60 );
@@ -124,10 +123,10 @@ function botSearchContent( $text, $phrase='', $ordering='' ) {
 	. "\n AND b.published = '1'"
 	. "\n AND ( publish_up = '$nullDate' OR publish_up <= '$now' )"
 	. "\n AND ( publish_down = '$nullDate' OR publish_down >= '$now' )"
+	. "\n GROUP BY a.id"
 	. "\n ORDER BY $order"
-	. $limit
 	;
-	$database->setQuery( $query );
+	$database->setQuery( $query, 0, $limit );
 	$list = $database->loadObjectList();
 
 	// search static content
@@ -144,9 +143,8 @@ function botSearchContent( $text, $phrase='', $ordering='' ) {
 	. "\n AND ( publish_up = '0000-00-00 00:00:00' OR publish_up <= '$now' )"
 	. "\n AND ( publish_down = '0000-00-00 00:00:00' OR publish_down >= '$now' )"
 	. "\n ORDER BY ". ($morder ? $morder : $order)
-	. $limit
 	;
-	$database->setQuery( $query );
+	$database->setQuery( $query, 0, $limit );
 	$list2 = $database->loadObjectList();
 
 	// search archived content
@@ -165,9 +163,8 @@ function botSearchContent( $text, $phrase='', $ordering='' ) {
 	. "\n AND ( publish_up = '0000-00-00 00:00:00' OR publish_up <= '$now' )"
 	. "\n AND ( publish_down = '0000-00-00 00:00:00' OR publish_down >= '$now' )"
 	. "\n ORDER BY $order"
-	. $limit
 	;
-	$database->setQuery( $query );
+	$database->setQuery( $query, 0, $limit );
 	$list3 = $database->loadObjectList();
 	
 	return array_merge( $list, $list2, $list3 );

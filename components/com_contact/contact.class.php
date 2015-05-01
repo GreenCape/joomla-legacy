@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.class.php 1004 2005-11-13 17:18:18Z stingrey $
+* @version $Id: contact.class.php 1325 2005-12-07 03:26:07Z Jinx $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -106,7 +106,8 @@ class MambovCard extends vCard {
 		}
 		$key.= ';ENCODING=QUOTED-PRINTABLE';
 		
-		$return = encode( $extended );
+		$return = encode( $postoffice ); 
+		$return .= $separator . encode( $extended );
 		$return .= $separator . encode( $street );
 		$return .= $separator . encode( $city );
 		$return .= $separator . encode( $region);

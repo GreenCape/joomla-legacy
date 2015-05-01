@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 1135 2005-11-20 21:00:27Z stingrey $
+* @version $Id: index.php 1550 2005-12-23 16:54:11Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -26,11 +26,12 @@ require_once( 'configuration.php' );
 require_once( 'includes/joomla.php' );
 
 //Installation sub folder check, removed for work with SVN
-if (file_exists( 'installation/index.php' )) {	
+if (file_exists( 'installation/index.php' )) {
 	define( '_INSTALL_CHECK', 1 );
 	include ('offline.php');
 	exit();
 }
+
 
 // displays offline/maintanance page or bar
 if ($mosConfig_offline == 1) {
@@ -93,8 +94,8 @@ if ($option == '') {
 if ( !$Itemid ) {
 // when no Itemid give a default value
 	$Itemid = 99999999;
-} 
-	
+}
+
 // mainframe is an API workhorse, lots of 'core' interaction routines
 $mainframe = new mosMainFrame( $database, $option, '.' );
 $mainframe->initSession();
@@ -149,7 +150,7 @@ if ($option == 'login') {
 		</script>
 		<?php
 	}
-	
+
 	if ($return) {
 		mosRedirect( $return );
 	} else {
@@ -208,6 +209,7 @@ if ($path = $mainframe->getPath( 'front' )) {
 		mosNotAuth();
 	}
 } else {
+	header("HTTP/1.0 404 Not Found");
 	echo _NOT_EXIST;
 }
 $_MOS_OPTION['buffer'] = ob_get_contents();

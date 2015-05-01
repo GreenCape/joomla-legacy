@@ -2,7 +2,7 @@
 /**
  * patTemplate
  *
- * $Id: patTemplate.php 173 2005-09-18 12:18:09Z eddieajau $
+ * $Id: patTemplate.php 1544 2005-12-23 07:01:01Z eddieajau $
  *
  * powerful templating engine
  *
@@ -2681,6 +2681,7 @@ class patFactory {
 		$tmpl->addGlobalVar( 'itemid', 			$GLOBALS['Itemid'] );
 		$tmpl->addGlobalVar( 'siteurl', $GLOBALS['mosConfig_live_site'] );
 		$tmpl->addGlobalVar( 'adminurl', $GLOBALS['mosConfig_live_site'] . '/administrator' );
+		$tmpl->addGlobalVar( 'templateurl', $GLOBALS['mosConfig_live_site'] . '/templates/' . $mainframe->getTemplate() );
 		$tmpl->addGlobalVar( 'admintemplateurl', $GLOBALS['mosConfig_live_site'] . '/administrator/templates/' . $mainframe->getTemplate() );
 		$tmpl->addGlobalVar( 'sitename', $GLOBALS['mosConfig_sitename'] );
 		$tmpl->addGlobalVar('treecss', 'dtree.css');

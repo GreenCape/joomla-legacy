@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.html.php 864 2005-11-04 17:06:49Z stingrey $
+* @version $Id: contact.html.php 1349 2005-12-07 19:56:22Z Jinx $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -344,6 +344,7 @@ class HTML_contact {
 				</tr>
 				</table>
 			</td>
+			<td>&nbsp;</td>
 		</tr>
 		<?php
 		// displays Email Form
@@ -696,6 +697,7 @@ class HTML_contact {
 				<input type="hidden" name="con_id" value="<?php echo $contact->id; ?>" />
 				<input type="hidden" name="sitename" value="<?php echo $sitename; ?>" />
 				<input type="hidden" name="op" value="sendmail" />
+				<input type="hidden" name="<?php echo mosHash( 'validate' );?>" value="1" />
 				</form>
 				<br />
 				</td>

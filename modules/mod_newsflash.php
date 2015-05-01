@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_newsflash.php 104 2005-09-16 10:29:04Z eddieajau $
+* @version $Id: mod_newsflash.php 1290 2005-12-05 07:56:43Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -72,6 +72,7 @@ switch ($style) {
 			$row->load( $id );
 			$row->text = $row->introtext;
 			$row->groups = '';
+			$row->readmore = (trim( $row->fulltext ) != '');
 			echo '<td>';
 			HTML_content::show( $row, $params, $access, 0, 'com_content' );
 			echo '</td>';
@@ -84,6 +85,7 @@ switch ($style) {
 			$row->load( $id );
 			$row->text = $row->introtext;
 			$row->groups = '';
+			$row->readmore = (trim( $row->fulltext ) != '');
 
 			HTML_content::show( $row, $params, $access, 0, 'com_content' );
 		}
@@ -91,17 +93,18 @@ switch ($style) {
 
 	case 'flash':
 		default:
-		if ($numrows > 0) {
-			srand ((double) microtime() * 1000000);
-			$flashnum = $rows[rand( 0, $numrows-1 )];
-		} else {
-			$flashnum = 0;
-		}
-		$row->load( $flashnum );
-		$row->text = $row->introtext;
-		$row->groups = '';
+			if ($numrows > 0) {
+				srand ((double) microtime() * 1000000);
+				$flashnum = $rows[rand( 0, $numrows-1 )];
+			} else {
+				$flashnum = 0;
+			}
+			$row->load( $flashnum );
+			$row->text = $row->introtext;
+			$row->groups = '';
+			$row->readmore = (trim( $row->fulltext ) != '');
 
-		HTML_content::show( $row, $params, $access, 0, 'com_content' );
-		break;
+			HTML_content::show( $row, $params, $access, 0, 'com_content' );
+			break;
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: gacl_api.class.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: gacl_api.class.php 1334 2005-12-07 05:32:52Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -1256,6 +1256,7 @@ class gacl_api extends gacl {
 		$name = trim($name);
 		$value = trim($value);
 		$order = trim($order);
+		$hidden = (int) $hidden;
 
 		if ($order == NULL OR $order == '') {
 			$order = 0;
@@ -1304,7 +1305,7 @@ class gacl_api extends gacl {
 		}
 
 		$insert_id = $this->db->GenID($this->_db_table_prefix.$object_type.'_seq',10);
-		$this->db->setQuery( "INSERT INTO $table ({$object_type}_id,section_value,value,order_value,name,hidden) VALUES($insert_id,'$section_value','$value','$order','$name','$hidden')" );
+		$this->db->setQuery( "INSERT INTO $table ({$object_type}_id,section_value,value,order_value,name,hidden) VALUES($insert_id,'$section_value','$value','$order','$name',$hidden)" );
 
 		if (!$this->db->query()) {
 			$this->debug_db('add_object');
@@ -1513,7 +1514,7 @@ class gacl_api extends gacl {
 
 					// Get rid of $object_id map referencing erased objects
 					$this->db->setQuery( "DELETE FROM $object_map_table WHERE section_value='$section_value' AND value='$value'" );
-					$rs = $this->db->query($query);
+					$rs = $this->db->query();
 
 					if (!$rs) {
 						$this->debug_db('edit_object');

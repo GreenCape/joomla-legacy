@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pageNavigation.php 574 2005-10-21 05:52:41Z Levis $
+* @version $Id: pageNavigation.php 1176 2005-11-22 22:13:32Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -103,6 +103,11 @@ class mosPageNav {
 		}
 
 		$link .= '&amp;limit='. $this->limit;
+
+        if (!defined( '_PN_LT' ) || !defined( '_PN_RT' ) ) {
+            DEFINE('_PN_LT','&lt;');
+            DEFINE('_PN_RT','&gt;');
+        }
 
         if (_PN_LT || _PN_RT) $pnSpace = " ";
 

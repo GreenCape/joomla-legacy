@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 1135 2005-11-20 21:00:27Z stingrey $
+* @version $Id: index.php 1550 2005-12-23 16:54:11Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -24,7 +24,7 @@ require_once( '../includes/joomla.php' );
 include_once ( $mosConfig_absolute_path . '/language/'. $mosConfig_lang .'.php' );
 
 //Installation sub folder check, removed for work with SVN
-if (file_exists( '../installation/index.php' )) {	
+if (file_exists( '../installation/index.php' )) {
 	define( '_INSTALL_CHECK', 1 );
 	include ('../offline.php');
 	exit();

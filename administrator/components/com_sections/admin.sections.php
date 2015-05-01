@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.sections.php 553 2005-10-19 08:48:19Z stingrey $
+* @version $Id: admin.sections.php 1355 2005-12-07 20:49:51Z Jinx $
 * @package Joomla
 * @subpackage Sections
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -295,7 +295,7 @@ function saveSection( $option, $scope, $task ) {
 	}
 
 	if (!$row->store()) {
-		echo "<script> alert('".$row->getErrorMsg()."'); window.history.go(-1); </script>\n";
+		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
 	}
 	$row->checkin();
