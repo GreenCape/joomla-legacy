@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: categories.searchbot.php 92 2005-09-16 03:37:11Z stingrey $
+* @version $Id: categories.searchbot.php 890 2005-11-06 15:56:30Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -28,6 +28,21 @@ $_MAMBOTS->registerFunction( 'onSearch', 'botSearchCategories' );
 function botSearchCategories( $text, $phrase='', $ordering='' ) {
 	global $database, $my;
 
+	// load mambot params info
+	$query = "SELECT id"
+	. "\n FROM #__mambots"
+	. "\n WHERE element = 'categories.searchbot'"
+	. "\n AND folder = 'search'"
+	;
+	$database->setQuery( $query );
+	$id 	= $database->loadResult();
+	$mambot = new mosMambot( $database );
+	$mambot->load( $id );
+	$botParams = new mosParameters( $mambot->params );
+	
+	$limit = $botParams->def( 'search_limit', 50 );
+	$limit = "\n LIMIT $limit";	
+	
 	$text = trim( $text );
 	if ( $text == '' ) {
 		return array();
@@ -65,6 +80,7 @@ function botSearchCategories( $text, $phrase='', $ordering='' ) {
 	. "\n AND ( m.type = 'content_section' OR m.type = 'content_blog_section'"
 	. "\n OR m.type = 'content_category' OR m.type = 'content_blog_category')"
 	. "\n ORDER BY $order"
+	. $limit
 	;
 	$database->setQuery( $query );
 	$rows = $database->loadObjectList();
@@ -73,10 +89,10 @@ function botSearchCategories( $text, $phrase='', $ordering='' ) {
 	for ( $i = 0; $i < $count; $i++ ) {
 		if ( $rows[$i]->menutype == 'content_blog_category' ) {
 			$rows[$i]->href = 'index.php?option=com_content&task=blogcategory&id='. $rows[$i]->catid .'&Itemid='. $rows[$i]->menuid;
-			$rows[$i]->section 	= 'Category Blog';
+			$rows[$i]->section 	= _SEARCH_CATBLOG;
 		} else {
 			$rows[$i]->href = 'index.php?option=com_content&task=category&sectionid='. $rows[$i]->secid .'&id='. $rows[$i]->catid .'&Itemid='. $rows[$i]->menuid;
-			$rows[$i]->section 	= 'Category List';
+			$rows[$i]->section 	= _SEARCH_CATLIST;
 		}
 	}
 

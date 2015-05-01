@@ -1,5 +1,5 @@
 <mos:comment>
-@version $Id: adminlists.html 184 2005-09-19 08:10:30Z eddieajau $
+@version $Id: adminlists.html 1110 2005-11-18 23:51:32Z eddieajau $
 @package Joomla
 @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -48,7 +48,7 @@ See COPYRIGHT.php for copyright notices and details.
 	</tr>
 	<tr>
 		<td colspan="99" nowrap="true" align="center">
-			<mos:Translate>Display Num</mos:Translate>
+			<mos:Translate>#</mos:Translate>
 			{PAGE_LIST_OPTIONS}
 			{PAGE_COUNTER}
 		</td>
@@ -70,7 +70,7 @@ See COPYRIGHT.php for copyright notices and details.
    	<input type="checkbox" name="cid[]" id="cb{ITEM_ID}" value="{ITEM_ID}" />
 </mos:tmpl>
 
-<mos:tmpl name="item-title" varscope="list-items">
+<mos:tmpl name="item-title" varscope="list-items" autoclear="yes">
 	<a href="#edit" onclick="listItemTask( 'cb{ITEM_ID}', 'edit' )">{ITEM_TITLE}</a>
 </mos:tmpl>
 

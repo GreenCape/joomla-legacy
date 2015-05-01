@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 532 2005-10-14 09:28:31Z stingrey $
+* @version $Id: index.php 1135 2005-11-20 21:00:27Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -142,7 +142,7 @@ if ($option == 'login') {
 	// JS Popup message
 	if ( $message ) {
 		?>
-		<script>
+		<script language="javascript" type="text/javascript">
 		<!--//
 		alert( "<?php echo _LOGIN_SUCCESS; ?>" );
 		//-->
@@ -153,7 +153,7 @@ if ($option == 'login') {
 	if ($return) {
 		mosRedirect( $return );
 	} else {
-		mosRedirect( 'index.php' );
+		mosRedirect( $mosConfig_live_site );
 	}
 
 } else if ($option == 'logout') {
@@ -162,7 +162,7 @@ if ($option == 'login') {
 	// JS Popup message
 	if ( $message ) {
 		?>
-		<script>
+		<script language="javascript" type="text/javascript">
 		<!--//
 		alert( "<?php echo _LOGOUT_SUCCESS; ?>" );
 		//-->
@@ -173,7 +173,7 @@ if ($option == 'login') {
 	if ($return) {
 		mosRedirect( $return );
 	} else {
-		mosRedirect( 'index.php' );
+		mosRedirect( $mosConfig_live_site );
 	}
 }
 

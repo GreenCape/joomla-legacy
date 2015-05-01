@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.html.php 311 2005-10-02 12:26:08Z stingrey $
+* @version $Id: content.html.php 1016 2005-11-13 20:05:17Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -402,7 +402,7 @@ class HTML_content {
 
 		// adds mospagebreak heading or title to <site> Title
 		if ( isset($row->page_title) ) {
-			$mainframe->SetPageTitle( $row->title .': '. $row->page_title );
+			$mainframe->setPageTitle( $row->title .': '. $row->page_title );
 		}
 
 		// determines the link and link text of the readmore button
@@ -413,12 +413,14 @@ class HTML_content {
 					$_Itemid = $mainframe->getItemid( $row->id, 0, 0, $ItemidCount['bs'], $ItemidCount['bc'], $ItemidCount['gbs'] );
 				}
 				$link_on = sefRelToAbs("index.php?option=com_content&amp;task=view&amp;id=".$row->id."&amp;Itemid=".$_Itemid);
-				if ( strlen( trim( $row->fulltext ) )) {
+				//if ( strlen( trim( $row->fulltext ) )) {
+				if ( @$row->readmore ) {
 					$link_text = _READ_MORE;
 				}
 			} else {
 				$link_on = sefRelToAbs("index.php?option=com_registration&amp;task=register");
-				if (strlen( trim( $row->fulltext ) )) {
+				//if (strlen( trim( $row->fulltext ) )) {
+				if ( @$row->readmore ) {
 					$link_text = _READ_MORE_REGISTER;
 				}
 			}
@@ -428,11 +430,7 @@ class HTML_content {
 
 		// for pop-up page
 		if ( $params->get( 'popup' ) && $no_html == 0) {
-			?>
-			<title>
-			<?php echo $mosConfig_sitename .' :: '. $row->title; ?>
-			</title>
-			<?php
+			$mainframe->setPageTitle( $mosConfig_sitename .' :: '. $row->title );
 		}
 
 		// determines links to next and prev content items within category
@@ -516,7 +514,7 @@ class HTML_content {
 			HTML_content::TOC( $row );
 
 			// displays Item Text
-			echo $row->text;
+			echo ampReplace( $row->text );
 			?>
 			</td>
 		</tr>
@@ -595,7 +593,7 @@ class HTML_content {
 		mosCommonHTML::loadOverlib();		
 		
 		$link = 'index.php?option=com_content&amp;task=edit&amp;id='. $row->id .'&amp;Itemid='. $Itemid .'&amp;Returnid='. $Itemid;
-		$image = mosAdminMenus::ImageCheck( 'edit.png', '/images/M_images/', NULL, NULL, _E_EDIT );
+		$image = mosAdminMenus::ImageCheck( 'edit.png', '/images/M_images/', NULL, NULL, _E_EDIT, _E_EDIT );
 		
 		if ( $row->state == 0 ) {
 			$overlib = _CMN_UNPUBLISHED;
@@ -612,7 +610,7 @@ class HTML_content {
 		$overlib 	.= '<br />';
 		$overlib 	.= $author;
 		?>
-		<a href="<?php echo sefRelToAbs( $link ); ?>" title="<?php echo _E_EDIT;?>"  onMouseOver="return overlib('<?php echo $overlib; ?>', CAPTION, '<?php echo 'Edit Item'; ?>', BELOW, RIGHT);" onMouseOut="return nd();">
+		<a href="<?php echo sefRelToAbs( $link ); ?>" onmouseover="return overlib('<?php echo $overlib; ?>', CAPTION, '<?php echo 'Edit Item'; ?>', BELOW, RIGHT);" onmouseout="return nd();">
 		<?php echo $image; ?>
 		</a>
 		<?php
@@ -628,13 +626,13 @@ class HTML_content {
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
 			$link = $mosConfig_live_site. '/index2.php?option=com_content&amp;do_pdf=1&amp;id='. $row->id;
 			if ( $params->get( 'icons' ) ) {
-				$image = mosAdminMenus::ImageCheck( 'pdf_button.png', '/images/M_images/', NULL, NULL, _CMN_PDF );
+				$image = mosAdminMenus::ImageCheck( 'pdf_button.png', '/images/M_images/', NULL, NULL, _CMN_PDF, _CMN_PDF );
 			} else {
 				$image = _CMN_PDF .'&nbsp;';
 			}
 			?>
 			<td align="right" width="100%" class="buttonheading">
-			<a href="javascript:void window.open('<?php echo $link; ?>', 'win2', '<?php echo $status; ?>');" title="<?php echo _CMN_PDF;?>">
+			<a href="#" onclick="window.open('<?php echo $link; ?>','win2','<?php echo $status; ?>');" title="<?php echo _CMN_PDF;?>">
 			<?php echo $image; ?>
 			</a>
 			</td>
@@ -652,13 +650,13 @@ class HTML_content {
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=400,height=250,directories=no,location=no';
 			$link = $mosConfig_live_site .'/index2.php?option=com_content&amp;task=emailform&amp;id='. $row->id;
 			if ( $params->get( 'icons' ) ) {
-				$image = mosAdminMenus::ImageCheck( 'emailButton.png', '/images/M_images/', NULL, NULL, _CMN_EMAIL );
+				$image = mosAdminMenus::ImageCheck( 'emailButton.png', '/images/M_images/', NULL, NULL, _CMN_EMAIL, _CMN_EMAIL );
 			} else {
 				$image = '&nbsp;'. _CMN_EMAIL;
 			}
 			?>
 			<td align="right" width="100%" class="buttonheading">
-			<a href="javascript:void window.open('<?php echo $link; ?>', 'win2', '<?php echo $status; ?>');" title="<?php echo _CMN_EMAIL;?>">
+			<a href="#" onclick="window.open('<?php echo $link; ?>','win2','<?php echo $status; ?>');" title="<?php echo _CMN_EMAIL;?>">
 			<?php echo $image; ?>
 			</a>
 			</td>
@@ -836,40 +834,40 @@ class HTML_content {
 	*/
 	function Navigation( $row, $params ) {
 		$task = mosGetParam( $_REQUEST, 'task', '' );
-		if ( $params->get( 'item_navigation' ) && ( $task == "view" ) && !$params->get( 'popup' ) ) {
-		?>
-		<table align="center" style="margin-top: 25px;">
-		<tr>
-			<?php
-			if ( $row->prev ) {
-				?>
-				<th class="pagenav_prev">
-				<a href="<?php echo $row->prev; ?>">
-				<?php echo _ITEM_PREVIOUS; ?>
-				</a>
-				</th>
-				<?php
-			}
-			if ( $row->prev && $row->next ) {
-				?>
-				<td width="50px">&nbsp;
-
-				</td>
-				<?php
-			}
-			if ( $row->next ) {
-				?>
-				<th class="pagenav_next">
-				<a href="<?php echo $row->next; ?>">
-				<?php echo _ITEM_NEXT; ?>
-				</a>
-				</th>
-				<?php
-			}
+		if ( $params->get( 'item_navigation' ) && ( $task == "view" ) && !$params->get( 'popup' ) && ( $row->prev || $row->next ) ) {
 			?>
-		</tr>
-		</table>
-		<?php
+			<table align="center" style="margin-top: 25px;">
+			<tr>
+				<?php
+				if ( $row->prev ) {
+					?>
+					<th class="pagenav_prev">
+					<a href="<?php echo $row->prev; ?>">
+					<?php echo _ITEM_PREVIOUS; ?>
+					</a>
+					</th>
+					<?php
+				}
+				if ( $row->prev && $row->next ) {
+					?>
+					<td width="50">&nbsp;
+	
+					</td>
+					<?php
+				}
+				if ( $row->next ) {
+					?>
+					<th class="pagenav_next">
+					<a href="<?php echo $row->next; ?>">
+					<?php echo _ITEM_NEXT; ?>
+					</a>
+					</th>
+					<?php
+				}
+				?>
+			</tr>
+			</table>
+			<?php
 		}
 	}
 
@@ -882,22 +880,23 @@ class HTML_content {
 	* @param string The html for the groups select list
 	*/
 	function editContent( &$row, $section, &$lists, &$images, &$access, $myid, $sectionid, $task, $Itemid ) {
-		global $mosConfig_live_site;
+		global $mosConfig_live_site, $mainframe;
 		
 		mosMakeHtmlSafe( $row );
 
 		require_once( $GLOBALS['mosConfig_absolute_path'] . '/includes/HTML_toolbar.php' );
 		
 		$Returnid 	= intval( mosGetParam( $_REQUEST, 'Returnid', $Itemid ) );
-		$tabs 		= new mosTabs(0);
+		$tabs 		= new mosTabs(0, 1);
+		
+		$mainframe->addCustomHeadTag( '<link rel="stylesheet" type="text/css" media="all" href="includes/js/calendar/calendar-mos.css" title="green" />' );	
 		?>
   		<div id="overDiv" style="position:absolute; visibility:hidden; z-index:10000;"></div>
-  		<link rel="stylesheet" type="text/css" media="all" href="includes/js/calendar/calendar-mos.css" title="green" />
-			<!-- import the calendar script -->
-			<script type="text/javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/calendar/calendar_mini.js"></script>
-			<!-- import the language module -->
-			<script type="text/javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/calendar/lang/calendar-en.js"></script>
-	  	<script language="Javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/overlib_mini.js"></script>
+		<!-- import the calendar script -->
+		<script language="javascript" type="text/javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/calendar/calendar_mini.js"></script>
+		<!-- import the language module -->
+		<script language="javascript" type="text/javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/calendar/lang/calendar-en.js"></script>
+	  	<script language="javascript" type="text/javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/overlib_mini.js"></script>
 	  	<script language="javascript" type="text/javascript">
 		onunload = WarnUser;
 		var folderimages = new Array;
@@ -968,8 +967,6 @@ class HTML_content {
 		</script>
 
 		<?php
-		//$docinfo = "<strong>"._E_SUBJECT."</strong> ";
-		//$docinfo .= $row->title."<br />";
 		$docinfo = "<strong>"._E_EXPIRES."</strong> ";
 		$docinfo .= $row->publish_down."<br />";
 		$docinfo .= "<strong>"._E_VERSION."</strong> ";
@@ -1316,7 +1313,7 @@ class HTML_content {
 		<input type="hidden" name="version" value="<?php echo $row->version; ?>" />
 		<input type="hidden" name="sectionid" value="<?php echo $row->sectionid; ?>" />
 		<input type="hidden" name="created_by" value="<?php echo $row->created_by; ?>" />
-		<input type="hidden" name="referer" value="<?php echo $_SERVER['HTTP_REFERER']; ?>" />
+		<input type="hidden" name="referer" value="<?php echo ampReplace( $_SERVER['HTTP_REFERER'] ); ?>" />
 		<input type="hidden" name="task" value="" />
 		</form>
 		<?php
@@ -1326,7 +1323,10 @@ class HTML_content {
 	* Writes Email form for filling in the send destination
 	*/
 	function emailForm( $uid, $title, $template='' ) {
-		global $mosConfig_sitename;
+		global $mosConfig_sitename, $mainframe;
+		
+		$mainframe->setPageTitle( $mosConfig_sitename .' :: '. $title );
+		$mainframe->addCustomHeadTag( '<link rel="stylesheet" href="templates/'. $template .'/css/template_css.css" type="text/css" />' );
 		?>
 		<script language="javascript" type="text/javascript">
 		function submitbutton() {
@@ -1340,9 +1340,7 @@ class HTML_content {
 		}
 		</script>
 
-		<title><?php echo $mosConfig_sitename; ?> :: <?php echo $title; ?></title>
-		<link rel="stylesheet" href="templates/<?php echo $template; ?>/css/template_css.css" type="text/css" />
-		<form action="index2.php?option=com_content&task=emailsend" name="frontendForm" method="post" onSubmit="return submitbutton();">
+		<form action="index2.php?option=com_content&amp;task=emailsend" name="frontendForm" method="post" onSubmit="return submitbutton();">
 		<table cellspacing="0" cellpadding="0" border="0">
 		<tr>
 			<td colspan="2">
@@ -1357,7 +1355,7 @@ class HTML_content {
 			<?php echo _EMAIL_FRIEND_ADDR; ?>
 			</td>
 			<td>
-			<input type="text" name="email" class="inputbox" size="25">
+			<input type="text" name="email" class="inputbox" size="25" />
 			</td>
 		</tr>
 		<tr>
@@ -1365,7 +1363,7 @@ class HTML_content {
 			<?php echo _EMAIL_YOUR_NAME; ?>
 			</td>
 			<td>
-			<input type="text" name="yourname" class="inputbox" size="25">
+			<input type="text" name="yourname" class="inputbox" size="25" />
 			</td>
 		</tr>
 		<tr>
@@ -1373,7 +1371,7 @@ class HTML_content {
 			<?php echo _EMAIL_YOUR_MAIL; ?>
 			</td>
 			<td>
-			<input type="text" name="youremail" class="inputbox" size="25">
+			<input type="text" name="youremail" class="inputbox" size="25" />
 			</td>
 		</tr>
 		<tr>
@@ -1381,7 +1379,7 @@ class HTML_content {
 			<?php echo _SUBJECT_PROMPT; ?>
 			</td>
 			<td>
-			<input type="text" name="subject" class="inputbox" maxlength="100" size="40">
+			<input type="text" name="subject" class="inputbox" maxlength="100" size="40" />
 			</td>
 		</tr>
 		<tr>
@@ -1389,14 +1387,15 @@ class HTML_content {
 		</tr>
 		<tr>
 			<td colspan="2">
-			<input type="submit" name="submit" class="button" value="<?php echo _BUTTON_SUBMIT_MAIL; ?>">
-			&nbsp;&nbsp; <input type="button" name="cancel" value="<?php echo _BUTTON_CANCEL; ?>" class="button" onclick="window.close();">
+			<input type="submit" name="submit" class="button" value="<?php echo _BUTTON_SUBMIT_MAIL; ?>" />
+			&nbsp;&nbsp; 
+			<input type="button" name="cancel" value="<?php echo _BUTTON_CANCEL; ?>" class="button" onclick="window.close();" />
 			</td>
 		</tr>
 		</table>
 
-		<input type="hidden" name="id" value="<?php echo $uid; ?>">
-		<input type="hidden" name="<?php echo mosHash( 'validate' );?>" value="1">
+		<input type="hidden" name="id" value="<?php echo $uid; ?>" />
+		<input type="hidden" name="<?php echo mosHash( 'validate' );?>" value="1" />
 		</form>
 		<?php
 	}
@@ -1407,10 +1406,11 @@ class HTML_content {
 	* @param string The current template
 	*/
 	function emailSent( $to, $template='' ) {
-		global $mosConfig_sitename;
+		global $mosConfig_sitename, $mainframe;
+
+		$mainframe->setPageTitle( $mosConfig_sitename );
+		$mainframe->addCustomHeadTag( '<link rel="stylesheet" href="templates/'. $template .'/css/template_css.css" type="text/css" />' );
 		?>
-		<title><?php echo $mosConfig_sitename; ?></title>
-		<link rel="stylesheet" href="templates/<?php echo $template; ?>/css/template_css.css" type="text/css" />
 		<span class="contentheading"><?php echo _EMAIL_SENT." $to";?></span> <br />
 		<br />
 		<br />

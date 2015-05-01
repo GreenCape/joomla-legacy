@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: uploadimage.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: uploadimage.php 1054 2005-11-16 17:58:59Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -24,11 +24,14 @@ $userfile2=(isset($_FILES['userfile']['tmp_name']) ? $_FILES['userfile']['tmp_na
 $userfile_name=(isset($_FILES['userfile']['name']) ? $_FILES['userfile']['name'] : "");
 
 if (isset($_FILES['userfile'])) {
-	if ($directory!="banners") {
-		$base_Dir = "../../images/stories/";
-	} else {
+	if ($directory == 'banners') {
 		$base_Dir = "../../images/banners/";
+	} else if ( $directory != '' ) {
+		$base_Dir = '../../images/stories/'. $directory;
+	} else {
+		$base_Dir = '../../images/stories/';
 	}
+	
 	if (empty($userfile_name)) {
 		echo "<script>alert('Please select an image to upload'); document.location.href='uploadimage.php';</script>";
 	}
@@ -36,41 +39,31 @@ if (isset($_FILES['userfile'])) {
 	$filename = split("\.", $userfile_name);
 
 	if (eregi("[^0-9a-zA-Z_]", $filename[0])) {
-		echo "<script> alert('File must only contain alphanumeric characters and no spaces please.'); window.history.go(-1);</script>\n";
-		exit();
+		mosErrorAlert("File must only contain alphanumeric characters and no spaces please.");
 	}
 
 	if (file_exists($base_Dir.$userfile_name)) {
-		echo "<script> alert('Image $userfile_name already exists.'); window.history.go(-1);</script>\n";
-		exit();
+		mosErrorAlert("Image ".$userfile_name." already exists.");
 	}
 
 	if ((strcasecmp(substr($userfile_name,-4),".gif")) && (strcasecmp(substr($userfile_name,-4),".jpg")) && (strcasecmp(substr($userfile_name,-4),".png")) && (strcasecmp(substr($userfile_name,-4),".bmp")) &&(strcasecmp(substr($userfile_name,-4),".doc")) && (strcasecmp(substr($userfile_name,-4),".xls")) && (strcasecmp(substr($userfile_name,-4),".ppt")) && (strcasecmp(substr($userfile_name,-4),".swf")) && (strcasecmp(substr($userfile_name,-4),".pdf"))) {
-		echo "<script>alert('The file must be gif, png, jpg, bmp, swf, doc, xls or ppt'); window.history.go(-1);</script>\n";
-		exit();
+		mosErrorAlert("The file must be gif, png, jpg, bmp, swf, doc, xls or ppt");
 	}
 
 
 	if (eregi(".pdf", $userfile_name) || eregi(".doc", $userfile_name) || eregi(".xls", $userfile_name) || eregi(".ppt", $userfile_name)) {
 		if (!move_uploaded_file ($_FILES['userfile']['tmp_name'],$media_path.$_FILES['userfile']['name']) || !mosChmod($media_path.$_FILES['userfile']['name'])) {
-			echo "<script>alert('Upload of $userfile_name failed'); window.history.go(-1);</script>\n";
-			exit();
-		}
-		else {
-			echo "<script>alert('Upload of $userfile_name to $media_path successful'); window.history.go(-1);</script>\n";
-			exit();
+			mosErrorAlert("Upload of ".$userfile_name." failed");
+		} else {
+			mosErrorAlert("Upload of ".$userfile_name." to $media_path successful");
 		}
 	} elseif (!move_uploaded_file ($_FILES['userfile']['tmp_name'],$base_Dir.$_FILES['userfile']['name']) || !mosChmod($base_Dir.$_FILES['userfile']['name'])) {
-		echo "<script>alert('Upload of $userfile_name failed'); window.history.go(-1);</script>\n";
-		exit();
+		mosErrorAlert("Upload of ".$userfile_name." failed");
+	} else {
+		mosErrorAlert("Upload of ".$userfile_name." to ".$base_Dir." successful");
 	}
-	else {
-		echo "<script>alert('Upload of $userfile_name to $base_Dir successful'); window.history.go(-1);</script>\n";
-		exit();
-	}
-
-
 }
+$css = mosGetParam($_REQUEST,'t','');
 
 $iso = split( '=', _ISO );
 // xml prolog
@@ -82,31 +75,31 @@ echo '<?xml version="1.0" encoding="'. $iso[1] .'"?' .'>';
 <title>Upload a file</title>
 </head>
 <body>
-<?php
-$css = mosGetParam($_REQUEST,"t","");
-?>
+
 <link rel="stylesheet" href="../templates/<?php echo $css; ?>/css/template_css.css" type="text/css" />
+<form method="post" action="uploadimage.php" enctype="multipart/form-data" name="filename">
+
 <table class="adminform">
-  <form method="post" action="uploadimage.php" enctype="multipart/form-data" name="filename">
-	<tr>
-	  <th class="title"> File Upload : <?php echo $directory; ?></th>
-	</tr>
-	<tr>
-	  <td align="center">
+<tr>
+	<th class="title"> 
+		File Upload : <?php echo $directory; ?>
+	</th>
+</tr>
+<tr>
+	<td align="center">
 		<input class="inputbox" name="userfile" type="file" />
-	  </td>
-	</tr>
-	<tr>
-	  <td>
+	</td>
+</tr>
+<tr>
+	<td>
 		<input class="button" type="submit" value="Upload" name="fileupload" />
 		Max size = <?php echo ini_get( 'post_max_size' );?>
-	  </td>
-	<tr>
-	  <td>
-		<input type="hidden" name="directory" value="<?php echo $directory;?>" />
-	  </td>
-	</tr>
-  </form>
+	</td>
+</tr>
 </table>
+
+<input type="hidden" name="directory" value="<?php echo $directory;?>" />
+</form>
+
 </body>
 </html>

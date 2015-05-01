@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install1.php 521 2005-10-14 06:39:07Z stingrey $
+* @version $Id: install1.php 597 2005-10-23 17:11:09Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -105,9 +105,9 @@ function check() {
   				<p>Setting up Joomla to run on your server involves 4 simple steps...</p>
   				<p>Please enter the hostname of the server Joomla is to be installed on.</p>
 				<p>Enter the MySQL username, password and database name you wish to use with Joomla.</p>
-				<p>Enter the a table name prefix to be used by this Joomla instance and select what
+				<p>Enter a table name prefix to be used by this Joomla! install and select what
 					to do with existing tables from former installations.</p>
-				<p>Install the samples unless you are experianced Mamber wanting to start with a completely empty site.</p>
+				<p>Install the sample data unless you are an experienced Joomla! User wanting to start with a completely empty site.</p>
   			</div>
 			<div class="install-form">
   				<div class="form-block">

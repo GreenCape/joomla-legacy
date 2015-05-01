@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_login.php 471 2005-10-12 17:35:51Z stingrey $
+* @version $Id: mod_login.php 739 2005-10-31 04:28:04Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -40,6 +40,8 @@ if ( $name ) {
 }
 
 if ( $my->id ) {
+// Logout output
+// ie HTML when already logged in and trying to logout
 	?>
 	<form action="<?php echo sefRelToAbs( 'index.php?option=logout' ); ?>" method="post" name="login">
 	<?php
@@ -60,6 +62,8 @@ if ( $my->id ) {
 	</form>
 	<?php
 } else {
+// Login output
+// ie HTML when not logged in and trying to login
 	?>
 	<form action="<?php echo sefRelToAbs( 'index.php' ); ?>" method="post" name="login" >
 	<?php

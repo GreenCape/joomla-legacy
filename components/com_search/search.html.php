@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: search.html.php 496 2005-10-13 04:48:32Z stingrey $
+* @version $Id: search.html.php 599 2005-10-23 17:45:26Z stingrey $
 * @package Joomla
 * @subpackage Search
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -140,7 +140,7 @@ class search_html {
 				for( $i=$z; $i < $end; $i++ ) {
 					$row = $rows[$i-1];
 					if ($row->created) {
-						$created = mosFormatDate ($row->created, '%d %B, %Y');
+						$created = mosFormatDate ($row->created, _DATE_FORMAT_LC);
 					} else {
 						$created = '';
 					}

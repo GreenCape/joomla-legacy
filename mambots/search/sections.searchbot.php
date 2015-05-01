@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: sections.searchbot.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: sections.searchbot.php 890 2005-11-06 15:56:30Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -27,7 +27,22 @@ $_MAMBOTS->registerFunction( 'onSearch', 'botSearchSections' );
 */
 function botSearchSections( $text, $phrase='', $ordering='' ) {
 	global $database, $my;
-
+	
+	// load mambot params info
+	$query = "SELECT id"
+	. "\n FROM #__mambots"
+	. "\n WHERE element = 'sections.searchbot'"
+	. "\n AND folder = 'search'"
+	;
+	$database->setQuery( $query );
+	$id 	= $database->loadResult();
+	$mambot = new mosMambot( $database );
+	$mambot->load( $id );
+	$botParams = new mosParameters( $mambot->params );
+	
+	$limit = $botParams->def( 'search_limit', 50 );
+	$limit = "\n LIMIT $limit";	
+	
 	 $text = trim( $text );
 	if ($text == '') {
 		return array();
@@ -37,6 +52,7 @@ function botSearchSections( $text, $phrase='', $ordering='' ) {
 		case 'alpha':
 			$order = 'a.name ASC';
 			break;
+			
 		case 'category':
 		case 'popular':
 		case 'newest':
@@ -59,6 +75,7 @@ function botSearchSections( $text, $phrase='', $ordering='' ) {
 	. "\n AND a.access <= $my->gid"
 	. "\n AND ( m.type = 'content_section' OR m.type = 'content_blog_section' )"
 	. "\n ORDER BY $order"
+	. "\n LIMIT $limit"
 	;
 	$database->setQuery( $query );
 	$rows = $database->loadObjectList();
@@ -67,13 +84,14 @@ function botSearchSections( $text, $phrase='', $ordering='' ) {
 	for ( $i = 0; $i < $count; $i++ ) {
 		if ( $rows[$i]->menutype == 'content_section' ) {
 			$rows[$i]->href 	= 'index.php?option=com_content&task=section&id='. $rows[$i]->secid .'&Itemid='. $rows[$i]->menuid;
-			$rows[$i]->section 	= 'Section List';
+			$rows[$i]->section 	= _SEARCH_SECLIST;
 		}
 		if ( $rows[$i]->menutype == 'content_blog_section' ) {
 			$rows[$i]->href 	= 'index.php?option=com_content&task=blogsection&id='. $rows[$i]->secid .'&Itemid='. $rows[$i]->menuid;
-			$rows[$i]->section 	= 'Section Blog';
+			$rows[$i]->section 	= _SEARCH_SECBLOG;
 		}
 	}
+	
 	return $rows;
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: poll.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: poll.php 743 2005-10-31 04:48:00Z stingrey $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -125,7 +125,8 @@ function pollresult( $uid ) {
 
 	$first_vote = '';
 	$last_vote 	= '';
-
+	$votes		= '';
+	
 	if (isset($poll->id) && $poll->id != '') {
 		$query = "SELECT MIN( date ) AS mindate, MAX( date ) AS maxdate"
 		. "\n FROM #__poll_date"
@@ -138,18 +139,18 @@ function pollresult( $uid ) {
 			$first_vote = mosFormatDate( $dates[0]->mindate, _DATE_FORMAT_LC2 );
 			$last_vote = mosFormatDate( $dates[0]->maxdate, _DATE_FORMAT_LC2 );
 		}
+		
+		$query = "SELECT a.id, a.text, count( DISTINCT b.id ) AS hits, count( DISTINCT b.id )/COUNT( DISTINCT a.id )*100.0 AS percent"
+		. "\n FROM #__poll_data AS a"
+		. "\n LEFT JOIN #__poll_date AS b ON b.vote_id = a.id"
+		. "\n WHERE a.pollid = $poll->id"
+		. "\n AND a.text != ''"
+		. "\n GROUP BY a.id"
+		. "\n ORDER BY a.id"
+		;
+		$database->setQuery( $query );
+		$votes = $database->loadObjectList();		
 	}
-
-	$query = "SELECT a.id, a.text, count( DISTINCT b.id ) AS hits, count( DISTINCT b.id )/COUNT( DISTINCT a.id )*100.0 AS percent"
-	. "\n FROM #__poll_data AS a"
-	. "\n LEFT JOIN #__poll_date AS b ON b.vote_id = a.id"
-	. "\n WHERE a.pollid = $poll->id"
-	. "\n AND a.text != ''"
-	. "\n GROUP BY a.id"
-	. "\n ORDER BY a.id"
-	;
-	$database->setQuery( $query );
-	$votes = $database->loadObjectList();
 
 	$query = "SELECT id, title"
 	. "\n FROM #__polls"

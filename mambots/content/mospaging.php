@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mospaging.php 427 2005-10-09 18:59:01Z stingrey $
+* @version $Id: mospaging.php 1136 2005-11-20 21:29:00Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -85,7 +85,7 @@ function botMosPaging( $published, &$row, &$params, $page=0 ) {
 				parse_str(  str_replace( '&amp;', '&', $matches[$page-1][2] ), $args );
 
 				if ( @$args['title'] ) {
-					$row->page_title = $args['title'];
+					$row->page_title = stripslashes( $args['title'] );
 				}
 			}
 	 	}
@@ -187,7 +187,7 @@ function createTOC( &$row, &$matches, &$page ) {
 				<tr>
 					<td>
 					<a href="'. $link .'" class="toclink">'
-					. $args2['title'] .
+					. stripslashes( $args2['title'] ) .
 					'</a>
 					</td>
 				</tr>

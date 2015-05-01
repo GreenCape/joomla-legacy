@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.templates.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: admin.templates.php 652 2005-10-25 22:23:27Z Jinx $
 * @package Joomla
 * @subpackage Templates
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -270,8 +270,7 @@ function removeTemplate( $cid, $option, $client ) {
 	$cur_template = $database->loadResult();
 
 	if ($cur_template == $cid) {
-		echo "<script>alert(\"You can not delete template in use.\"); window.history.go(-1); </script>\n";
-		exit();
+		mosErrorAlert( "You can not delete template in use" );
 	}
 
 	// Un-assign

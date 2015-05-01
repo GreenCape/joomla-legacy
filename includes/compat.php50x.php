@@ -6,8 +6,6 @@
 // no direct access
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
-eval( 'function clone( $object ) { return $object; }' );
-
 if (!defined('FILE_USE_INCLUDE_PATH')) {
 	define('FILE_USE_INCLUDE_PATH', 1);
 }
@@ -23,7 +21,7 @@ if (!defined('FILE_APPEND')) {
  * @package	 PHP_Compat
  * @link		http://php.net/function.file_put_contents
  * @author	  Aidan Lister <aidan@php.net>
- * @version	 $Revision: 47 $
+ * @version	 $Revision: 1097 $
  * @internal	resource_context is not supported
  * @since	   PHP 5
  * @require	 PHP 4.0.1 (trigger_error)
@@ -86,5 +84,12 @@ if (!function_exists('file_put_contents')) {
 		// Return length
 		return $bytes;
 	}
+}
+
+/**
+ * Ported PHP5 function to PHP4 for forward compatibility
+ */
+function clone($object) {
+      return $object;
 }
 ?>

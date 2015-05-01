@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.php 528 2005-10-14 08:44:53Z stingrey $
+* @version $Id: content.php 1016 2005-11-13 20:05:17Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -20,7 +20,6 @@ require_once( $mainframe->getPath( 'front_html', 'com_content' ) );
 $id			= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 $sectionid 	= intval( mosGetParam( $_REQUEST, 'sectionid', 0 ) );
 $pop 		= intval( mosGetParam( $_REQUEST, 'pop', 0 ) );
-$id 		= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 $limit 		= intval( mosGetParam( $_REQUEST, 'limit', '' ) );
 $order 		= mosGetParam( $_REQUEST, 'order', '' );
 $limitstart = intval( mosGetParam( $_REQUEST, 'limitstart', 0 ) );
@@ -38,7 +37,6 @@ $cache =& mosCache::getCache( 'com_content' );
 
 // loads function for frontpage component
 if ( $option == 'com_frontpage' ) {
-	//frontpage( $gid, $access, $pop, $now );
 	$cache->call( 'frontpage', $gid, $access, $pop, $now );
 	return;
 }
@@ -157,7 +155,11 @@ function frontpage( $gid, &$access, $pop, $now ) {
 	$order_pri = _orderby_pri( $orderby_pri );
 
 	// query records
-	$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
+//	$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
+	$query = "SELECT a.id, a.title, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
+	. "\n a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, a.images, a.urls, a.ordering, a.metakey, a.metadesc, a.access,"
+	. "\n CHAR_LENGTH( a.fulltext ) AS readmore,"
+	. "\n ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
 	. "\n FROM #__content AS a"
 	. "\n INNER JOIN #__content_frontpage AS f ON f.content_id = a.id"
 	. "\n INNER JOIN #__categories AS cc ON cc.id = a.catid"
@@ -186,8 +188,8 @@ function frontpage( $gid, &$access, $pop, $now ) {
 function showSection( $id, $gid, &$access, $now ) {
 	global $database, $mainframe, $Itemid;
 
-	$nullDate = $database->getNullDate();
-	$noauth = !$mainframe->getCfg( 'shownoauth' );
+	$nullDate 	= $database->getNullDate();
+	$noauth 	= !$mainframe->getCfg( 'shownoauth' );
 
 	// Paramters
 	$params = new stdClass();
@@ -196,23 +198,24 @@ function showSection( $id, $gid, &$access, $now ) {
 		$menu->load( $Itemid );
 		$params = new mosParameters( $menu->params );
 	} else {
-		$menu = "";
+		$menu 	= '';
 		$params = new mosEmpty();
 
 	}
 	$orderby = $params->get( 'orderby', '' );
 
-	$params->set( 'type', 'section' );
+	$params->set( 'type', 				'section' );
 
-	$params->def( 'page_title', 1 );
-	$params->def( 'pageclass_sfx', '' );
-	$params->def( 'other_cat_section', 1 );
-	$params->def( 'other_cat', 1 );
-	$params->def( 'empty_cat', 0 );
-	$params->def( 'cat_items', 1 );
-	$params->def( 'cat_description', 1 );
-	$params->def( 'back_button', $mainframe->getCfg( 'back_button' ) );
-	$params->def( 'pageclass_sfx', '' );
+	$params->def( 'page_title', 		1 );
+	$params->def( 'pageclass_sfx', 		'' );
+	$params->def( 'other_cat_section', 	1 );
+	$params->def( 'empty_cat_section', 	0 );
+	$params->def( 'other_cat', 			1 );
+	$params->def( 'empty_cat', 			0 );
+	$params->def( 'cat_items', 			1 );
+	$params->def( 'cat_description', 	1 );
+	$params->def( 'back_button', 		$mainframe->getCfg( 'back_button' ) );
+	$params->def( 'pageclass_sfx', 		'' );
 
 	// Ordering control
 	$orderby = _orderby_sec( $orderby );
@@ -226,16 +229,29 @@ function showSection( $id, $gid, &$access, $now ) {
 	} else {
 		$xwhere = "\n AND a.published = 1";
 		$xwhere2 = "\n AND b.state = 1"
-		. "\n AND ( publish_up = '$nullDate' OR publish_up <= '$now' )"
-		. "\n AND ( publish_down = '$nullDate' OR publish_down >= '$now' )"
+		. "\n AND ( b.publish_up = '$nullDate' OR b.publish_up <= '$now' )"
+		. "\n AND ( b.publish_down = '$nullDate' OR b.publish_down >= '$now' )"
 		;
 	}
 
-	// show/hide empty categories
-	if ( $params->get( 'empty_cat' ) ) {
-		$empty = '';
-	} else {
-		$empty = "\n HAVING COUNT( b.id ) > 0";
+	$empty 		= '';
+	$empty_sec 	= '';
+	if ( $params->get( 'type' ) == 'category' ) {
+		// show/hide empty categories
+		if ( !$params->get( 'empty_cat' ) ) {
+			$empty = "\n HAVING numitems > 0";
+		}
+	}	
+	if ( $params->get( 'type' ) == 'section' ) {
+		// show/hide empty categories in section
+		if ( !$params->get( 'empty_cat_section' ) ) {
+			$empty_sec = "\n HAVING numitems > 0";
+		}
+	}
+
+	$access = '';
+	if ($noauth) {
+		$access = "\n AND a.access <= $gid";
 	}
 
 	// Main Query
@@ -245,14 +261,10 @@ function showSection( $id, $gid, &$access, $now ) {
 	. $xwhere2
 	. "\n WHERE a.section = '$section->id'"
 	. $xwhere
-	;
-	if ($noauth) {
-		$query .= "\n AND a.access <= $gid"
-		. "\n AND b.access <= $gid"
-		;
-	}
-	$query .= "\n GROUP BY a.id"
+	. $access
+	. "\n GROUP BY a.id"
 	. $empty
+	. $empty_sec
 	. "\n ORDER BY $orderby"
 	;
 	$database->setQuery( $query );
@@ -298,27 +310,27 @@ function showCategory( $id, $gid, &$access, $sectionid, $limit, $selected, $limi
 		$selected = $orderby;
 	}
 
-	$params->set( 'type', 'category' );
+	$params->set( 'type', 				'category' );
 
-	$params->def( 'page_title', 1 );
-	$params->def( 'title', 1 );
-	$params->def( 'hits', $mainframe->getCfg( 'hits' ) );
-	$params->def( 'author', !$mainframe->getCfg( 'hideAuthor' ) );
-	$params->def( 'date', !$mainframe->getCfg( 'hideCreateDate' ) );
-	$params->def( 'date_format', _DATE_FORMAT_LC );
-	$params->def( 'navigation', 2 );
-	$params->def( 'display', 1 );
-	$params->def( 'display_num', $mosConfig_list_limit );
-	$params->def( 'other_cat', 1 );
-	$params->def( 'empty_cat', 0 );
-	$params->def( 'cat_items', 1 );
-	$params->def( 'cat_description', 0 );
-	$params->def( 'back_button', $mainframe->getCfg( 'back_button' ) );
-	$params->def( 'pageclass_sfx', '' );
-	$params->def( 'headings', 1 );
-	$params->def( 'order_select', 1 );
-	$params->def( 'filter', 1 );
-	$params->def( 'filter_type', 'title' );
+	$params->def( 'page_title',			1 );
+	$params->def( 'title', 				1 );
+	$params->def( 'hits', 				$mainframe->getCfg( 'hits' ) );
+	$params->def( 'author', 			!$mainframe->getCfg( 'hideAuthor' ) );
+	$params->def( 'date', 				!$mainframe->getCfg( 'hideCreateDate' ) );
+	$params->def( 'date_format', 		_DATE_FORMAT_LC );
+	$params->def( 'navigation', 		2 );
+	$params->def( 'display', 			1 );
+	$params->def( 'display_num', 		$mosConfig_list_limit );
+	$params->def( 'other_cat', 			1 );
+	$params->def( 'empty_cat', 			0 );
+	$params->def( 'cat_items', 			1 );
+	$params->def( 'cat_description', 	0 );
+	$params->def( 'back_button', 		$mainframe->getCfg( 'back_button' ) );
+	$params->def( 'pageclass_sfx', 		'' );
+	$params->def( 'headings', 			1 );
+	$params->def( 'order_select', 		1 );
+	$params->def( 'filter', 			1 );
+	$params->def( 'filter_type', 		'title' );
 
 	// Ordering control
 	$orderby = _orderby_sec( $orderby );
@@ -502,11 +514,15 @@ function showBlogSection( $id=0, $gid, &$access, $pop, $now=NULL ) {
 	// Ordering control
 	$orderby_sec 	= $params->def( 'orderby_sec', 'rdate' );
 	$orderby_pri 	= $params->def( 'orderby_pri', '' );
-	$order_sec 	= _orderby_sec( $orderby_sec );
-	$order_pri 	= _orderby_pri( $orderby_pri );
+	$order_sec 		= _orderby_sec( $orderby_sec );
+	$order_pri 		= _orderby_pri( $orderby_pri );
 
 	// Main data query
-	$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, cc.name AS category, g.name AS groups"
+	//$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, cc.name AS category, g.name AS groups"
+	$query = "SELECT a.id, a.title, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
+	. "\n a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, a.images, a.urls, a.ordering, a.metakey, a.metadesc, a.access,"
+	. "\n CHAR_LENGTH( a.fulltext ) AS readmore,"
+	. "\n ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
 	. "\n FROM #__content AS a"
 	. "\n INNER JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"
@@ -556,11 +572,15 @@ function showBlogCategory( $id=0, $gid, &$access, $pop, $now ) {
 	// Ordering control
 	$orderby_sec 	= $params->def( 'orderby_sec', 'rdate' );
 	$orderby_pri 	= $params->def( 'orderby_pri', '' );
-	$order_sec 	= _orderby_sec( $orderby_sec );
-	$order_pri 	= _orderby_pri( $orderby_pri );
+	$order_sec 		= _orderby_sec( $orderby_sec );
+	$order_pri 		= _orderby_pri( $orderby_pri );
 
 	// Main data query
-	$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, g.name AS groups, cc.name AS category"
+	//$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, g.name AS groups, cc.name AS category"
+	$query = "SELECT a.id, a.title, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
+	. "\n a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, a.images, a.urls, a.ordering, a.metakey, a.metadesc, a.access,"
+	. "\n CHAR_LENGTH( a.fulltext ) AS readmore,"
+	. "\n ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
 	. "\n FROM #__content AS a"
 	. "\n LEFT JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"
@@ -607,10 +627,10 @@ function showArchiveSection( $id=NULL, $gid, &$access, $pop, $option ) {
 	$params->set( 'month', $month );
 
 	// Ordering control
-	$orderby_sec = $params->def( 'orderby_sec', 'rdate' );
-	$orderby_pri = $params->def( 'orderby_pri', '' );
-	$order_sec = _orderby_sec( $orderby_sec );
-	$order_pri = _orderby_pri( $orderby_pri );
+	$orderby_sec 	= $params->def( 'orderby_sec', 'rdate' );
+	$orderby_pri 	= $params->def( 'orderby_pri', '' );
+	$order_sec 		= _orderby_sec( $orderby_sec );
+	$order_pri 		= _orderby_pri( $orderby_pri );
 
 	// used in query
 	$where = _where( -1, $access, $noauth, $gid, $id, NULL, $year, $month );
@@ -632,7 +652,11 @@ function showArchiveSection( $id=NULL, $gid, &$access, $pop, $option ) {
 	$archives = count( $items );
 
 	// Main Query
-	$query = "SELECT a.*, ROUND(v.rating_sum/v.rating_count) AS rating, v.rating_count, u.name AS author, u.usertype, cc.name AS category, g.name AS groups"
+	//$query = "SELECT a.*, ROUND(v.rating_sum/v.rating_count) AS rating, v.rating_count, u.name AS author, u.usertype, cc.name AS category, g.name AS groups"
+	$query = "SELECT a.id, a.title, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
+	. "\n a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, a.images, a.urls, a.ordering, a.metakey, a.metadesc, a.access,"
+	. "\n CHAR_LENGTH( a.fulltext ) AS readmore,"
+	. "\n ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
 	. "\n FROM #__content AS a"
 	. "\n INNER JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"
@@ -676,8 +700,8 @@ function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
 
 	// Parameters
 	$noauth = !$mainframe->getCfg( 'shownoauth' );
-	$year 	= mosGetParam( $_REQUEST, 'year', date( 'Y' ) );
-	$month 	= mosGetParam( $_REQUEST, 'month', date( 'm' ) );
+	$year 	= mosGetParam( $_REQUEST, 'year', 	date( 'Y' ) );
+	$month 	= mosGetParam( $_REQUEST, 'month', 	date( 'm' ) );
 	$module = mosGetParam( $_REQUEST, 'module', '' );
 
 	// used by archive module
@@ -716,7 +740,11 @@ function showArchiveCategory( $id=0, $gid, &$access, $pop, $option, $now ) {
 	$items = $database->loadObjectList();
 	$archives = count( $items );
 
-	$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, g.name AS groups"
+	//$query = "SELECT a.*, ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, g.name AS groups"
+	$query = "SELECT a.id, a.title, a.introtext, a.sectionid, a.state, a.catid, a.created, a.created_by, a.created_by_alias, a.modified, a.modified_by,"
+	. "\n a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, a.images, a.urls, a.ordering, a.metakey, a.metadesc, a.access,"
+	. "\n CHAR_LENGTH( a.fulltext ) AS readmore,"
+	. "\n ROUND( v.rating_sum / v.rating_count ) AS rating, v.rating_count, u.name AS author, u.usertype, s.name AS section, cc.name AS category, g.name AS groups"
 	. "\n FROM #__content AS a"
 	. "\n INNER JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n LEFT JOIN #__users AS u ON u.id = a.created_by"
@@ -772,14 +800,14 @@ function BlogOutput ( &$rows, &$params, $gid, &$access, $pop, &$menu, $archive=N
 	if ( $columns == 0 ) {
 		$columns = 1;
 	}
-	$intro				= $params->def( 'intro', 4 );
-	$leading 			= $params->def( 'leading', 1 );
-	$links				= $params->def( 'link', 4 );
-	$pagination 		= $params->def( 'pagination', 2 );
-	$pagination_results = $params->def( 'pagination_results', 1 );
-	$pagination_results = $params->def( 'pagination_results', 1 );
-	$descrip		 	= $params->def( 'description', 1 );
-	$descrip_image	 	= $params->def( 'description_image', 1 );
+	$intro				= $params->def( 'intro', 				4 );
+	$leading 			= $params->def( 'leading', 				1 );
+	$links				= $params->def( 'link', 				4 );
+	$pagination 		= $params->def( 'pagination', 			2 );
+	$pagination_results = $params->def( 'pagination_results', 	1 );
+	$pagination_results = $params->def( 'pagination_results', 	1 );
+	$descrip		 	= $params->def( 'description', 			1 );
+	$descrip_image	 	= $params->def( 'description_image', 	1 );
 	// needed for back button for page
 	$back 				= $params->get( 'back_button', $mainframe->getCfg( 'back_button' ) );
 	// needed to disable back button for item
@@ -1030,8 +1058,8 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 		}
 
 		$params = new mosParameters( $row->attribs );
-		$params->set( 'intro_only', 0 );
-		$params->def( 'back_button', $mainframe->getCfg( 'back_button' ) );
+		$params->set( 'intro_only', 	0 );
+		$params->def( 'back_button', 	$mainframe->getCfg( 'back_button' ) );
 		if ( $row->sectionid == 0) {
 			$params->set( 'item_navigation', 0 );
 		} else {
@@ -1081,7 +1109,7 @@ function showItem( $uid, $gid, &$access, $pop, $option, $now ) {
 
 
 function show( $row, $params, $gid, &$access, $pop, $option, $ItemidCount=NULL ) {
-	global $database, $mainframe;
+	global $database, $mainframe, $Itemid;
 	global $cache;
 
 	$noauth = !$mainframe->getCfg( 'shownoauth' );
@@ -1110,49 +1138,59 @@ function show( $row, $params, $gid, &$access, $pop, $option, $ItemidCount=NULL )
 	}
 
 	// GC Parameters
-	$params->def( 'link_titles', $mainframe->getCfg( 'link_titles' ) );
-	$params->def( 'author', !$mainframe->getCfg( 'hideAuthor' ) );
-	$params->def( 'createdate', !$mainframe->getCfg( 'hideCreateDate' ) );
-	$params->def( 'modifydate', !$mainframe->getCfg( 'hideModifyDate' ) );
-	$params->def( 'print', !$mainframe->getCfg( 'hidePrint' ) );
-	$params->def( 'pdf', !$mainframe->getCfg( 'hidePdf' ) );
-	$params->def( 'email', !$mainframe->getCfg( 'hideEmail' ) );
-	$params->def( 'rating', $mainframe->getCfg( 'vote' ) );
-	$params->def( 'icons', $mainframe->getCfg( 'icons' ) );
-	$params->def( 'readmore', $mainframe->getCfg( 'readmore' ) );
+	$params->def( 'link_titles', 	$mainframe->getCfg( 'link_titles' ) );
+	$params->def( 'author', 		!$mainframe->getCfg( 'hideAuthor' ) );
+	$params->def( 'createdate', 	!$mainframe->getCfg( 'hideCreateDate' ) );
+	$params->def( 'modifydate', 	!$mainframe->getCfg( 'hideModifyDate' ) );
+	$params->def( 'print', 			!$mainframe->getCfg( 'hidePrint' ) );
+	$params->def( 'pdf', 			!$mainframe->getCfg( 'hidePdf' ) );
+	$params->def( 'email', 			!$mainframe->getCfg( 'hideEmail' ) );
+	$params->def( 'rating', 		$mainframe->getCfg( 'vote' ) );
+	$params->def( 'icons', 			$mainframe->getCfg( 'icons' ) );
+	$params->def( 'readmore', 		$mainframe->getCfg( 'readmore' ) );
 	// Other Params
-	$params->def( 'image', 1 );
-	$params->def( 'section', 0 );
-	$params->def( 'section_link', 0 );
-	$params->def( 'category', 0 );
-	$params->def( 'category_link', 0 );
-	$params->def( 'introtext', 1 );
-	$params->def( 'pageclass_sfx', '' );
-	$params->def( 'item_title', 1 );
-	$params->def( 'url', 1 );
+	$params->def( 'image', 			1 );
+	$params->def( 'section', 		0 );
+	$params->def( 'section_link', 	0 );
+	$params->def( 'category', 		0 );
+	$params->def( 'category_link', 	0 );
+	$params->def( 'introtext', 		1 );
+	$params->def( 'pageclass_sfx', 	'' );
+	$params->def( 'item_title', 	1 );
+	$params->def( 'url', 			1 );
 
 	// loads the link for Section name
 	if ( $params->get( 'section_link' ) ) {
-		$query = 	"SELECT a.id"
+		$query = "SELECT a.id"
 		. "\n FROM #__menu AS a"
 		. "\n WHERE a.componentid = ". $row->sectionid.""
 		;
 		$database->setQuery( $query );
 		$_Itemid = $database->loadResult();
-		$link = sefRelToAbs( 'index.php?option=com_content&amp;task=section&amp;id='. $row->sectionid .'&amp;Itemid='.$_Itemid );
-		$row->section = '<a href="'. $link .'">'. $row->section .'</a>';
+		
+		if ( $_Itemid ) {
+			$_Itemid = '&amp;Itemid='. $_Itemid;
+		}
+		
+		$link 			= sefRelToAbs( 'index.php?option=com_content&amp;task=section&amp;id='. $row->sectionid . $_Itemid );
+		$row->section 	= '<a href="'. $link .'">'. $row->section .'</a>';
 	}
 
 	// loads the link for Category name
 	if ( $params->get( 'category_link' ) ) {
-		$query = 	"SELECT a.id"
+		$query = "SELECT a.id"
 		. "\n FROM #__menu AS a"
 		. "\n WHERE a.componentid = $row->catid"
 		;
 		$database->setQuery( $query );
 		$_Itemid = $database->loadResult();
-		$link = sefRelToAbs( 'index.php?option=com_content&amp;task=category&amp;sectionid='. $row->sectionid .'&amp;id='. $row->catid .'&amp;Itemid='.$_Itemid );
-		$row->category = '<a href="'. $link .'">'. $row->category .'</a>';
+		
+		if ( $_Itemid ) {
+			$_Itemid = '&amp;Itemid='. $_Itemid;
+		}
+		
+		$link 			= sefRelToAbs( 'index.php?option=com_content&amp;task=category&amp;sectionid='. $row->sectionid .'&amp;id='. $row->catid . $_Itemid );
+		$row->category 	= '<a href="'. $link .'">'. $row->category .'</a>';
 	}
 
 	// loads current template for the pop-up window
@@ -1200,8 +1238,7 @@ function editItem( $uid, $gid, &$access, $sectionid=0, $task, $Itemid ){
 
 	// fail if checked out not by 'me'
 	if ($row->isCheckedOut( $my->id )) {
-		echo"<script>alert('The module [ ".$row->title." ] is currently being edited by another person.'); window.history.go(-1); </script>";
-		exit;
+		mosErrorAlert( "The module [ ".$row->title." ] is currently being edited by another person.");
 	}
 
 	if ( $uid ) {
@@ -1237,7 +1274,7 @@ function editItem( $uid, $gid, &$access, $sectionid=0, $task, $Itemid ){
 
 	if ( $uid ) {
 		$row->checkout( $my->id );
-		if (trim( $row->publish_down ) == "0000-00-00 00:00:00") {
+		if (trim( $row->publish_down ) == '0000-00-00 00:00:00') {
 			$row->publish_down = 'Never';
 		}
 		if (trim( $row->images )) {
@@ -1452,7 +1489,7 @@ function saveContent( &$access, $task ) {
 
 		case 'apply_new':
 			$Itemid = mosGetParam( $_POST, 'Returnid', $Itemid );
-			$link = 'index.php?option=com_content&task=edit&id='. $row->id.'&Itemid='. $Itemid;
+			$link 	= 'index.php?option=com_content&task=edit&id='. $row->id.'&Itemid='. $Itemid;
 			break;
 
 
@@ -1475,7 +1512,7 @@ function saveContent( &$access, $task ) {
 * @param database A database connector object
 */
 function cancelContent( &$access ) {
-	global $database, $my;
+	global $database, $my, $task;
 
 	$row = new mosContent( $database );
 	$row->bind( $_POST );
@@ -1490,12 +1527,12 @@ function cancelContent( &$access ) {
 	$parts 		= parse_url( $referer );
 	parse_str( $parts['query'], $query );
 
-	if ( $query['task'] == 'edit' ) {
+	if ( $task == 'edit' ) {
 		$Itemid  = mosGetParam( $_POST, 'Returnid', '' );
 		$referer = 'index.php?option=com_content&task=view&id='. $row->id.'&Itemid='. $Itemid;
 	}
 	
-	if ( $referer && !( $query['task'] == 'new' ) ) {
+	if ( $referer && !( $task == 'new' ) ) {
 		mosRedirect( $referer );
 	} else {
 		mosRedirect( 'index.php' );
@@ -1552,8 +1589,7 @@ function emailContentSend( $uid ) {
 	$subject = mosGetParam( $_POST, 'subject', $subject_default );
 
 	if ($uid < 1 || !$email || !$youremail || ( is_email( $email ) == false ) || (is_email( $youremail ) == false)) {
-		echo '<script>alert ("' . _EMAIL_ERR_NOINFO . '");window.history.go(-1);</script>';
-		exit(0);
+		mosErrorAlert( _EMAIL_ERR_NOINFO );
 	}
 
 	$query = "SELECT template"
@@ -1571,7 +1607,7 @@ function emailContentSend( $uid ) {
 	$msg = sprintf( _EMAIL_MSG, $mosConfig_sitename, $yourname, $youremail, $link );
 
 	// mail function
-	mosMail( $mosConfig_mailfrom, $mosConfig_fromname, $email, $subject, $msg );
+	mosMail( $youremail, $yourname, $email, $subject, $msg );
 
 	HTML_content::emailSent( $email, $template );
 }

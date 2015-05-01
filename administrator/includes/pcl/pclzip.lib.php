@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pclzip.lib.php 47 2005-09-15 02:55:27Z rhuk $
+* @version $Id: pclzip.lib.php 768 2005-10-31 10:32:18Z stingrey $
 * @package Joomla
 */
 
@@ -30,7 +30,7 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 //	The use of this software is at the risk of the user.
 //
 // --------------------------------------------------------------------------------
-// $Id: pclzip.lib.php 47 2005-09-15 02:55:27Z rhuk $
+// $Id: pclzip.lib.php 768 2005-10-31 10:32:18Z stingrey $
 // --------------------------------------------------------------------------------
 
   // ----- Constants
@@ -649,7 +649,7 @@ $v_options[PCLZIP_OPT_EXTRACT_AS_STRING] = FALSE;
 // ----- Look for arguments
 if ($v_size > 0) {
   // ----- Get the arguments
-  $v_arg_list = &func_get_args();
+  $v_arg_list = func_get_args();
 
   // ----- Look for first arg
   if ((is_integer($v_arg_list[0])) && ($v_arg_list[0] > 77000)) {

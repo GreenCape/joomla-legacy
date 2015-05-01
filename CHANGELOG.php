@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: CHANGELOG.php 532 2005-10-14 09:28:31Z stingrey $
+* @version $Id: CHANGELOG.php 1136 2005-11-20 21:29:00Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -31,6 +31,155 @@ Legend:
 - -> Removed
 ! -> Note
 
+---------------- 1.0.4 Released -- [21-Nov-2005 10:00 UTC] ------------------
+
+This Release Contains following Security Fixes
+
+Critical Level Threat
+ * Potentional XSS injection through GET and other variables
+ * Hardened SEF against XSS injection
+
+Low Level Threat
+ * Potential SQL injection in Polls modules through the Itemid variable
+ * Potential SQL injection in several methods in mosDBTable class
+ * Potential misuse of Media component file management functions
+ * Add search limit param (default of 50) to `Search` Mambots to prevent search flooding
+
+---
+
+20-Nov-2005 Levis Bisson
+ # Fixed Artifact artf1967 displays with an escaped apostrophe in both title and TOC.
+
+20-Nov-2005 Emir Sakic
+ * SECURITY: Hardened SEF against XSS injection
+
+19-Nov-2005 Levis Bisson
+ # replaced charset=utf-8 to charset=iso-8859-1 in language file
+
+19-Nov-2005 Andrew Eddie
+ * SECURITY: Fixed XSS injection of global variable through the _GET array
+
+17-Nov-2005 Johan Janssens
+ ^ Replaced install.png with new image
+ - Reverted artf2139 : admin menu xhtml
+ + Added clone function for PHP5 backwards compatibility
+
+16-Nov-2005 Rey Gigataras
+ # Fixed artf2137 : editorArea xhtml
+ # Fixed artf2139 : admin menu xhtml
+ # Fixed artf2136 : Admin menubar valid xhtml
+ # Fixed artf2135 : Admin invalid xhtml
+ # Fixed artf2140 : mosMenuBar::publishList
+ # Fixed artf2027 : uploading images from custom component
+
+13-Nov-2005 Rey Gigataras
+ # PERFORMANCE: Fixed artf1993 : Inefficient queries in com_content
+ # Fixed artf2021 : artf1791 : Failed Login results in redirect to referring page
+ # Fixed artf2021 : appendMetaTag() prepends instead of appends
+ # Fixed artf1981 : incorrect url's at next/previous links at content items
+ # Fixed artf2079 : SQL error in category manager thru contact manager
+ # Fixed artf1586 : .htaccess - RewriteEngine problem
+ # Fixed artf1976 : Check for custom icon in mod_quickicon.php
+
+11-Nov-2005 Andy Miller
+ # Fixed issue with RSS module not displaying inside module rendering wrapper
+
+10-Nov-2005 Rey Gigataras
+ # Fixed contact component dropdown select category bug
+
+07-Nov-2005 Rey Gigataras
+ # Fixed mod_quickicon `redeclaration of function` error possibilities
+
+07-Nov-2005 Johan Janssens
+ # Fixed  artf1648 : tinyMCE BR and P elements
+ # Fixed artf1700 : TinyMCE doesn't support relative URL's for images
+
+07-Nov-2005 Andrew Eddie
+ * SECURITY: Fixed artf1978 : mod_poll SQL Injection Vulnerability [ Low Level Security Bug ]
+ * SECURITY: Fixed SQL injection possibility in several mosDBTable methods [ Low Level Security Bug ]
+ * SECURITY: Fixed malicious injection into filename variables in com_media [ Low Level Security Bug ]
+ ^ mosDBTable::publish_array renamed to publish
+ ^ mosDBTable::save no longer updates the ordering (must now be done separately)
+
+06-Nov-2005 Rey Gigataras
+ * SECURITY: Add search limit param (default of 50) to `Search` Mambots to prevent search flooding [ Low Level Security Bug ]
+ # Fixed custom() & customX() functions in menu.html.php no checking for image in /administrator/images/
+
+04-Nov-2005 Rey Gigataras
+ # Fixed artf1953 : Page Class Suffix in Contacts component
+ # Fixed artf1945 : mosToolTip not generating valid xhtml
+
+03-Nov-2005 Rey Gigataras
+ + modduleclass_sfx support to mod_poll
+ # Fixed artf1902 : Incorrect number of table cells in mod_poll
+
+03-Nov-2005 Samuel Moffatt
+ # Fixed bug which prevented component uninstall if another XML file was in the directory
+
+01-Nov-2005 Rey Gigataras
+ # Fixed artf1888 : linkable [category|section] URL incorrect
+ # Fixed artf1620 : Hardcoded words in pdf.php
+ # Fixed artf1887 : Content: Bug in creation date generation
+
+31-Oct-2005 Johan Janssens
+ # Fixed artf1277 : News Feed Display Bad Accent character
+
+31-Oct-2005 Rey Gigataras
+ # Fixed artf1739 : Problem with the menuitem type url and assigned templates and modules
+ # Fixed artf1574 : Who is online after update to Joomla 1.0.3 no more work correctly
+ # Fixed artf1666 : Notice: on component installation
+ # Fixed artf1573 : Manage Banners | Error in Field Name
+ # Fixed artf1597 : Small bug in loadAssocList function in database.php
+ # Fixed artf1832 : Logout problem
+ # Fixed artf1769 : Undefined index: 2 in includes/joomla.php on line 2721
+ # Fixed artf1749 : Email-to-friend is NOT actually from friend
+ # Fixed artf1591 : page is expired at installation
+ # Fixed artf1851 : 1.0.2 copy content has error
+ # Fixed artf1569 : Display of mouseover in IE gives a problem with a dropdown-box
+ # Fixed artf1869 : Poll produces MySQL-Error when accessed via Component Link
+ # Fixed artf1694 : 1.0.3 undefined indexes filter_sectionid and catid on "Add New Content"
+ # Fixed artf1834 : English Localisation
+ # Fixed artf1771 : Wrong mosmsg
+ # Fixed artf1792 : "Receive Submission Emails" label is misleading
+ # Fixed artf1770 : Undefined index: HTTP_USER_AGENT
+
+30-Oct-2005 Rey Gigataras
+ ^ Upgraded TinyMCE Compressor [1.02]
+ ^ Upgraded TinyMCE [2.0 RC4]
+
+27-Oct-2005 Johan Janssens
+ # Fixed artf1671 : Media Manager
+ # Fixed artf1814 : Tab Class wrong
+ # Fixed artf1086 : Icons at the control panel fall apart
+
+26-Oct-2005 Samuel Moffatt
+ # Fixed bug where a new database object with the same username, password and host but different database name would kill Joomla!
+
+25-Oct-2005 Johan Janssens
+ # Fixed artf1733 : $contact->id used instead of $Itemid
+ # Fixed artf1654 : base url above title tag
+ # Fixed artf1738 : Registration - javascript alert
+
+23-Oct-2005 Rey Gigataras
+ # Fixed artf1695 : Show Empty Categories in Section does not work
+ # Fixed artf1710 : Unnecessary queries (optimization)
+ # Fixed artf1711 : Missing whitespace in search results
+ # Fixed artf1706 : Mambo logo not removed from admin images
+ # Fixed artf1708 : Search CMT: Hardcoded date format
+ # Fixed artf1689 : Joomla! Installer - Wording still not correct
+ # Fixed artf1692 : email and print buttons (maybe also the PDF) does not validate
+
+19-Oct-2005 Andrew Eddie
+ # Fixed missing autoclear in "list-item" stock template
+
+19-Oct-2005 Rey Gigataras
+ # Fixed artf1577 : MenuLink Blog section error
+
+19-Oct-2005 Levis Bisson
+  Applyed Feature Requests:
+^ Artifact artf1282 : Easier sorting of static content in creating menu links
+^ Artifact artf1162 : Remove hardcoding of <<, <, > and >> in pageNavigation.php
+
 ---------------- 1.0.3 Released -- [14-Oct-2005 10:00 UTC] ------------------
 
 Contains following Security Fixes
@@ -56,7 +205,7 @@ Low Level Threat
  # Fixed duplicated module creation in install
  # Fixed XHTML issue in rss feed module
  # Fixed XHTML issue in com_search
- # Fixed artf1550 : Properly SEFify com_registration links 
+ # Fixed artf1550 : Properly SEFify com_registration links
  # Fixed artf1533 : rhuk_solarflare_ii 2.2 active_menu
  # Fixed artf1354 : Can't create new user
  # Fixed artf1433 : Images in Templates
@@ -185,8 +334,8 @@ Low Level Threat
  # Fixed artf1188 : includes/vcard.class.php uses short open tags
 
 29-Sep-2005 Levis Bisson
-# Fixed artf1274 : Module display bug when using register/forgot password links
-# Fixed artf1238 : header("Location: $url")- some servers require an absolute URI
+ # Fixed artf1274 : Module display bug when using register/forgot password links
+ # Fixed artf1238 : header("Location: $url")- some servers require an absolute URI
 
 28-Sep-2005 Levis Bisson
  # Fixed artf1250 : Order is no use when many pages
@@ -480,9 +629,9 @@ Low Level Threat
 
 01-Sep-2005 Andrew Eddie
  + Added article_separator span after a content item
- ^ Hardened mosGetParam by using phpInputFilter for NO_HTML mode
+ ^ SECURITY: Hardened mosGetParam by using phpInputFilter for NO_HTML mode
  + Added new mosHash function to produce secure keys
- + Hardened Email to Friend form
+ + SECURITY: Hardened Email to Friend form
 
 31-Aug-2005 Andrew Eddie
  + Added setTemplateVars method to admin pageNavigation class
@@ -499,7 +648,7 @@ Low Level Threat
  ^ Convert 4xSpace to tab
 
 08-Aug-2005 Andrew Eddie
- * Fixed SQL injection bugs in user activation (thanks Enno Klasing) [ Medium Level Security Bug ]
+ * SECURITY: Fixed SQL injection bugs in user activation (thanks Enno Klasing) [ Medium Level Security Bug ]
  ^ Encased text files in PHP wrapper to help obsfucate version info
  # Changed admin session name to hash of live_site to allow you to log into more than one Joomla! on the same host
  # Fixed hardcoded (c) character in web installer files

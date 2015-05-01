@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.contact.html.php 294 2005-10-02 01:05:31Z Jinx $
+* @version $Id: admin.contact.html.php 1007 2005-11-13 17:45:15Z stingrey $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -81,7 +81,7 @@ class HTML_contact {
 
 			$checked 	= mosCommonHTML::CheckedOutProcessing( $row, $i );
 
-			$row->cat_link 	= 'index2.php?option=com_categories&section=com_contacts&task=editA&hidemainmenu=1&id='. $row->catid;
+			$row->cat_link 	= 'index2.php?option=com_categories&section=com_contact_details&task=editA&hidemainmenu=1&id='. $row->catid;
 			$row->user_link	= 'index2.php?option=com_users&task=editA&hidemainmenu=1&id='. $row->user_id;
 			?>
 			<tr class="<?php echo "row$k"; ?>">

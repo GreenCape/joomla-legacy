@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.languages.php 490 2005-10-13 03:21:14Z Jinx $
+* @version $Id: admin.languages.php 652 2005-10-25 22:23:27Z Jinx $
 * @package Joomla
 * @subpackage Languages
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -187,8 +187,7 @@ function removeLanguage( $cid, $option, $client = 'admin' ) {
 	$cur_language = $mosConfig_lang;
 
 	if ($cur_language == $cid) {
-		echo "<script>alert(\"You can not delete language in use.\"); window.history.go(-1); </script>\n";
-		exit();
+		mosErrorAlert( "You can not delete language in use." );
 	}
 
 	/*$lang_path = "../language/$cid.php";

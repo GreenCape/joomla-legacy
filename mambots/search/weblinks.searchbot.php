@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: weblinks.searchbot.php 242 2005-09-28 11:05:13Z jick $
+* @version $Id: weblinks.searchbot.php 890 2005-11-06 15:56:30Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -27,7 +27,22 @@ $_MAMBOTS->registerFunction( 'onSearch', 'botSearchWeblinks' );
 */
 function botSearchWeblinks( $text, $phrase='', $ordering='' ) {
 	global $database, $my;
-
+	
+	// load mambot params info
+	$query = "SELECT id"
+	. "\n FROM #__mambots"
+	. "\n WHERE element = 'weblinks.searchbot'"
+	. "\n AND folder = 'search'"
+	;
+	$database->setQuery( $query );
+	$id 	= $database->loadResult();
+	$mambot = new mosMambot( $database );
+	$mambot->load( $id );
+	$botParams = new mosParameters( $mambot->params );
+	
+	$limit = $botParams->def( 'search_limit', 50 );
+	$limit = "\n LIMIT $limit";	
+	
 	$text = trim( $text );
 	if ($text == '') {
 		return array();
@@ -94,9 +109,11 @@ function botSearchWeblinks( $text, $phrase='', $ordering='' ) {
 	. "\n WHERE ($where)"
 	. "\n AND a.published = 1"
 	. "\n ORDER BY $order"
+	. $limit
 	;
 	$database->setQuery( $query );
 	$rows = $database->loadObjectList();
+	
 	return $rows;
 }
 ?>

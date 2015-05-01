@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.typedcontent.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: admin.typedcontent.php 652 2005-10-25 22:23:27Z Jinx $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -209,8 +209,7 @@ function edit( $uid, $option ) {
 
 		// fail if checked out not by 'me'
 		if ($row->isCheckedOut( $my->id )) {
-			echo "<script>alert('The module $row->title is currently being edited by another administrator'); document.location.href='index2.php?option=$option'</script>\n";
-			exit(0);
+			mosErrorAlert( "The module ".$row->title." is currently being edited by another administrator" );
 		}
 
 		$row->checkout( $my->id );

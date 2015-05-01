@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.users.html.php 197 2005-09-20 11:13:25Z stingrey $
+* @version $Id: admin.users.html.php 736 2005-10-31 03:35:38Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -270,7 +270,7 @@ class HTML_users {
 					?>
 					<tr>
 						<td>
-						Receive Submission Emails
+						Receive System Emails
 						</td>
 						<td>
 						<?php echo $lists['sendEmail']; ?>

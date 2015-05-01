@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: registration.php 147 2005-09-17 20:59:30Z Levis $
+* @version $Id: registration.php 652 2005-10-25 22:23:27Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -117,8 +117,7 @@ function saveRegistration( $option ) {
 	$row = new mosUser( $database );
 
 	if (!$row->bind( $_POST, 'usertype' )) {
-		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
-		exit();
+		mosErrorAlert( $row->getError() );
 	}
 
 	mosMakeHtmlSafe($row);

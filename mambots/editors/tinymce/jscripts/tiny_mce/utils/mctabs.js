@@ -1,6 +1,6 @@
 /**
  * $RCSfile: mctabs.js,v $
- * $Revision: 47 $
+ * $Revision: 1.1 $
  * $Date: 2005/08/01 18:36:35 $
  *
  * Moxiecode DHTML Tabs script.

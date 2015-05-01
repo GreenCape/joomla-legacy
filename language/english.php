@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: english.php 263 2005-09-30 03:14:29Z Levis $
+* @version $Id: english.php 1126 2005-11-19 17:24:13Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -110,12 +110,12 @@ DEFINE('_NOT_EXIST','The page you are trying to access does not exist.<br />Plea
 DEFINE('_BUTTON_VOTE','Vote');
 DEFINE('_BUTTON_RESULTS','Results');
 DEFINE('_USERNAME','Username');
-DEFINE('_LOST_PASSWORD','Forgotten your password?');
+DEFINE('_LOST_PASSWORD','Lost Password?');
 DEFINE('_PASSWORD','Password');
 DEFINE('_BUTTON_LOGIN','Login');
 DEFINE('_BUTTON_LOGOUT','Logout');
 DEFINE('_NO_ACCOUNT','No account yet?');
-DEFINE('_CREATE_ACCOUNT','Create one');
+DEFINE('_CREATE_ACCOUNT','Register');
 DEFINE('_VOTE_POOR','Poor');
 DEFINE('_VOTE_BEST','Best');
 DEFINE('_USER_RATING','User Rating');
@@ -159,6 +159,8 @@ DEFINE('_CONTACT_DOWNLOAD_AS','Download information as a');
 DEFINE('_VCARD','VCard');
 
 /** pageNavigation */
+DEFINE('_PN_LT','&lt;');
+DEFINE('_PN_RT','&gt;');
 DEFINE('_PN_PAGE','Page');
 DEFINE('_PN_OF','of');
 DEFINE('_PN_START','Start');
@@ -384,9 +386,17 @@ DEFINE('_SEARCH_OLDEST','Oldest first');
 DEFINE('_SEARCH_POPULAR','Most popular');
 DEFINE('_SEARCH_ALPHABETICAL','Alphabetical');
 DEFINE('_SEARCH_CATEGORY','Section/Category');
+DEFINE('_SEARCH_MESSAGE','Search term must be a minimum of 3 characters and a maximum of 20 characters');
+DEFINE('_SEARCH_ARCHIVED','Archived');
+DEFINE('_SEARCH_CATBLOG','Category Blog');
+DEFINE('_SEARCH_CATLIST','Category List');
+DEFINE('_SEARCH_NEWSFEEDS','Newsfeeds');
+DEFINE('_SEARCH_SECLIST','Section List');
+DEFINE('_SEARCH_SECBLOG','Section Blog');
+
 
 /** templates/*.php */
-DEFINE('_ISO','charset=utf-8');
+DEFINE('_ISO','charset=iso-8859-1');
 DEFINE('_DATE_FORMAT','l, F d Y');  //Uses PHP's DATE Command Format - Depreciated
 /**
 * Modify this line to reflect how you want the date to appear in your site
@@ -521,4 +531,8 @@ DEFINE('_MASSMAIL_MESSAGE', "This is an email from '%s'
 Message:
 " );
 
+
+/** includes/pdf.php */
+DEFINE('_PDF_GENERATED','Generated:');
+DEFINE('_PDF_POWERED','Powered by Joomla!');
 ?>

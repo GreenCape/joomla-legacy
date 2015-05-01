@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: newsfeeds.searchbot.php 92 2005-09-16 03:37:11Z stingrey $
+* @version $Id: newsfeeds.searchbot.php 890 2005-11-06 15:56:30Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -27,7 +27,22 @@ $_MAMBOTS->registerFunction( 'onSearch', 'botSearchNewsfeedslinks' );
 */
 function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 	global $database, $my;
-
+	
+	// load mambot params info
+	$query = "SELECT id"
+	. "\n FROM #__mambots"
+	. "\n WHERE element = 'newsfeeds.searchbot'"
+	. "\n AND folder = 'search'"
+	;
+	$database->setQuery( $query );
+	$id 	= $database->loadResult();
+	$mambot = new mosMambot( $database );
+	$mambot->load( $id );
+	$botParams = new mosParameters( $mambot->params );
+	
+	$limit = $botParams->def( 'search_limit', 50 );
+	$limit = "\n LIMIT $limit";	
+	
 	$text = trim( $text );
 	if ($text == '') {
 		return array();
@@ -41,6 +56,7 @@ function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 			$wheres2[] = "LOWER(a.link) LIKE '%$text%'";
 			$where = '(' . implode( ') OR (', $wheres2 ) . ')';
 			break;
+			
 		case 'all':
 		case 'any':
 		default:
@@ -76,7 +92,7 @@ function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 	$query = "SELECT a.name AS title,"
 	. "\n '' AS created,"
 	. "\n a.link AS text,"
-	. "\n CONCAT_WS( ' / ','Newsfeeds', b.title )AS section,"
+	. "\n CONCAT_WS( ' / ','". _SEARCH_NEWSFEEDS ."', b.title )AS section,"
 	. "\n CONCAT( 'index.php?option=com_newsfeeds&task=view&feedid=', a.id ) AS href,"
 	. "\n '1' AS browsernav"
 	. "\n FROM #__newsfeeds AS a"
@@ -84,9 +100,11 @@ function botSearchNewsfeedslinks( $text, $phrase='', $ordering='' ) {
 	. "\n WHERE ( $where )"
 	. "\n AND a.published = 1"
 	. "\n ORDER BY $order"
+	. $limit
 	;
 	$database->setQuery( $query );
 	$rows = $database->loadObjectList();
+	
 	return $rows;
 }
 ?>

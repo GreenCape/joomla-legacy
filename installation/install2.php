@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install2.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: install2.php 749 2005-10-31 06:25:03Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -118,8 +118,8 @@ function db_err($step, $alert) {
 	<input type=\"hidden\" name=\"DBDel\" value=\"$DBDel\">
 	<input type=\"hidden\" name=\"DBname\" value=\"$DBname\">
 	</form>\n";
-	//echo "<script>alert(\"$alert\"); document.$step.submit();</script>";
-	echo "<script>alert(\"$alert\"); window.history.go(-1);</script>";  //this wasn't working
+	//echo "<script>alert(\"$alert\"); window.history.go(-1);</script>";
+	echo "<script>alert(\"$alert\"); document.location.href='install1.php';</script>";  
 	exit();
 }
 

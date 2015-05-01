@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.categories.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: admin.categories.php 555 2005-10-19 12:04:23Z eddieajau $
 * @package Joomla
 * @subpackage Categories
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -263,7 +263,7 @@ function editCategory( $uid=0, $section='' ) {
 	;
 	$database->setQuery( $query );
 	$sections = $database->loadResult();
-	if (!$sections && $type!="other") {
+	if (!$sections && $type != 'other') {
 		echo "<script> alert('You need to have at least one Section before you can create a Category'); window.history.go(-1); </script>\n";
 		exit();
 	}	

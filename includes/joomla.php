@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.php 469 2005-10-12 17:23:21Z Jinx $
+* @version $Id: joomla.php 1124 2005-11-19 05:54:21Z eddieajau $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -51,19 +51,13 @@ class mosProfiler {
 }
 
 if (phpversion() < '4.2.0') {
-	require_once( $mosConfig_absolute_path . '/includes/compat.php41x.php' );
+	require_once( dirname( __FILE__ ) . '/compat.php41x.php' );
 }
 if (phpversion() < '4.3.0') {
-	require_once( $mosConfig_absolute_path . '/includes/compat.php42x.php' );
-}
-if (in_array( 'globals', array_keys( array_change_key_case( $_REQUEST, CASE_LOWER ) ) ) ) {
-	die( 'Fatal error.  Global variable hack attempted.' );
-}
-if (in_array( '_post', array_keys( array_change_key_case( $_REQUEST, CASE_LOWER ) ) ) ) {
-	die( 'Fatal error.  Post variable hack attempted.' );
+	require_once( dirname( __FILE__ ) . '/compat.php42x.php' );
 }
 if (version_compare( phpversion(), '5.0' ) < 0) {
-	require_once( $mosConfig_absolute_path . '/includes/compat.php50x.php' );
+	require_once( dirname( __FILE__ ) . '/compat.php50x.php' );
 }
 
 @set_magic_quotes_runtime( 0 );
@@ -308,7 +302,7 @@ class mosAbstractTasker {
 	 * @return null
 	 */
 	function notAllowed( $name ) {
-		echo $GLOBALS['_LANG']->_( 'NOT_AUTH' );
+		echo _NOT_AUTH;
 
 		return null;
 	}
@@ -399,6 +393,74 @@ class mosMainFrame {
 		//set the admin check
 		$this->_isAdmin 		= (boolean) $isAdmin;
 	}
+
+	/**
+	 * Gets the id number for a client
+	 * @param mixed A client identifier
+	 */
+	function getClientID( $client ) {
+		switch ($client) {
+			case '2':
+			case 'installation':
+				return 2;
+				break;
+
+			case '1':
+			case 'admin':
+			case 'administrator':
+				return 1;
+				break;
+
+			case '0':
+			case 'site':
+			case 'front':
+			default:
+				return 0;
+				break;
+		}
+	}
+
+	/**
+	 * Gets the client name
+	 * @param int The client identifier
+	 * @return strint The text name of the client
+	 */
+	function getClientName( $client_id ) {
+		 // do not translate
+		$clients = array( 'site', 'admin', 'installer' );
+		return mosGetParam( $clients, $client_id, 'unknown' );
+	}
+
+	/**
+	 * Gets the base path for the client
+	 * @param mixed A client identifier
+	 * @param boolean True (default) to add traling slash
+	 */
+	function getBasePath( $client=0, $addTrailingSlash=true ) {
+		global $mosConfig_absolute_path;
+
+		switch ($client) {
+			case '0':
+			case 'site':
+			case 'front':
+			default:
+				return JFile::getNativePath( $mosConfig_absolute_path, $addTrailingSlash );
+				break;
+
+			case '2':
+			case 'installation':
+				return JFile::getNativePath( $mosConfig_absolute_path . '/installation', $addTrailingSlash );
+				break;
+
+			case '1':
+			case 'admin':
+			case 'administrator':
+				return JFile::getNativePath( $mosConfig_absolute_path . '/administrator', $addTrailingSlash );
+				break;
+
+		}
+	}
+
 	/**
 	* @param string
 	*/
@@ -621,8 +683,7 @@ class mosMainFrame {
 			$row = null;
 			if ($this->_db->loadObject( $row )) {
 				if ($row->block == 1) {
-					echo "<script>alert(\""._LOGIN_BLOCKED."\"); window.history.go(-1); </script>\n";
-					exit();
+					mosErrorAlert(_LOGIN_BLOCKED);
 				}
 				// fudge the group stuff
 				$grp = $acl->getAroGroup( $row->id );
@@ -663,7 +724,7 @@ class mosMainFrame {
 				mosCache::cleanCache();
 			} else {
 				if (isset($bypost)) {
-					echo "<script>alert(\""._LOGIN_INCORRECT."\"); window.history.go(-1); </script>\n";
+					mosErrorAlert(_LOGIN_INCORRECT);
 				} else {
 					$this->logout();
 					mosRedirect("index.php");
@@ -740,7 +801,9 @@ class mosMainFrame {
 	function _setTemplate( $isAdmin=false ) {
 		global $Itemid;
 		$mosConfig_absolute_path = $this->getCfg( 'absolute_path' );
-
+/*
+Unneeded Query
+http://developer.joomla.org/sf/go/artf1710?nav=1
 		// Default template
 		$query = "SELECT template"
 		. "\n FROM #__templates_menu"
@@ -761,7 +824,7 @@ class mosMainFrame {
 			$this->_db->setQuery( $query );
 			$cur_template = $this->_db->loadResult() ? $this->_db->loadResult() : $cur_template;
 		}
-
+*/
 		if ($isAdmin) {
 			$query = "SELECT template"
 			. "\n FROM #__templates_menu"
@@ -775,9 +838,21 @@ class mosMainFrame {
 				$cur_template = 'joomla_admin';
 			}
 		} else {
+			$assigned = ( !empty( $Itemid ) ? " OR menuid = $Itemid" : '' );
+			
+			$query = "SELECT template"
+			. "\n FROM #__templates_menu"
+			. "\n WHERE client_id = 0"
+			. "\n AND ( menuid = 0 $assigned )"
+			. "\n ORDER BY menuid DESC"
+			. "\n LIMIT 1"
+			;
+			$this->_db->setQuery( $query );
+			$cur_template = $this->_db->loadResult();
+			
 			// TemplateChooser Start
-			$jos_user_template = mosGetParam( $_COOKIE, 'jos_user_template', '' );
-			$jos_change_template = mosGetParam( $_REQUEST, 'jos_change_template', $jos_user_template );
+			$jos_user_template 		= mosGetParam( $_COOKIE, 'jos_user_template', '' );
+			$jos_change_template 	= mosGetParam( $_REQUEST, 'jos_change_template', $jos_user_template );
 			if ($jos_change_template) {
 				// check that template exists in case it was deleted
 				if (file_exists( $mosConfig_absolute_path .'/templates/'. $jos_change_template .'/index.php' )) {
@@ -953,7 +1028,12 @@ class mosMainFrame {
 				$agent = getenv( "HTTP_USER_AGENT" );
 				$domain = gethostbyaddr( getenv( "REMOTE_ADDR" ) );
 			} else {
-				$agent = $_SERVER['HTTP_USER_AGENT'];
+				if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
+					$agent = $_SERVER['HTTP_USER_AGENT'];
+				} else {
+					$agent = 'Unknown';
+				}
+				
 				$domain = gethostbyaddr( $_SERVER['REMOTE_ADDR'] );
 			}
 
@@ -1609,7 +1689,7 @@ class mosHTML {
 
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'icons' ) ) {
-				$image = mosAdminMenus::ImageCheck( 'printButton.png', '/images/M_images/', NULL, NULL, _CMN_PRINT );
+				$image = mosAdminMenus::ImageCheck( 'printButton.png', '/images/M_images/', NULL, NULL, _CMN_PRINT, _CMN_PRINT );
 			} else {
 				$image = _ICON_SEP .'&nbsp;'. _CMN_PRINT. '&nbsp;'. _ICON_SEP;
 			}
@@ -1627,7 +1707,7 @@ class mosHTML {
 				// Print Button - used in pop-up window
 				?>
 				<td align="right" width="100%" class="buttonheading">
-				<a href="javascript:void window.open('<?php echo $link; ?>', 'win2', '<?php echo $status; ?>');" title="<?php echo _CMN_PRINT;?>">
+				<a href="#" onclick="window.open('<?php echo $link; ?>','win2','<?php echo $status; ?>');" title="<?php echo _CMN_PRINT;?>">
 				<?php echo $image;?>
 				</a>
 				</td>
@@ -1753,6 +1833,7 @@ class mosCategory extends mosDBTable {
 			$this->_error = "Your Category must have a name.";
 			return false;
 		}
+
 		// check for existing name
 		$query = "SELECT id"
 		. "\n FROM #__categories "
@@ -2425,6 +2506,28 @@ function mosRedirect( $url, $msg='' ) {
 	exit();
 }
 
+function mosErrorAlert( $text, $action='window.history.go(-1);', $mode=1 ) {
+	$text = nl2br( $text );
+	$text = addslashes( $text );
+	$text = strip_tags( $text );
+
+	switch ( $mode ) {
+		case 2:
+			echo "<script>$action</script> \n";
+			break;
+
+		case 1:
+		default:
+			echo "<script>alert('$text'); $action</script> \n";
+			//echo '<noscript>';
+			//mosRedirect( @$_SERVER['HTTP_REFERER'], $text );
+			//echo '</noscript>';
+			break;
+	}
+
+	exit;
+}
+
 function mosTreeRecurse( $id, $indent, $list, &$children, $maxlevel=9999, $level=0, $type=1 ) {
 	if (@$children[$id] && $level <= $maxlevel) {
 		foreach ($children[$id] as $v) {
@@ -2714,7 +2817,7 @@ function mosGetBrowser( $agent ) {
 	&& !preg_match( "/galeon/i", $agent )
 	&& !preg_match( "/safari/i", $agent )) {
 		// Netscape 3.x, 4.x ...
-		return "Netscape $m[2]";
+		return "Netscape $m[1]";
 	} else {
 		// Other
 		$found = false;
@@ -2896,18 +2999,22 @@ function mosToolTip( $tooltip, $title='', $width='', $image='tooltip.png', $text
 	}
 	if ( !$text ) {
 		$image 	= $mosConfig_live_site . '/includes/js/ThemeOffice/'. $image;
-		$text 	= '<img src="'. $image .'" border="0" />';
+		$text 	= '<img src="'. $image .'" border="0" alt="tooltip"/>';
 	}
 	$style = 'style="text-decoration: none; color: #333;"';
 	if ( $href ) {
 		$style = '';
+	} else{ 
+		$href = '#'; 
 	}
-	else{ $href = "#"; }
 
+	$mousover = 'return overlib(\''. $tooltip .'\''. $title .', BELOW, RIGHT'. $width .');';
+	
+	$tip = "<!-- Tooltip -->\n";
 	if ( $link ) {
-		$tip = "<a href=\"". $href ."\" onMouseOver=\"return overlib('" . $tooltip . "'". $title .", BELOW, RIGHT". $width .");\" onmouseout=\"return nd();\" ". $style .">". $text ."</a>";
+		$tip .= '<a href="'. $href .'" onmouseover="'. $mousover .'" onmouseout="return nd();" '. $style .'>'. $text .'</a>';
 	} else {
-		$tip = "<span onMouseOver=\"return overlib('" . $tooltip . "'". $title .", BELOW, RIGHT". $width .");\" onmouseout=\"return nd();\" ". $style .">". $text ."</span>";
+		$tip .= '<span onmouseover="" onmouseout="return nd();" '. $style .'>'. $text .'</span>';
 	}
 
 	return $tip;
@@ -2921,7 +3028,13 @@ function mosToolTip( $tooltip, $title='', $width='', $image='tooltip.png', $text
 */
 function mosWarning($warning, $title='Joomla! Warning') {
 	global $mosConfig_live_site;
-	$tip = "<a href=\"#\" onMouseOver=\"return overlib('" . $warning . "', CAPTION, '$title', BELOW, RIGHT);\" onmouseout=\"return nd();\"><img src=\"" . $mosConfig_live_site . "/includes/js/ThemeOffice/warning.png\" border=\"0\" /></a>";
+	
+	$mouseover 	= 'return overlib(\''. $warning .'\', CAPTION, \'$title\', BELOW, RIGHT);';
+	
+	$tip 		= "<!-- Warning -->\n";
+	$tip 		.= '<a href="#" onmouseover="'. $mouseover .'" onmouseout="return nd();">';
+	$tip 		.= '<img src="'. $mosConfig_live_site .'/includes/js/ThemeOffice/warning.png" border="0"  alt="warning"/></a>';
+	
 	return $tip;
 }
 
@@ -3329,7 +3442,6 @@ class mosMambotHandler {
 /**
 * Tab Creation handler
 * @package Joomla
-* @author Phil Taylor
 */
 class mosTabs {
 	/** @var int Use cookies */
@@ -3340,10 +3452,17 @@ class mosTabs {
 	* Includes files needed for displaying tabs and sets cookie options
 	* @param int useCookies, if set to 1 cookie will hold last used tab between page refreshes
 	*/
-	function mosTabs($useCookies) {
-		global $mosConfig_live_site;
-		echo "<link id=\"luna-tab-style-sheet\" type=\"text/css\" rel=\"stylesheet\" href=\"" . $mosConfig_live_site. "/includes/js/tabs/tabpane.css\" />";
+	function mosTabs( $useCookies, $xhtml=NULL ) {
+		global $mosConfig_live_site, $mainframe;
+		
+		if ( $xhtml ) {
+			$mainframe->addCustomHeadTag( '<link rel="stylesheet" type="text/css" media="all" href="includes/js/tabs/tabpane.css" id="luna-tab-style-sheet" />' );	
+		} else {
+			echo "<link id=\"luna-tab-style-sheet\" type=\"text/css\" rel=\"stylesheet\" href=\"" . $mosConfig_live_site. "/includes/js/tabs/tabpane.css\" />";
+		}
+		
 		echo "<script type=\"text/javascript\" src=\"". $mosConfig_live_site . "/includes/js/tabs/tabpane_mini.js\"></script>";
+		
 		$this->useCookies = $useCookies;
 	}
 
@@ -3522,11 +3641,18 @@ class mosAdminMenus {
 
 		// get a list of the menu items
 		$query = "SELECT m.*"
-		. "\n FROM #__menu m"
-		. "\n WHERE type != 'url'"
-		. "\n AND type != 'separator'"
-		. "\n AND published = 1"
-		. "\n ORDER BY menutype, parent, ordering"
+		. "\n FROM #__menu AS m"
+//		. "\n WHERE type != 'url'"
+//		. "\n AND type != 'separator'"
+// Change adds Itemid support for Link - Urls without `index.php` or `Itemid=` in their url
+		. "\n WHERE m.type != 'separator'"
+		. "\n AND NOT ("
+			. "\n ( m.type = 'url' )" 
+			. "\n AND ( m.link LIKE '%index.php%' )"
+			. "\n AND ( m.link LIKE '%Itemid=%' )"
+		. "\n )"
+		. "\n AND m.published = 1"
+		. "\n ORDER BY m.menutype, m.parent, m.ordering"
 		;
 		$database->setQuery( $query );
 		$mitems = $database->loadObjectList();
@@ -4341,7 +4467,8 @@ class mosCommonHTML {
 		if ( !$mainframe->get( 'loadOverlib' ) ) {
 		// check if this function is already loaded
 			?>
-			<script language="Javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/overlib_mini.js"></script>
+			<script language="javascript" type="text/javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/overlib_mini.js"></script>
+			<script language="javascript" type="text/javascript" src="<?php echo $mosConfig_live_site;?>/includes/js/overlib_hideform_mini.js"></script>
 			<div id="overDiv" style="position:absolute; visibility:hidden; z-index:10000;"></div>
 			<?php
 			// change state so it isnt loaded a second time
@@ -4507,6 +4634,9 @@ function mosPrepareSearchContent( $text, $length=200, $searchword ) {
 	$text = preg_replace( "'<script[^>]*>.*?</script>'si", "", $text );
 	$text = preg_replace( '/{.+?}/', '', $text);
 	//$text = preg_replace( '/<a\s+.*?href="([^"]+)"[^>]*>([^<]+)<\/a>/is','\2', $text );
+	// replace line breaking tags with whitespace
+	$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
+
 	return mosSmartSubstr( strip_tags( $text ), $length, $searchword );
 }
 

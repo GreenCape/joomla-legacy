@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: admin.content.php 782 2005-11-01 12:09:01Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -454,10 +454,10 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		$and = "\n AND componentid = $row->id";
 		$menus = mosAdminMenus::Links2Menu( 'content_item_link', $and );
 	} else {
-		if ( !$sectionid && $_POST['filter_sectionid'] ) {
+		if ( !$sectionid && @$_POST['filter_sectionid'] ) {
 			$sectionid = $_POST['filter_sectionid'];
 		}
-		if ( $_POST['catid'] ) {
+		if ( @$_POST['catid'] ) {
 			$row->catid 	= $_POST['catid'];
 			$category = new mosCategory( $database );
 			$category->load( $_POST['catid'] );
@@ -594,13 +594,11 @@ function saveContent( $sectionid, $task ) {
 
 	$isNew = ( $row->id < 1 );
 	if ($isNew) {
-		//$row->created		= $row->created ? $row->created : date( 'Y-m-d H:i:s' );
-		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset * 60 * 60 ) : date( 'Y-m-d H:i:s' );
+		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
 		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	} else {
 		$row->modified 		= date( 'Y-m-d H:i:s' );
 		$row->modified_by 	= $my->id;
-		//$row->created 	= $row->created ? $row->created : date( 'Y-m-d H:i:s' );
 		$row->created 		= $row->created ? mosFormatDate( $row->created, '%Y-%m-%d %H:%M:%S', -$mosConfig_offset ) : date( 'Y-m-d H:i:s' );
 		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	}
@@ -721,7 +719,7 @@ function saveContent( $sectionid, $task ) {
 * @param string The name of the current user
 */
 function changeContent( $cid=null, $state=0, $option ) {
-	global $database, $my;
+	global $database, $my, $task;
 
 	if (count( $cid ) < 1) {
 		$action = $state == 1 ? 'publish' : ($state == -1 ? 'archive' : 'unpublish');
@@ -747,23 +745,34 @@ function changeContent( $cid=null, $state=0, $option ) {
 		$row->checkin( $cid[0] );
 	}
 
-	if ( $state == "-1" ) {
-		$msg = $total ." Item(s) successfully Archived";
-	} else if ( $state == "1" ) {
-		$msg = $total ." Item(s) successfully Published";
-	} else if ( $state == "0" ) {
-		$msg = $total ." Item(s) successfully Unpublished";
+	switch ( $state ) {
+		case -1:				
+			$msg = $total .' Item(s) successfully Archived';
+			break;
+		
+		case 1:				
+			$msg = $total .' Item(s) successfully Published';
+			break;
+			
+		case 0:				
+		default:
+			if ( $task == 'unarchive' ) {
+				$msg = $total .' Item(s) successfully Unarchived';
+			} else {
+				$msg = $total .' Item(s) successfully Unpublished';
+			}
+			break;
 	}
 
-	$redirect = mosGetParam( $_POST, 'redirect', $row->sectionid );
-	$task = mosGetParam( $_POST, 'returntask', '' );
-	if ( $task ) {
-		$task = '&task='. $task;
+	$redirect 	= mosGetParam( $_POST, 'redirect', $row->sectionid );
+	$rtask 		= mosGetParam( $_POST, 'returntask', '' );
+	if ( $rtask ) {
+		$rtask = '&task='. $rtask;
 	} else {
-		$task = '';
+		$rtask = '';
 	}
 
-	mosRedirect( 'index2.php?option='. $option . $task .'&sectionid='. $redirect .'&mosmsg='. $msg );
+	mosRedirect( 'index2.php?option='. $option . $rtask .'&sectionid='. $redirect .'&mosmsg='. $msg );
 }
 
 /**
@@ -1069,8 +1078,6 @@ function copyItemSave( $cid, $sectionid, $option ) {
 		$row->modified_by 		= $item[0]->modified_by;
 		$row->checked_out 		= $item[0]->checked_out;
 		$row->checked_out_time 	= $item[0]->checked_out_time;
-		$row->frontpage_up 		= $item[0]->frontpage_up;
-		$row->frontpage_down 	= $item[0]->frontpage_down;
 		$row->publish_up 		= $item[0]->publish_up;
 		$row->publish_down 		= $item[0]->publish_down;
 		$row->images 			= $item[0]->images;

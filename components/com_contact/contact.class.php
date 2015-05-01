@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.class.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: contact.class.php 1004 2005-11-13 17:18:18Z stingrey $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -98,12 +98,22 @@ class MambovCard extends vCard {
 	// needed to fix bug in vcard class
 	function setAddress( $postoffice='', $extended='', $street='', $city='', $region='', $zip='', $country='', $type='HOME;POSTAL' ) {
 		// $type may be DOM | INTL | POSTAL | PARCEL | HOME | WORK or any combination of these: e.g. "WORK;PARCEL;POSTAL"
-		$key 	= 'ADR';
+		$separator 	= ';';
+		
+		$key 		= 'ADR';
 		if ( $type != '' ) {
-			$key	.= ';'. $type;
+			$key	.= $separator . $type;
 		}
 		$key.= ';ENCODING=QUOTED-PRINTABLE';
-		$this->properties[$key] = encode( $extended ) .';'. encode( $street ) .';'. encode( $city ) .';'. encode( $region) .';'. encode( $zip ) .';'. encode( $country );
+		
+		$return = encode( $extended );
+		$return .= $separator . encode( $street );
+		$return .= $separator . encode( $city );
+		$return .= $separator . encode( $region);
+		$return .= $separator . encode( $zip );
+		$return .= $separator . encode( $country );
+		
+		$this->properties[$key] = $return;
 	}
 
 	// added ability to set filename
@@ -114,24 +124,34 @@ class MambovCard extends vCard {
 	// added ability to set position/title
 	function setTitle( $title ) {
 		$title 	= trim( $title );
+		
 		$this->properties['TITLE'] 	= $title;
 	}
 
 	// added ability to set organisation/company
 	function setOrg( $org ) {
 		$org 	= trim( $org );
-		$this->properties['ORG'] 	= $org;
+		
+		$this->properties['ORG'] = $org;
 	}
 
 	function getVCard( $sitename ) {
-		$text 	= "BEGIN:VCARD\r\n";
-		$text 	.= "VERSION:2.1\r\n";
+		$text 	= 'BEGIN:VCARD';
+		$text	.= "\r\n";
+		$text 	.= 'VERSION:2.1';
+		$text	.= "\r\n";
+
 		foreach( $this->properties as $key => $value ) {
-			$text	.= "$key:$value\r\n";
+			$text	.= "$key:$value";
+			$text	.= "\r\n";
 		}
-		$text	.= "REV:" .date( 'Y-m-d' ) ."T". date( 'H:i:s' ). "Z\r\n";
-		$text	.= "MAILER: Joomla! vCard for ". $sitename ."\r\n";
-		$text	.= "END:VCARD\r\n";
+		$text	.= 'REV:'. date( 'Y-m-d' ) .'T'. date( 'H:i:s' ). 'Z';
+		$text	.= "\r\n";
+		$text	.= 'MAILER: Joomla! vCard for '. $sitename;
+		$text	.= "\r\n";
+		$text	.= 'END:VCARD';
+		$text	.= "\r\n";
+
 		return $text;
 	}
 }

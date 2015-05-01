@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: contact.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: contact.php 1002 2005-11-13 16:32:29Z stingrey $
 * @package Joomla
 * @subpackage Contact
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -179,7 +179,7 @@ function listContacts( $option, $catid ) {
 function contactpage( $contact_id ) {
 	global $mainframe, $database, $my, $Itemid;
 
-	$query = "SELECT a.id AS value, CONCAT_WS( ' - ', a.name, a.con_position ) AS text"
+	$query = "SELECT a.id AS value, CONCAT_WS( ' - ', a.name, a.con_position ) AS text, a.catid"
 	. "\n FROM #__contact_details AS a"
 	. "\n LEFT JOIN #__categories AS cc ON cc.id = a.catid"
 	. "\n WHERE a.published = 1"
@@ -189,12 +189,12 @@ function contactpage( $contact_id ) {
 	. "\n ORDER BY a.default_con DESC, a.ordering ASC"
 	;
 	$database->setQuery( $query );
-	$list = $database->loadObjectList();
+	$checks = $database->loadObjectList();
 
-	$count = count( $list );
+	$count = count( $checks );
 	if ($count) {
 		if ($contact_id < 1) {
-			$contact_id = $list[0]->value;
+			$contact_id = $checks[0]->value;
 		}
 
 		$query = "SELECT *"
@@ -211,6 +211,13 @@ function contactpage( $contact_id ) {
 			return;
 		}
 		$contact = $contacts[0];
+		
+		$list = array();
+		foreach ( $checks as $check ) {
+			if ( $check->catid == $contact->catid ) {
+				$list[] = $check;
+			}
+		}		
 		// creates dropdown select list
 		$contact->select = mosHTML::selectList( $list, 'contact_id', 'class="inputbox" onchange="ViewCrossReference(this);"', 'value', 'text', $contact_id );
 
@@ -285,7 +292,7 @@ function contactpage( $contact_id ) {
 				$params->set( 'marker_telephone', _CONTACT_TELEPHONE );
 				$params->set( 'marker_fax', _CONTACT_FAX );
 				$params->set( 'marker_misc', _CONTACT_MISC );
-				$params->set( 'column_width', '100px' );
+				$params->set( 'column_width', '100' );
 				break;
 			case 2:
 			// none
@@ -294,21 +301,21 @@ function contactpage( $contact_id ) {
 				$params->set( 'marker_telephone', '' );
 				$params->set( 'marker_fax', '' );
 				$params->set( 'marker_misc', '' );
-				$params->set( 'column_width', '0px' );
+				$params->set( 'column_width', '0' );
 				break;
 			default:
 			// icons
-				$image1 = mosAdminMenus::ImageCheck( 'con_address.png', '/images/M_images/', $params->get( 'icon_address' ) );
-				$image2 = mosAdminMenus::ImageCheck( 'emailButton.png', '/images/M_images/', $params->get( 'icon_email' ) );
-				$image3 = mosAdminMenus::ImageCheck( 'con_tel.png', '/images/M_images/', $params->get( 'icon_telephone' ) );
-				$image4 = mosAdminMenus::ImageCheck( 'con_fax.png', '/images/M_images/', $params->get( 'icon_fax' ) );
-				$image5 = mosAdminMenus::ImageCheck( 'con_info.png', '/images/M_images/', $params->get( 'icon_misc' ) );
+				$image1 = mosAdminMenus::ImageCheck( 'con_address.png', '/images/M_images/', $params->get( 'icon_address' ), NULL, _CONTACT_ADDRESS, _CONTACT_ADDRESS );
+				$image2 = mosAdminMenus::ImageCheck( 'emailButton.png', '/images/M_images/', $params->get( 'icon_email' ), NULL, _CONTACT_EMAIL, _CONTACT_EMAIL );
+				$image3 = mosAdminMenus::ImageCheck( 'con_tel.png', '/images/M_images/', $params->get( 'icon_telephone' ), NULL, _CONTACT_TELEPHONE, _CONTACT_TELEPHONE );
+				$image4 = mosAdminMenus::ImageCheck( 'con_fax.png', '/images/M_images/', $params->get( 'icon_fax' ), NULL, _CONTACT_FAX, _CONTACT_FAX );
+				$image5 = mosAdminMenus::ImageCheck( 'con_info.png', '/images/M_images/', $params->get( 'icon_misc' ), NULL, _CONTACT_MISC, _CONTACT_MISC );
 				$params->set( 'marker_address', $image1 );
 				$params->set( 'marker_email', $image2 );
 				$params->set( 'marker_telephone', $image3 );
 				$params->set( 'marker_fax', $image4 );
 				$params->set( 'marker_misc', $image5 );
-				$params->set( 'column_width', '40px' );
+				$params->set( 'column_width', '40' );
 				break;
 		}
 
@@ -349,8 +356,7 @@ function sendmail( $con_id, $option ) {
 	$email_copy = mosGetParam( $_POST, 'email_copy', 0 );
 
 	if ( !$email || !$text || ( is_email( $email )==false ) ) {
-		echo "<script>alert (\""._CONTACT_FORM_NC."\"); window.history.go(-1);</script>";
-		exit(0);
+		mosErrorAlert( _CONTACT_FORM_NC );
 	}
 	$prefix = sprintf( _ENQUIRY_TEXT, $mosConfig_live_site );
 	$text 	= $prefix ."\n". $name. ' <'. $email .'>' ."\n\n". stripslashes( $text );
@@ -383,9 +389,9 @@ function is_email($email){
 
 function vCard( $id ) {
 	global $database;
-	global $mosConfig_sitename, $mosConfig_absolute_path, $mosConfig_live_site;
+	global $mosConfig_sitename, $mosConfig_live_site;
 
-	$contact 	= new mosContact( $database );
+	$contact	= new mosContact( $database );
 	$contact->load( $id );
 	$name 	= explode( ' ', $contact->name );
 	$count 	= count( $name );
@@ -430,13 +436,15 @@ function vCard( $id ) {
 	$v->setFilename( $filename );
 
 	$output 	= $v->getVCard( $mosConfig_sitename );
-	$filename = $v->getFileName();
+	$filename 	= $v->getFileName();
 
 	// header info for page
 	header( 'Content-Disposition: attachment; filename='. $filename );
 	header( 'Content-Length: '. strlen( $output ) );
 	header( 'Connection: close' );
-	header( 'Content-Type: text/x-vCard; name='. $filename );
+	header( 'Content-Type: text/x-vCard; name='. $filename );	
+	header( 'Cache-Control: store, cache' );
+	header( 'Pragma: cache' );
 
 	print $output;
 }

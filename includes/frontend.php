@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: frontend.php 249 2005-09-29 04:21:08Z Levis $
+* @version $Id: frontend.php 649 2005-10-25 20:26:31Z Jinx $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -163,16 +163,16 @@ function mosShowHead() {
 		<?php
 	}
 
-	if ( isset($mosConfig_sef) && $mosConfig_sef ) {
-		echo "<base href=\"$mosConfig_live_site/\" />\r\n";
-	}
-
 	$mainframe->appendMetaTag( 'description', $mosConfig_MetaDesc );
 	$mainframe->appendMetaTag( 'keywords', $mosConfig_MetaKeys );
 	$mainframe->addMetaTag( 'Generator', $_VERSION->PRODUCT . " - " . $_VERSION->COPYRIGHT);
 	$mainframe->addMetaTag( 'robots', 'index, follow' );
 
 	echo $mainframe->getHead();
+	
+	if ( isset($mosConfig_sef) && $mosConfig_sef ) {
+		echo "<base href=\"$mosConfig_live_site/\" />\r\n";
+	}
 
 	// support for Firefox Live Bookmarks ability for site syndication
 	$query = "SELECT a.id"

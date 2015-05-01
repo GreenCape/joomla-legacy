@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.sections.php 415 2005-10-09 16:52:44Z stingrey $
+* @version $Id: admin.sections.php 553 2005-10-19 08:48:19Z stingrey $
 * @package Joomla
 * @subpackage Sections
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -671,6 +671,10 @@ function menuLink( $id ) {
 	$row->link			= $link;
 	$row->ordering		= 9999;
 
+	if ( $type == 'content_blog_section' ) {
+		$row->params = 'sectionid='. $id;
+	}
+	
 	if (!$row->check()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();

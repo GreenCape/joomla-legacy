@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: none.php 109 2005-09-16 17:45:24Z stingrey $
+* @version $Id: none.php 1056 2005-11-16 18:34:33Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -70,7 +70,7 @@ function botNoEditorEditorArea( $name, $content, $hiddenField, $width, $height, 
 	$buttons = array();
 	foreach ($results as $result) {
 		if ( $result[0] ) {
-			$buttons[] = '<img src="'.$mosConfig_live_site.'/mambots/editors-xtd/'.$result[0].'" onclick="insertAtCursor( document.adminForm.'.$hiddenField.', \''.$result[1].'\' )" />';
+			$buttons[] = '<img src="'.$mosConfig_live_site.'/mambots/editors-xtd/'.$result[0].'" onclick="insertAtCursor( document.adminForm.'.$hiddenField.', \''.$result[1].'\' )" alt="'.$result[1].'"/>';
 		}
 	}
 	$buttons = implode( "", $buttons );

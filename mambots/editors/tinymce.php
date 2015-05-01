@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: tinymce.php 454 2005-10-11 06:12:09Z stingrey $
+* @version $Id: tinymce.php 1056 2005-11-16 18:34:33Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -112,15 +112,17 @@ function botTinymceEditorInit() {
 	}
 
 	if ( $newlines ) {
-		$newlines	= 'true';
+		$br_newlines	= 'true';
+		$p_newlines     = 'false';
 	} else {
-		$newlines	= 'false';
+		$br_newlines	= 'false';
+		$p_newlines     = 'true';
 	}
 	
 	if ( $compressed ) {		
 		$load = '<script type="text/javascript" src="'. $mosConfig_live_site .'/mambots/editors/tinymce/jscripts/tiny_mce/tiny_mce_gzip.php"></script>';
 	} else {
-		$load = '<script type="text/javascript" src="'. $mosConfig_live_site .'/mambots/editors/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>';
+		$load = '<script type="text/javascript" src="'. $mosConfig_live_site .'/mambots/editors/tinymce/jscripts/tiny_mce/tiny_mce_src.js"></script>';
 	}
 
 // preview
@@ -191,7 +193,8 @@ return <<<EOD
 		theme_advanced_source_editor_height : "$html_height",
 		theme_advanced_source_editor_width : "$html_width",
 		directionality: "$text_direction",
-		force_br_newlines : "$newlines",
+		force_br_newlines : "$br_newlines",
+		force_p_newlines : "$p_newlines",
 		$content_css
 		debug : false,
 		cleanup : $cleanup,
@@ -215,9 +218,12 @@ return <<<EOD
 		if (true == true){
 			vHTML = tinyMCE.regexpReplace(vHTML, 'href\s*=\s*"?'+base_url+'', 'href="', 'gi');
 			vHTML = tinyMCE.regexpReplace(vHTML, 'src\s*=\s*"?'+base_url+'', 'src="', 'gi');
+			vHTML = tinyMCE.regexpReplace(vHTML, 'mce_real_src\s*=\s*"?', '', 'gi');
+			vHTML = tinyMCE.regexpReplace(vHTML, 'mce_real_href\s*=\s*"?', '', 'gi');
 		}
 		return vHTML;
 	}
+	
 </script>
 EOD;
 }
@@ -249,7 +255,7 @@ function botTinymceEditorEditorArea( $name, $content, $hiddenField, $width, $hei
 	$buttons = array();
 	foreach ($results as $result) {
 		if ( $result[0] ) {
-			$buttons[] = '<img src="'.$mosConfig_live_site.'/mambots/editors-xtd/'.$result[0].'" onclick="tinyMCE.execCommand(\'mceInsertContent\',false,\''.$result[1].'\')" />';
+			$buttons[] = '<img src="'.$mosConfig_live_site.'/mambots/editors-xtd/'.$result[0].'" onclick="tinyMCE.execCommand(\'mceInsertContent\',false,\''.$result[1].'\')" alt="'.$result[1].'"/>';
 		}
 	}
 	$buttons = implode( "", $buttons );

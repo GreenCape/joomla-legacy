@@ -1,6 +1,6 @@
 <?php
 /**
-* version $Id: newsfeeds.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* version $Id: newsfeeds.html.php 775 2005-10-31 23:25:31Z Jinx $
 * @package Joomla
 * @subpackage Newsfeeds
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -155,7 +155,7 @@ class HTML_newsfeed {
 				if ( $params->get( 'link' ) ) {
 					?>
 					<td width="50%" class="<?php echo $tabclass[$k]; ?>">
-					<?php echo $row->link; ?>
+					<?php echo ampReplace( $row->link ); ?>
 					</td>
 					<?php
 				}
@@ -270,8 +270,8 @@ class HTML_newsfeed {
 				?>
 				<tr>
 					<td class="contentheading<?php echo $params->get( 'pageclass_sfx' ); ?>">
-					<a href="<?php echo $currChannel->getLink(); ?>" target="_child">
-					<?php echo $currChannel->getTitle(); ?>
+					<a href="<?php echo ampReplace( $currChannel->getLink() ); ?>" target="_blank">
+					<?php echo str_replace('&apos;', "'", html_entity_decode($currChannel->getTitle())); ?>
 					</a>
 					</td>
 				</tr>
@@ -281,7 +281,7 @@ class HTML_newsfeed {
 					?>
 					<tr>
 						<td>
-						<?php echo $currChannel->getDescription(); ?>
+						<?php echo str_replace('&apos;', "'", html_entity_decode($currChannel->getDescription())); ?>
 						<br /><br />
 						</td>
 					</tr>
@@ -313,13 +313,14 @@ class HTML_newsfeed {
 						$currItem =& $currChannel->getItem($j);
 						?>
 							<li>
-							<a href="<?php echo $currItem->getLink(); ?>" target="_child">
-							<?php echo $currItem->getTitle(); ?>
+							<a href="<?php echo ampReplace( $currItem->getLink() ); ?>" target="_blank">
+							<?php echo str_replace('&apos;', "'", html_entity_decode($currItem->getTitle())); ?>
 							</a>
 							<?php
 							// item description
 							if ( $params->get( 'item_descr' ) ) {
-								$text 	= html_entity_decode( $currItem->getDescription() );
+								$text   = html_entity_decode( $currItem->getDescription() );
+								$text   = str_replace('&apos;', "'", $text);
 								$num 	= $params->get( 'word_count' );
 
 								// word limit check

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: version.php 532 2005-10-14 09:28:31Z stingrey $
+* @version $Id: version.php 1135 2005-11-20 21:00:27Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -23,13 +23,13 @@ class joomlaVersion {
 	/** @var string Development Status */
 	var $DEV_STATUS = 'Stable';
 	/** @var int Sub Release Level */
-	var $DEV_LEVEL 	= '3';
+	var $DEV_LEVEL 	= '4';
 	/** @var int build Number */
-	var $BUILD	 	= '$Revision: 532 $';
+	var $BUILD	 	= '$Revision: 1135 $';
 	/** @var string Codename */
-	var $CODENAME 	= 'Sunlight';
+	var $CODENAME 	= 'Sundial';
 	/** @var string Date */
-	var $RELDATE 	= '14-Oct-2005';
+	var $RELDATE 	= '21-Nov-2005';
 	/** @var string Time */
 	var $RELTIME 	= '10:00';
 	/** @var string Timezone */

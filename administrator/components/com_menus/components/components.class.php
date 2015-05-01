@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: components.class.php 393 2005-10-08 13:37:52Z akede $
+* @version $Id: components.class.php 652 2005-10-25 22:23:27Z Jinx $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -36,8 +36,7 @@ class components_menu {
 
 		// fail if checked out not by 'me'
 		if ( $menu->checked_out && $menu->checked_out != $my->id ) {
-			echo "<script>alert('The module $menu->title is currently being edited by another administrator'); document.location.href='index2.php?option=$option'</script>\n";
-			exit(0);
+			mosErrorAlert( "The module ".$menu->title." is currently being edited by another administrator" );	
 		}
 
 		if ( $uid ) {

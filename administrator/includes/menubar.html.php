@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: menubar.html.php 217 2005-09-21 15:15:58Z stingrey $
+* @version $Id: menubar.html.php 1056 2005-11-16 18:34:33Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -23,7 +23,7 @@ class mosMenuBar {
 	function startTable() {
 		?>
 		<table cellpadding="0" cellspacing="0" border="0" id="toolbar">
-		<tr height="60" valign="middle" align="center">
+		<tr valign="middle" align="center">
 		<?php
 	}
 
@@ -36,26 +36,30 @@ class mosMenuBar {
 	* @param boolean True if required to check that a standard list item is checked
 	*/
 	function custom( $task='', $icon='', $iconOver='', $alt='', $listSelect=true ) {
+		$icon 	= ( $iconOver ? $iconOver : $icon );
+		$image 	= mosAdminMenus::ImageCheckAdmin( $icon, '/administrator/images/', NULL, NULL, $alt, $task, 1 );
+		
 		if ($listSelect) {
 			$href = "javascript:if (document.adminForm.boxchecked.value == 0){ alert('Please make a selection from the list to $alt');}else{submitbutton('$task')}";
 		} else {
 			$href = "javascript:submitbutton('$task')";
 		}
+		
 		if ($icon && $iconOver) {
-		?>
-		<td>
-			<a class="toolbar" href="<?php echo $href;?>">
-				<img name="<?php echo $task;?>" src="images/<?php echo $iconOver;?>" alt="<?php echo $alt;?>" border="0" align="middle" />
-				<br /><?php echo $alt; ?></a>
-		</td>
-		<?php
+			?>
+			<td>
+				<a class="toolbar" href="<?php echo $href;?>">
+					<?php echo $image; ?>
+					<br /><?php echo $alt; ?></a>
+			</td>
+			<?php
 		} else {
-		?>
-		<td>
-			<a class="toolbar" href="<?php echo $href;?>">
-				<br /><?php echo $alt; ?></a>
-		</td>
-		<?php
+			?>
+			<td>
+				<a class="toolbar" href="<?php echo $href;?>">
+					<br /><?php echo $alt; ?></a>
+			</td>
+			<?php
 		}
 	}
 
@@ -69,26 +73,30 @@ class mosMenuBar {
 	* @param boolean True if required to check that a standard list item is checked
 	*/
 	function customX( $task='', $icon='', $iconOver='', $alt='', $listSelect=true ) {
+		$icon 	= ( $iconOver ? $iconOver : $icon );
+		$image 	= mosAdminMenus::ImageCheckAdmin( $icon, '/administrator/images/', NULL, NULL, $alt, $task, 1 );
+		
 		if ($listSelect) {
 			$href = "javascript:if (document.adminForm.boxchecked.value == 0){ alert('Please make a selection from the list to $alt');}else{hideMainMenu();submitbutton('$task')}";
 		} else {
 			$href = "javascript:hideMainMenu();submitbutton('$task')";
 		}
+		
 		if ($icon && $iconOver) {
-		?>
-		<td>
-			<a class="toolbar" href="<?php echo $href;?>">
-				<img name="<?php echo $task;?>" src="images/<?php echo $iconOver;?>" alt="<?php echo $alt;?>" border="0" align="middle" />
-				<br /><?php echo $alt; ?></a>
-		</td>
-		<?php
+			?>
+			<td>
+				<a class="toolbar" href="<?php echo $href;?>">
+					<?php echo $image; ?>
+					<br /><?php echo $alt; ?></a>
+			</td>
+			<?php
 		} else {
-		?>
-		<td>
-			<a class="toolbar" href="<?php echo $href;?>">
-				<br /><?php echo $alt; ?></a>
-		</td>
-		<?php
+			?>
+			<td>
+				<a class="toolbar" href="<?php echo $href;?>">
+					<br /><?php echo $alt; ?></a>
+			</td>
+			<?php
 		}
 	}
 
@@ -150,7 +158,7 @@ class mosMenuBar {
 		$image2 = mosAdminMenus::ImageCheckAdmin( 'publish_f2.png', '/administrator/images/', NULL, NULL, $alt, $task, 1 );
 		?>
 	 	<td>
-			<a class="toolbar" href="javascript:if (document.adminForm.boxchecked.value == 0){ alert('Please make a selection from the list to publish'); } else {submitbutton('<?php echo $task;?>', '');}"">
+			<a class="toolbar" href="javascript:if (document.adminForm.boxchecked.value == 0){ alert('Please make a selection from the list to publish'); } else {submitbutton('<?php echo $task;?>', '');}">
 				<?php echo $image2; ?>
 				<br /><?php echo $alt; ?></a>
 		</td>
@@ -594,11 +602,17 @@ class mosMenuBar {
 	* Writes a media_manager button
 	* @param string The sub-drectory to upload the media to
 	*/
-	function media_manager( $directory = '', $alt='Upload' ) {
+	function media_manager( $directory='', $alt='Upload' ) {
 		global $database;
-		$sql = "SELECT template FROM #__templates_menu WHERE client_id='1' AND menuid='0'";
-		$database->setQuery( $sql );
+		
+		$query = "SELECT template"
+		. "\n FROM #__templates_menu"
+		. "\n WHERE client_id = 1"
+		. "\n AND menuid = 0"
+		;
+		$database->setQuery( $query );		
 		$cur_template = $database->loadResult();
+		
 		$image2 = mosAdminMenus::ImageCheckAdmin( 'upload_f2.png', '/administrator/images/', NULL, NULL, 'Upload Image', 'uploadPic', 1 );
 		?>
 		<td>
