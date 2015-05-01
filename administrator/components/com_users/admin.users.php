@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.users.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.users.php 197 2005-09-20 11:13:25Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -306,11 +306,11 @@ function saveUser( $option, $task ) {
 	}
 
 	if (!$row->check()) {
-		echo "<script> alert('".$row->getError()."'); window.history.go(-2); </script>\n";
+		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
 	}
 	if (!$row->store()) {
-		echo "<script> alert('".$row->getError()."'); window.history.go(-2); </script>\n";
+		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
 	}
 	$row->checkin();

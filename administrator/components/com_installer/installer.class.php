@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: installer.class.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: installer.class.php 200 2005-09-20 15:11:17Z Levis $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -483,15 +483,18 @@ function cleanupInstall( $userfile_name, $resultdir) {
 
 function deldir( $dir ) {
 	$current_dir = opendir( $dir );
+	$old_umask = umask(0);
 	while ($entryname = readdir( $current_dir )) {
 		if ($entryname != '.' and $entryname != '..') {
 			if (is_dir( $dir . $entryname )) {
 				deldir( mosPathName( $dir . $entryname ) );
 			} else {
+                @chmod($dir . $entryname, 0777);
 				unlink( $dir . $entryname );
 			}
 		}
 	}
+	umask($old_umask);
 	closedir( $current_dir );
 	return rmdir( $dir );
 }

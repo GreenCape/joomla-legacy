@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.html.php 89 2005-09-16 02:49:20Z stingrey $
+* @version $Id: content.html.php 218 2005-09-21 15:46:00Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -14,8 +14,6 @@
 
 // no direct access
 defined( '_VALID_MOS' ) or die( 'Restricted access' );
-
-require_once( $GLOBALS['mosConfig_absolute_path'] . '/includes/HTML_toolbar.php' );
 
 /**
 * Utility class for writing the HTML for content
@@ -403,7 +401,7 @@ class HTML_content {
 		$results = $_MAMBOTS->trigger( 'onPrepareContent', array( &$row, &$params, $page ), true );
 
 		// adds mospagebreak heading or title to <site> Title
-		if ( @$row->page_title ) {
+		if ( isset($row->page_title) ) {
 			$mainframe->SetPageTitle( $row->title .': '. $row->page_title );
 		}
 
@@ -531,7 +529,7 @@ class HTML_content {
 		HTML_content::ReadMore( $params, $link_on, $link_text );
 		?>
 		</table>
-		<span class="article_seperator"></span>
+		<span class="article_seperator">&nbsp;</span>
 		<?php
 		$results = $_MAMBOTS->trigger( 'onAfterDisplayContent', array( &$row, &$params, $page ) );
 		echo trim( implode( "\n", $results ) );
@@ -605,11 +603,11 @@ class HTML_content {
 		$date 		= mosFormatDate( $row->created );
 		$author		= $row->created_by_alias ? $row->created_by_alias : $row->author;
 		
-		$overlib 	.= '<br/>';
+		$overlib 	.= '<br />';
 		$overlib 	.= $row->groups;
-		$overlib 	.= '<br/>';
+		$overlib 	.= '<br />';
 		$overlib 	.= $date;
-		$overlib 	.= '<br/>';
+		$overlib 	.= '<br />';
 		$overlib 	.= $author;
 		?>
 		<a href="<?php echo sefRelToAbs( $link ); ?>" title="<?php echo _E_EDIT;?>"  onMouseOver="return overlib('<?php echo $overlib; ?>', CAPTION, '<?php echo 'Edit Item'; ?>', BELOW, RIGHT);" onMouseOut="return nd();">
@@ -788,7 +786,7 @@ class HTML_content {
 	* Writes TOC
 	*/
 	function TOC( $row ) {
-		if ( @$row->toc ) {
+		if ( isset($row->toc) ) {
 			echo $row->toc;
 		}
 	}
@@ -883,8 +881,11 @@ class HTML_content {
 	*/
 	function editContent( &$row, $section, &$lists, &$images, &$access, $myid, $sectionid, $task, $Itemid ) {
 		global $mosConfig_live_site;
+		
 		mosMakeHtmlSafe( $row );
 
+		require_once( $GLOBALS['mosConfig_absolute_path'] . '/includes/HTML_toolbar.php' );
+		
 		$Returnid 	= intval( mosGetParam( $_REQUEST, 'Returnid', $Itemid ) );
 		$tabs 		= new mosTabs(0);
 		?>
@@ -915,7 +916,7 @@ class HTML_content {
 
 			// var goodexit=false;
 			// assemble the images back into one field
-			form.goodexit.value=1
+			form.goodexit.value=1;
 			var temp = new Array;
 			for (var i=0, n=form.imagelist.options.length; i < n; i++) {
 				temp[i] = form.imagelist.options[i].value;
@@ -959,7 +960,7 @@ class HTML_content {
 		function WarnUser(){
 			if (document.adminForm.goodexit.value==0) {
 				alert('<?php echo _E_WARNUSER;?>');
-				window.location="<?php echo sefRelToAbs("index.php?option=com_content&task=".$task."&sectionid=".$sectionid."&id=".$row->id."&Itemid=".$Itemid); ?>"
+				window.location="<?php echo sefRelToAbs("index.php?option=com_content&task=".$task."&sectionid=".$sectionid."&id=".$row->id."&Itemid=".$Itemid); ?>";
 			}
 		}
 		</script>
@@ -997,7 +998,7 @@ class HTML_content {
 			<td>
 				<div style="float: left;">
 					<?php echo _E_TITLE; ?>
-					<br/>
+					<br />
 					<input class="inputbox" type="text" name="title" size="50" maxlength="100" value="<?php echo $row->title; ?>" />
 				</div>
 				<div style="float: right;">
@@ -1005,7 +1006,7 @@ class HTML_content {
 					// Toolbar Top
 					mosToolBar::startTable();
 					mosToolBar::save();
-					mosToolBar::apply();
+					mosToolBar::apply( 'apply_new' );
 					mosToolBar::cancel();
 					mosToolBar::endtable();
 					?>
@@ -1018,7 +1019,7 @@ class HTML_content {
 			<tr>
 				<td>
 				<?php echo _E_CATEGORY; ?>
-				<br/>
+				<br />
 				<?php echo $lists['catid']; ?>
 				</td>
 			</tr>
@@ -1085,32 +1086,39 @@ class HTML_content {
 		?>
 			<table class="adminform">
 			<tr>
-				<td colspan="6">
+				<td colspan="4">
 				<?php echo _CMN_SUBFOLDER; ?> :: <?php echo $lists['folders'];?>
 				</td>
 			</tr>
 			<tr>
 				<td align="top">
-				<?php echo _E_GALLERY_IMAGES; ?>
+					<?php echo _E_GALLERY_IMAGES; ?>
+				</td>
+				<td width="2%">
 				</td>
 				<td align="top">
-				<?php echo _E_CONTENT_IMAGES; ?>
+					<?php echo _E_CONTENT_IMAGES; ?>
 				</td>
 				<td align="top">
-				<?php echo _E_EDIT_IMAGE; ?>
+					<?php echo _E_EDIT_IMAGE; ?>
 				</td>
+			</tr>
 			<tr>
 				<td valign="top">
-				<?php echo $lists['imagefiles'];?>
-				<br />
-				<input class="button" type="button" value="<?php echo _E_INSERT; ?>" onclick="addSelectedToList('adminForm','imagefiles','imagelist')" />
+					<?php echo $lists['imagefiles'];?>
+					<br />
+					<input class="button" type="button" value="<?php echo _E_INSERT; ?>" onclick="addSelectedToList('adminForm','imagefiles','imagelist')" />
+				</td>
+				<td width="2%">
+					<input class="button" type="button" value=">>" onclick="addSelectedToList('adminForm','imagefiles','imagelist')" title="Add"/>
+					<br/>
+					<input class="button" type="button" value="<<" onclick="delSelectedFromList('adminForm','imagelist')" title="Remove"/>				
 				</td>
 				<td valign="top">
-				<?php echo $lists['imagelist'];?>
-				<br />
-				<input class="button" type="button" value="<?php echo _E_UP; ?>" onclick="moveInList('adminForm','imagelist',adminForm.imagelist.selectedIndex,-1)" />
-				<input class="button" type="button" value="<?php echo _E_DOWN; ?>" onclick="moveInList('adminForm','imagelist',adminForm.imagelist.selectedIndex,+1)" />
-				<input class="button" type="button" value="<?php echo _E_REMOVE; ?>" onclick="delSelectedFromList('adminForm','imagelist')" />
+					<?php echo $lists['imagelist'];?>
+					<br />
+					<input class="button" type="button" value="<?php echo _E_UP; ?>" onclick="moveInList('adminForm','imagelist',adminForm.imagelist.selectedIndex,-1)" />
+					<input class="button" type="button" value="<?php echo _E_DOWN; ?>" onclick="moveInList('adminForm','imagelist',adminForm.imagelist.selectedIndex,+1)" />
 				</td>
 				<td valign="top">
 					<table>
@@ -1189,11 +1197,15 @@ class HTML_content {
 			</tr>
 			<tr>
 				<td>
-				<img name="view_imagefiles" src="<?php echo $mosConfig_live_site;?>/images/M_images/blank.png" width="50" alt="No Image" />
+					<img name="view_imagefiles" src="<?php echo $mosConfig_live_site;?>/images/M_images/blank.png" width="50" alt="No Image" />
+				</td>
+				<td width="2%">
 				</td>
 				<td>
-				<img name="view_imagelist" src="<?php echo $mosConfig_live_site;?>/images/M_images/blank.png" width="50" alt="No Image" />
+					<img name="view_imagelist" src="<?php echo $mosConfig_live_site;?>/images/M_images/blank.png" width="50" alt="No Image" />
 				</td>
+				<td>
+				</td>				
 			</tr>
 			</table>
 		<?php

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.modules.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.modules.php 158 2005-09-18 02:53:14Z stingrey $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -479,7 +479,7 @@ function removeModule( &$cid, $option, $client ) {
 	if (count( $cid )) {
 		$cids = implode( ',', $cid );
 		$query = "DELETE FROM #__modules"
-		. "n WHERE id IN ( $cids )"
+		. "\n WHERE id IN ( $cids )"
 		;
 		$database->setQuery( $query );
 		if (!$database->query()) {

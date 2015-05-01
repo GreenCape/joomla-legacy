@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: pathway.php 98 2005-09-16 04:50:03Z eddieajau $
+* @version $Id: pathway.php 202 2005-09-20 18:46:34Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -274,8 +274,8 @@ function showPathway( $Itemid ) {
 		$item =& $mitems[$mid];
 
 		// converts & to &amp; for xtml compliance
-		$itemname = str_replace( '&amp;', '&', $item->name );
-
+		$itemname = ampReplace( $item->name );
+		
 		// if it is the current page, then display a non hyperlink
 		if ($item->id == $Itemid || empty( $mid ) || empty($item->link)) {
 			$newlink = "  $itemname";

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.trash.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.trash.php 212 2005-09-21 07:50:23Z stingrey $
 * @package Joomla
 * @subpackage Trash
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -31,24 +31,24 @@ if ( !is_array( $cid ) ) {
 
 switch ($task) {
 	case 'deleteconfirm':
-	viewdeleteTrash( $cid, $mid, $option );
-	break;
+		viewdeleteTrash( $cid, $mid, $option );
+		break;
 
 	case 'delete':
-	deleteTrash( $cid, $option );
-	break;
+		deleteTrash( $cid, $option );
+		break;
 
 	case 'restoreconfirm':
-	viewrestoreTrash( $cid, $mid, $option );
-	break;
+		viewrestoreTrash( $cid, $mid, $option );
+		break;
 
 	case 'restore':
-	restoreTrash( $cid, $option );
-	break;
+		restoreTrash( $cid, $option );
+		break;
 
 	default:
-	viewTrash( $option );
-	break;
+		viewTrash( $option );
+		break;
 }
 
 
@@ -123,7 +123,7 @@ function viewTrash( $option ) {
 * Compiles a list of the items you have selected to permanently delte
 */
 function viewdeleteTrash( $cid, $mid, $option ) {
-	global $database, $mainframe;
+	global $database;
 
 	// seperate contentids
 	$cids = implode( ',', $cid );
@@ -161,7 +161,8 @@ function viewdeleteTrash( $cid, $mid, $option ) {
 * Permanently deletes the selected list of trash items
 */
 function deleteTrash( $cid, $option ) {
-	global $database, $mainframe;
+	global $database;
+	
 	$type = mosGetParam( $_POST, 'type', array(0) );
 
 	$total = count( $cid );
@@ -191,7 +192,7 @@ function deleteTrash( $cid, $option ) {
 * Compiles a list of the items you have selected to permanently delte
 */
 function viewrestoreTrash( $cid, $mid, $option ) {
-	global $database, $mainframe;
+	global $database;
 
 	// seperate contentids
 	$cids = implode( ',', $cid );
@@ -230,6 +231,7 @@ function viewrestoreTrash( $cid, $mid, $option ) {
 */
 function restoreTrash( $cid, $option ) {
 	global $database;
+	
 	$type = mosGetParam( $_POST, 'type', array(0) );
 
 	$total = count( $cid );

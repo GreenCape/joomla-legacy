@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: menubar.html.php 132 2005-09-16 23:22:56Z eddieajau $
+* @version $Id: menubar.html.php 217 2005-09-21 15:15:58Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -390,11 +390,18 @@ class mosMenuBar {
 	/**
 	* Write a trash button that will move items to Trash Manager
 	*/
-	function trash( $task='remove', $alt='Trash' ) {
+	function trash( $task='remove', $alt='Trash', $check=true ) {
 		$image2 = mosAdminMenus::ImageCheckAdmin( 'delete_f2.png', '/administrator/images/', NULL, NULL, $alt, $task, 1 );
+		
+		if ( $check ) {
+			$js = "javascript:if (document.adminForm.boxchecked.value == 0){ alert('Please make a selection from the list to Trash'); } else { submitbutton('$task');}";
+		} else {
+			$js = "javascript:submitbutton('$task');";
+		}
+		
 		?>
 		 <td>
-			<a class="toolbar" href="javascript:submitbutton('<?php echo $task;?>');">
+			<a class="toolbar" href="<?php echo $js; ?>">
 				<?php echo $image2; ?>
 				<br /><?php echo $alt; ?></a>
 		</td>
@@ -439,9 +446,13 @@ class mosMenuBar {
 	*/
 	function help( $ref, $com=false ) {
 		global $mosConfig_live_site;
-		$image2 = mosAdminMenus::ImageCheckAdmin( 'help_f2.png', '/administrator/images/', NULL, NULL, 'Help', 'help', 1 );
-		$helpUrl = mosGetParam( $GLOBALS, 'mosConfig_helpurl', '' );
-
+		$image2 	= mosAdminMenus::ImageCheckAdmin( 'help_f2.png', '/administrator/images/', NULL, NULL, 'Help', 'help', 1 );
+		$helpUrl 	= mosGetParam( $GLOBALS, 'mosConfig_helpurl', '' );
+		
+		if ( $helpUrl == 'http://help.mamboserver.com' ) {
+			$helpUrl = 'http://help.joomla.org';
+		}
+				
 		if ($com) {
 	   // help file for 3PD Components
 			$url = $mosConfig_live_site . '/administrator/components/' . $GLOBALS['option'] . '/help/';

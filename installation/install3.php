@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install3.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: install3.php 188 2005-09-19 12:06:19Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -139,7 +139,7 @@ function changeDirPermsMode(mode)
 			<div class="clr"></div>
 			<h1>Confirm the site URL, path, admin e-mail and file/directory chmods</h1>
 			<div class="install-text">
-				  <p>If URL and Path looks correct then please do not change.
+				  <p>If URL and Path look correct then please do not change them.
 				  If you are not sure then please contact your ISP or administrator. Usually
 				  the values displayed will work for your site.<br/>
 				  <br/>

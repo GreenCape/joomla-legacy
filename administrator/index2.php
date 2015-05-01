@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index2.php 136 2005-09-17 00:00:54Z stingrey $
+* @version $Id: index2.php 161 2005-09-18 03:18:52Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -41,6 +41,7 @@ $task 		= mosGetParam( $_REQUEST, 'task', '' );
 $act 		= strtolower( mosGetParam( $_REQUEST, 'act', '' ) );
 $section 	= mosGetParam( $_REQUEST, 'section', '' );
 $no_html 	= strtolower( mosGetParam( $_REQUEST, 'no_html', '' ) );
+$id         = intval( mosGetParam( $_REQUEST, 'id' ) );
 
 if ($option == 'logout') {
 	require 'logout.php';

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.weblinks.php 88 2005-09-16 02:10:02Z stingrey $
+* @version $Id: admin.weblinks.php 160 2005-09-18 03:11:33Z stingrey $
 * @package Joomla
 * @subpackage Weblinks
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -24,7 +24,8 @@ if (!($acl->acl_check( 'administration', 'edit', 'users', $my->usertype, 'compon
 require_once( $mainframe->getPath( 'admin_html' ) );
 require_once( $mainframe->getPath( 'class' ) );
 
-$cid = mosGetParam( $_POST, 'cid', array(0) );
+$cid 	= mosGetParam( $_POST, 'cid', array(0) );
+$id 	= mosGetParam( $_GET, 'id', 0 );
 
 switch ($task) {
 	case 'new':

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: database.php 104 2005-09-16 10:29:04Z eddieajau $
+* @version $Id: database.php 192 2005-09-19 19:16:58Z stingrey $
 * @package Joomla
 * @subpackage Database
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -1057,7 +1057,7 @@ class mosDBTable {
 		}
 		$time = date( 'H:i:s' );
 		$query = "UPDATE $this->_tbl"
-		. "\n SET checked_out = 0, checked_out_time = '$this->_nullDate'"
+		. "\n SET checked_out = 0, checked_out_time = '$this->_db->_nullDate'"
 		. "\n WHERE $this->_tbl_key = '". $this->$k ."'"
 		;
 		$this->_db->setQuery( $query );

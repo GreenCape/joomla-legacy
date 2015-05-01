@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.typedcontent.html.php 104 2005-09-16 10:29:04Z eddieajau $
+* @version $Id: admin.typedcontent.html.php 199 2005-09-20 13:29:10Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -546,7 +546,6 @@ class HTML_typedcontent {
 									<br />
 									<input class="button" type="button" value="Up" onclick="moveInList('adminForm','imagelist',adminForm.imagelist.selectedIndex,-1)" />
 									<input class="button" type="button" value="Down" onclick="moveInList('adminForm','imagelist',adminForm.imagelist.selectedIndex,+1)" />
-									<input class="button" type="button" value="remove" onClick="delSelectedFromList('adminForm','imagelist')" />
 								</div>
 							</td>
 						</tr>

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.newsfeeds.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.newsfeeds.php 165 2005-09-18 06:11:15Z stingrey $
 * @package Joomla
 * @subpackage Newsfeeds
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -201,7 +201,7 @@ function saveNewsFeed( $option ) {
 * @param string The current GET/POST option
 */
 function publishNewsFeeds( $cid, $publish, $option ) {
-	global $database;
+	global $database, $my;
 
 	if (count( $cid ) < 1) {
 		$action = $publish ? 'publish' : 'unpublish';
@@ -212,7 +212,7 @@ function publishNewsFeeds( $cid, $publish, $option ) {
 	$cids = implode( ',', $cid );
 
 	$query = "UPDATE #__newsfeeds"
-	. "\n SET published = " . intval( $publish )
+	. "\n SET published = ". intval( $publish )
 	. "\n WHERE id IN ( $cids )"
 	. "\n AND ( checked_out = 0 OR ( checked_out = $my->id ) )"
 	;

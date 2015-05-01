@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.php 106 2005-09-16 11:36:10Z eddieajau $
+* @version $Id: joomla.php 202 2005-09-20 18:46:34Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -771,16 +771,16 @@ class mosMainFrame {
 			}
 		} else {
 			// TemplateChooser Start
-			$mos_user_template = mosGetParam( $_COOKIE, 'mos_user_template', '' );
-			$mos_change_template = mosGetParam( $_REQUEST, 'mos_change_template', $mos_user_template );
-			if ($mos_change_template) {
+			$jos_user_template = mosGetParam( $_COOKIE, 'jos_user_template', '' );
+			$jos_change_template = mosGetParam( $_REQUEST, 'jos_change_template', $jos_user_template );
+			if ($jos_change_template) {
 				// check that template exists in case it was deleted
-				if (file_exists( $mosConfig_absolute_path .'/templates/'. $mos_change_template .'/index.php' )) {
+				if (file_exists( $mosConfig_absolute_path .'/templates/'. $jos_change_template .'/index.php' )) {
 					$lifetime = 60*10;
-					$cur_template = $mos_change_template;
-					setcookie( 'mos_user_template', "$mos_change_template", time()+$lifetime);
+					$cur_template = $jos_change_template;
+					setcookie( 'jos_user_template', "$jos_change_template", time()+$lifetime);
 				} else {
-					setcookie( 'mos_user_template', '', time()-3600 );
+					setcookie( 'jos_user_template', '', time()-3600 );
 				}
 			}
 			// TemplateChooser End
@@ -2063,11 +2063,10 @@ class mosUser extends mosDBTable {
 		// check for existing username
 		$query = "SELECT id"
 		. "\n FROM #__users "
-		. "\n WHERE LOWER( username ) = LOWER ( '$this->username' )"
+		. "\n WHERE username = '$this->username'"
 		. "\n AND id != $this->id"
 		;
 		$this->_db->setQuery( $query );
-
 		$xid = intval( $this->_db->loadResult() );
 		if ($xid && $xid != intval( $this->id )) {
 			$this->_error = _REGWARN_INUSE;
@@ -2082,7 +2081,6 @@ class mosUser extends mosDBTable {
 			. "\n AND id != $this->id"
 			;
 			$this->_db->setQuery( $query );
-
 			$xid = intval( $this->_db->loadResult() );
 			if ($xid && $xid != intval( $this->id )) {
 				$this->_error = _REGWARN_EMAIL_INUSE;
@@ -2315,7 +2313,7 @@ function mosBindArrayToObject( $array, &$obj, $ignore='', $prefix=NULL, $checkSl
 					$ak = $k;
 				}
 				if (isset($array[$ak])) {
-					$obj->$k = ($checkSlashes && get_magic_quotes_gpc()) ? mosStripslashes( $array[$k] ) : $array[$k];
+					$obj->$k = ($checkSlashes && get_magic_quotes_gpc()) ? mosStripslashes( $array[$ak] ) : $array[$k];
 				}
 			}
 		}
@@ -2991,7 +2989,7 @@ function mosMail($from, $fromname, $recipient, $subject, $body, $mode=0, $cc=NUL
 	}
 	if (isset($bcc)) {
 		if( is_array($bcc) )
-			foreach ($bcc as $to) $mail->AddCC($to);
+			foreach ($bcc as $to) $mail->AddBCC($to);
 		else
 			$mail->AddBCC($bcc);
 	}
@@ -4430,7 +4428,7 @@ function mosNotAuth() {
 */
 function ampReplace( $text ) {
 	$text = str_replace( '&#', '*-*', $text );
-	$text = str_replace( '&', '&amp;', $text );
+	$text = preg_replace( '|&(?![\w]+;)|', '&amp;', $text );
 	$text = str_replace( '*-*', '&#', $text );
 
 	return $text;

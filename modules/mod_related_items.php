@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_related_items.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mod_related_items.php 216 2005-09-21 14:28:41Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -57,7 +57,6 @@ if ($option == 'com_content' && $task == 'view' && $id) {
 						$Itemid = $mainframe->getItemid($item->id);
 					}
 					$href = sefRelToAbs( "index.php?option=com_content&task=view&id=$item->id&Itemid=$Itemid" );
-					echo '<li><a href="'. $href .'">'. $item->title .'</a></li>';
 					?>
 					<li>
 						<a href="<?php echo $href; ?>">

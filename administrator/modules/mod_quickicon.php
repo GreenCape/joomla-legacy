@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_quickicon.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mod_quickicon.php 159 2005-09-18 02:57:08Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -72,7 +72,7 @@ function quickiconButton( $link, $image, $text ) {
 	}
 
 	if ( $my->gid > 24 ) {
-		$link = 'index2.php?option=com_config';
+		$link = 'index2.php?option=com_config&hidemainmenu=1';
 		quickiconButton( $link, 'config.png', 'Global Configuration' );
 	}
 	?>

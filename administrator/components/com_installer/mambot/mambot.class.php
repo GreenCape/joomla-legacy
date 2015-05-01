@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mambot.class.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mambot.class.php 186 2005-09-19 09:09:25Z stingrey $
 * @package Joomla
 * @subpackage Installer
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -51,7 +51,7 @@ class mosInstallerMambot extends mosInstaller {
 			return false;
 		}
 
-		// Insert in module in DB
+		// Insert mambot in DB
 		$query = "SELECT id"
 		. "\n FROM #__mambots"
 		. "\n WHERE element = '" . $this->elementName() . "'"
@@ -73,6 +73,10 @@ class mosInstallerMambot extends mosInstaller {
 			$row->access 	= 0;
 			$row->client_id = 0;
 			$row->element 	= $this->elementSpecial();
+			
+			if ($folder == 'editors') {
+				$row->published	= 1;
+			}
 
 			if (!$row->store()) {
 				$this->setError( 1, 'SQL error: ' . $row->getError() );

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: user.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: user.html.php 171 2005-09-18 09:53:20Z stingrey $
 * @package Joomla
 * @subpackage Users
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -39,7 +39,7 @@ class HTML_user {
 	function userEdit( $row, $option, $submitvalue, &$params ) {
 		global $mosConfig_absolute_path;
 
-		require( $mosConfig_absolute_path .'/includes/HTML_toolbar.php' );
+		require_once( $mosConfig_absolute_path .'/includes/HTML_toolbar.php' );
 
 		mosCommonHTML::loadOverlib();
 		?>

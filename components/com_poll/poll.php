@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: poll.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: poll.php 204 2005-09-20 18:55:08Z stingrey $
 * @package Joomla
 * @subpackage Polls
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -48,7 +48,7 @@ function pollAddVote( $uid ) {
 	$sessioncookie 		= mosGetParam( $_REQUEST, $sessionCookieName, '' );
 
 	if (!$sessioncookie) {
-		echo '<h3>'. _ALERT_ENABLED .'"</h3>';
+		echo '<h3>'. _ALERT_ENABLED .'</h3>';
 		echo '<input class="button" type="button" value="'. _CMN_CONTINUE .'" onClick="window.history.go(-1);">';
 		return;
 	}

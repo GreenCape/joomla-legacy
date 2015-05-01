@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: content.php 134 2005-09-16 23:55:30Z stingrey $
+* @version $Id: content.php 218 2005-09-21 15:46:00Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -86,6 +86,7 @@ switch ( strtolower( $task ) ) {
 
 	case 'save':
 	case 'apply':
+	case 'apply_new':
 		mosCache::cleanCache( 'com_content' );
 		saveContent( $access, $task );
 		break;
@@ -1298,7 +1299,7 @@ function editItem( $uid, $gid, &$access, $sectionid=0, $task, $Itemid ){
 */
 function saveContent( &$access, $task ) {
 	global $database, $mainframe, $my;
-	global $mosConfig_absolute_path;
+	global $mosConfig_absolute_path, $Itemid;
 
 	$nullDate = $database->getNullDate();
 	$row = new mosContent( $database );
@@ -1327,6 +1328,19 @@ function saveContent( &$access, $task ) {
 	if ( trim( $row->publish_down ) == 'Never' ) {
 		$row->publish_down = $nullDate;
 	}
+	
+	// code cleaner for xhtml transitional compliance
+	$row->introtext = str_replace( '<br>', '<br />', $row->introtext );
+	$row->fulltext 	= str_replace( '<br>', '<br />', $row->fulltext );
+
+ 	// remove <br /> take being automatically added to empty fulltext
+ 	$length	= strlen( $row->fulltext ) < 9;
+ 	$search = strstr( $row->fulltext, '<br />');
+ 	if ( $length && $search ) {
+ 		$row->fulltext = NULL;
+ 	}
+	
+	$row->title = ampReplace( $row->title );
 
 	if (!$row->check()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
@@ -1408,6 +1422,12 @@ function saveContent( &$access, $task ) {
 			$link = $_SERVER['HTTP_REFERER'];
 			break;
 
+		case 'apply_new':
+			$Itemid = mosGetParam( $_POST, 'Returnid', $Itemid );
+			$link = 'index.php?option=com_content&task=edit&id='. $row->id.'&Itemid='. $Itemid;
+			break;
+
+
 		case 'save':
 		default:
 			$Itemid = mosGetParam( $_POST, 'Returnid', '' );
@@ -1447,7 +1467,7 @@ function cancelContent( &$access ) {
 		$referer = 'index.php?option=com_content&task=view&id='. $row->id.'&Itemid='. $Itemid;
 	}
 
-	if ( $referer ) {
+	if ( $referer && !( $query['task'] == 'new' ) ) {
 		mosRedirect( $referer );
 	} else {
 		mosRedirect( 'index.php' );

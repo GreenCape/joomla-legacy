@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: mod_templatechooser.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: mod_templatechooser.php 149 2005-09-17 21:49:44Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -29,7 +29,7 @@ $darray = array();
 
 if ($templatefolder) {
 	while ($templatefile = $templatefolder->read()) {
-		if ($templatefile != "." && $templatefile != ".." && $templatefile != "CVS" && is_dir( "$template_path/$templatefile" )  ) {
+		if ($templatefile != "." && $templatefile != ".." && $templatefile != ".svn" && $templatefile != "css" && is_dir( "$template_path/$templatefile" )  ) {
 			if(strlen($templatefile) > $titlelength) {
 				$templatename = substr( $templatefile, 0, $titlelength-3 );
 				$templatename .= "...";

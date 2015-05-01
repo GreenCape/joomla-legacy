@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.modules.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.modules.html.php 185 2005-09-19 08:39:45Z stingrey $
 * @package Joomla
 * @subpackage Modules
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -383,7 +383,7 @@ class HTML_modules {
 							<td>
 							<?php
 							// parameters : areaname, content, hidden field, width, height, rows, cols
-							editorArea( 'editor1',  $row->content , 'content', '700', '350', '95', '30' ) ; ?>
+							editorArea( 'editor1',  $row->content , 'content', '800', '400', '110', '40' ) ; ?>
 							</td>
 						</tr>
 						</table>

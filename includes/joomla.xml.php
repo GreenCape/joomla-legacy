@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: joomla.xml.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: joomla.xml.php 153 2005-09-18 01:44:39Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -247,12 +247,8 @@ class mosParameters {
 				$result = $this->renderParam( $param, $name );
 				$html[] = '<tr>';
 
-				//$html[] = '<td width="35%" align="right" valign="top">' . $result[0] . '</td>';
-				//$html[] = '<td>' . $result[1] . '</td>';
-				//$html[] = '<td width="10%" align="left" valign="top">' . $result[2] . "</td>";
 				$html[] = '<td width="40%" align="right" valign="top"><span class="editlinktip">' . $result[0] . '</span></td>';
 				$html[] = '<td>' . $result[1] . '</td>';
-				//$html[] = '<td width="10%" align="left" valign="top">' . $result[2] . "</td>";
 
 				$html[] = '</tr>';
 			}
@@ -285,7 +281,7 @@ class mosParameters {
 		if ($result[0] == '@spacer') {
 			$result[0] = '';
 		} else {
-			$result[0] = mosToolTip( $description, $result[0], '', '', $result[0], '#', 0 );
+			$result[0] = mosToolTip( addslashes( $description ), $result[0], '', '', $result[0], '#', 0 );
 		}
 		$type = $param->getAttribute( 'type' );
 

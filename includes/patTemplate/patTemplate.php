@@ -2,7 +2,7 @@
 /**
  * patTemplate
  *
- * $Id: patTemplate.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: patTemplate.php 173 2005-09-18 12:18:09Z eddieajau $
  *
  * powerful templating engine
  *
@@ -2693,6 +2693,10 @@ class patFactory {
 
 		$tmpl->addVar( 'form', 'formAction', $_SERVER['PHP_SELF'] );
 		$tmpl->addVar( 'form', 'formName', 'adminForm' );
+
+		// tabs
+		$turl = $GLOBALS['mosConfig_live_site'] .'/includes/js/tabs/';
+		$tmpl->addVar( 'includeTabs', 'taburl', $turl );
 
 		return $tmpl;
 	}

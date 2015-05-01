@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: index.php 195 2005-09-20 10:05:51Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -240,6 +240,8 @@ writableCell( 'images/stories' );
 writableCell( 'language' );
 writableCell( 'mambots' );
 writableCell( 'mambots/content' );
+writableCell( 'mambots/editors' );
+writableCell( 'mambots/editors-xtd' );
 writableCell( 'mambots/search' );
 writableCell( 'media' );
 writableCell( 'modules' );

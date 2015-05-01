@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.menus.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.menus.php 210 2005-09-21 07:23:20Z stingrey $
 * @package Joomla
 * @subpackage Menus
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -17,7 +17,7 @@ defined( '_VALID_MOS' ) or die( 'Restricted access' );
 
 require_once( $mainframe->getPath( 'admin_html' ) );
 
-$id 		= intval( mosGetParam( $_GET, 'id', 0 ) );
+$id 		= intval( mosGetParam( $_REQUEST, 'id', 0 ) );
 $type 		= mosGetParam( $_REQUEST, 'type', false );
 $menutype 	= mosGetParam( $_REQUEST, 'menutype', 'mainmenu' );
 $task 		= mosGetParam( $_REQUEST, 'task', '' );
@@ -50,13 +50,13 @@ switch ($task) {
 
 		if ( $menu->type ) {
 			$type = $menu->type;
-			require( $path . $menu->type .'/'. $menu->type .'.menu.php' );
+			require_once( $path . $menu->type .'/'. $menu->type .'.menu.php' );
 		}
 		break;
 
 	case 'save':
 	case 'apply':
-		require( $path . $type .'/'. $type .'.menu.php' );
+		require_once( $path . $type .'/'. $type .'.menu.php' );
 		break;
 
 	case 'publish':
@@ -130,7 +130,7 @@ switch ($task) {
 		$type = mosGetParam( $_REQUEST, 'type' );
 		if ($type) {
 			// adding a new item - type selection form
-			require( $path . $type .'/'. $type .'.menu.php' );
+			require_once( $path . $type .'/'. $type .'.menu.php' );
 		} else {
 			viewMenuItems( $menutype, $option );
 		}
@@ -380,6 +380,8 @@ function saveMenu( $option, $task='save' ) {
 		exit();
 	}
 
+	$row->name = ampReplace( $row->name );
+	
 	if (!$row->check()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();
@@ -433,7 +435,9 @@ function publishMenuSection( $cid=null, $publish=1 ) {
 		if ($menu->type) {
 			$database = &$database;
 			$task = $publish ? 'publish' : 'unpublish';
-			require( $mosConfig_absolute_path . '/administrator/components/com_menus/' . $menu->type . '/' . $menu->type . '.menu.php' );
+			// $type value is used in *.menu.php
+			$type = $menu->type;
+			require_once( $mosConfig_absolute_path . '/administrator/components/com_menus/' . $type . '/' . $type . '.menu.php' );
 		}
 	}
 	return null;

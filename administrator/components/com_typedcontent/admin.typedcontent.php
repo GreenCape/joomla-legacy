@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.typedcontent.php 104 2005-09-16 10:29:04Z eddieajau $
+* @version $Id: admin.typedcontent.php 205 2005-09-20 19:01:49Z Levis $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -312,7 +312,7 @@ function save( $option, $task ) {
 		$row->modified_by = $my->id;
 	} else {
 		$row->created = date( 'Y-m-d H:i:s' );
-		$row->created_by = $my->id;
+		$row->created_by 	= $row->created_by ? $row->created_by : $my->id;
 	}
 	if (trim( $row->publish_down ) == 'Never') {
 		$row->publish_down = $nullDate;
@@ -333,6 +333,8 @@ function save( $option, $task ) {
 
 	$row->state = mosGetParam( $_REQUEST, 'published', 0 );
 
+	$row->title = ampReplace( $row->title );
+	
 	if (!$row->check()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
 		exit();

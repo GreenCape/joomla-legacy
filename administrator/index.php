@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: index.php 223 2005-09-21 16:27:10Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -22,6 +22,13 @@ if (!file_exists( '../configuration.php' )) {
 require_once( '../configuration.php' );
 require_once( '../includes/joomla.php' );
 include_once ( $mosConfig_absolute_path . '/language/'. $mosConfig_lang .'.php' );
+
+//Installation sub folder check, removed for work with SVN
+if (file_exists( '../installation/index.php' )) {	
+	define( '_INSTALL_CHECK', 1 );
+	include ('../offline.php');
+	exit();
+}
 
 $option = mosGetParam( $_REQUEST, 'option', NULL );
 

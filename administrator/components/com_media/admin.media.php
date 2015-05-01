@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.media.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.media.php 181 2005-09-19 01:01:12Z stingrey $
 * @package Joomla
 * @subpackage Massmail
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -70,6 +70,10 @@ switch ($task) {
 		listImages($listdir);
 		break;
 
+	case 'cancel':
+		mosRedirect( 'index2.php' );
+		break;
+	
 	default:
 		showMedia($listdir);
 		break;
@@ -80,7 +84,10 @@ switch ($task) {
 
 function delete_file($delfile, $listdir) {
 	global $mosConfig_absolute_path;
-	$del_image = $mosConfig_absolute_path."/images/stories".$listdir."/".$delfile;
+	global $base;
+	
+	$del_image = $mosConfig_absolute_path . $base . $listdir .'/'. $delfile;
+	
 	unlink($del_image);
 }
 
@@ -92,7 +99,7 @@ function create_folder($folder_name,$dirPath) {
 		if (eregi("[^0-9a-zA-Z_]", $folder_name)) {
 			mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], "Directory name must only contain alphanumeric characters and no spaces please." );
 		}
-		$folder = $mosConfig_absolute_path. $base .$dirPath."/".$folder_name;
+		$folder = $mosConfig_absolute_path. $base . $dirPath .'/'. $folder_name;
 		if(!is_dir($folder) && !is_file($folder)) {
 			mosMakePath($folder);
 			$fp = fopen($folder."/index.html", "w" );
@@ -164,10 +171,13 @@ function do_upload($file, $dest_dir) {
 			'odg',
 			'gif',
 			'jpg',
+			'epg',
 			'png',
 			'bmp',
 			'doc',
+			'txt',
 			'xls',
+			'csv',
 			'ppt',
 			'swf',
 			'pdf',
@@ -176,11 +186,13 @@ function do_upload($file, $dest_dir) {
 			'odp'
 		);
 
+        $noMatch = 0;
 		foreach( $allowable as $ext ) {
-			if ( strcasecmp( $format, $ext ) ) {
-				mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], 'This file type is not supported' );
-			}
+			if ( strcasecmp( $format, $ext ) == 0 ) $noMatch = 1;
 		}
+        if(!$noMatch){
+			mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], 'This file type is not supported' );
+        }
 
 		if (!move_uploaded_file($file['tmp_name'], $dest_dir.strtolower($file['name']))){
 			mosRedirect( "index2.php?option=com_media&listdir=".$_POST['dirPath'], "Upload FAILED" );
@@ -268,7 +280,10 @@ function listImages($listdir) {
 					$images[$entry] = $file_details;
 				} else {
 					// file is document
-					$docs[$entry] = $img_file;
+					$file_details['size'] = filesize($mosConfig_absolute_path. $base .$listdir."/".$img_file);
+					$file_details['file'] = $mosConfig_absolute_path. $base .$listdir."/".$img_file;
+					//$docs[$entry] = $img_file;
+					$docs[$entry] = $file_details;
 				}
 			} else if(is_dir($mosConfig_absolute_path. $base ."/".$listdir.'/'.$img_file) && substr($entry,0,1) != '.' && strtolower($entry) !== 'cvs') {
 				$folders[$entry] = $img_file;
@@ -301,7 +316,8 @@ function listImages($listdir) {
 				} else {
 					$icon = "components/com_media/images/con_info.png";
 				}
-				HTML_Media::show_doc($docs[$doc_name], $listdir, $icon);
+				//HTML_Media::show_doc($docs[$doc_name], $listdir, $icon);
+				HTML_Media::show_doc($doc_name, $docs[$doc_name]['size'],$listdir, $icon);
 				next($docs);
 			}
 

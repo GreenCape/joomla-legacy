@@ -1,6 +1,6 @@
 // <?php !! This fools phpdocumentor into parsing this file
 /**
-* @version $Id: joomla.javascript.js 47 2005-09-15 02:55:27Z rhuk $
+* @version $Id: joomla.javascript.js 199 2005-09-20 13:29:10Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL
@@ -89,7 +89,8 @@ function addSelectedToList( frmName, srcListName, tgtListName ) {
 	}
 
 	//Pull selected resources and add them to list
-	for (var i=srcLen-1; i > -1; i--) {
+	//for (var i=srcLen-1; i > -1; i--) {
+	for (var i=0; i < srcLen; i++) {
 		if (srcList.options[i].selected && tgt.indexOf( "," + srcList.options[i].value + "," ) == -1) {
 			opt = new Option( srcList.options[i].text, srcList.options[i].value );
 			tgtList.options[tgtList.length] = opt;

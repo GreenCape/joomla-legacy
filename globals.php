@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: globals.php 47 2005-09-15 02:55:27Z rhuk $
+* @version $Id: globals.php 202 2005-09-20 18:46:34Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -15,8 +15,12 @@ if (!ini_get('register_globals')) {
 	while (list( $key, $value ) = each( $_GET )) $GLOBALS[$key] = $value;
 	while (list( $key, $value ) = each( $_POST )) $GLOBALS[$key] = $value;
 	while (list( $key, $value ) = each( $_COOKIE )) $GLOBALS[$key] = $value;
-	while (list( $key, $value ) = each( $_SERVER )) $GLOBALS[$key] = $value;
-	while (list( $key, $value ) = @each( $_SESSION )) $GLOBALS[$key] = $value;
+	while (list( $key, $value ) = each( $_SERVER )) $GLOBALS[$key] = $value;	
+	
+	if (isset($_SESSION)) {
+		while (list( $key, $value ) = @each( $_SESSION )) $GLOBALS[$key] = $value;
+	}	
+	
 	foreach ($_FILES as $key => $value){
 		$GLOBALS[$key] = $_FILES[$key]['tmp_name'];
 		foreach ($value as $ext => $value2){

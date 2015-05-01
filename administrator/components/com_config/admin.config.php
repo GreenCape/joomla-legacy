@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.config.php 123 2005-09-16 21:21:02Z Saka $
+* @version $Id: admin.config.php 196 2005-09-20 10:56:09Z stingrey $
 * @package Joomla
 * @subpackage Config
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -151,12 +151,50 @@ function showconfig( $option) {
 // LOCALE SETTINGS
 
 	$lists['lang'] = mosHTML::selectList( $langs, 'config_lang', 'class="inputbox" size="1"', 'value', 'text', $row->config_lang );
-
-	for ($i=-24;$i<=24;$i++) {
-		$timeoffset[] = mosHTML::makeOption( $i, $i );
-	}
-	$lists['offset'] = mosHTML::selectList( $timeoffset, 'config_offset', 'class="inputbox" size="1"',	'value', 'text', $row->config_offset );
-
+	
+	$timeoffset = array(	
+		mosHTML::makeOption( -12, '(UTC -12:00) International Date Line West'),
+		mosHTML::makeOption( -11, '(UTC -11:00) Midway Island, Samoa'),
+		mosHTML::makeOption( -10, '(UTC -10:00) Hawaii'),
+		mosHTML::makeOption( -9.5, '(UTC -09:30) Taiohae, Marquesas Islands'),
+		mosHTML::makeOption( -9, '(UTC -09:00) Alaska'),
+		mosHTML::makeOption( -8, '(UTC -08:00) Pacific Time (US &amp; Canada)'),
+		mosHTML::makeOption( -7, '(UTC -07:00) Mountain Time (US &amp; Canada)'),
+		mosHTML::makeOption( -6, '(UTC -06:00) Central Time (US &amp; Canada), Mexico City'),
+		mosHTML::makeOption( -5, '(UTC -05:00) Eastern Time (US &amp; Canada), Bogota, Lima'),
+		mosHTML::makeOption( -4, '(UTC -04:00) Atlantic Time (Canada), Caracas, La Paz'),
+		mosHTML::makeOption( -3.5, '(UTC -03:30) St. John`s, Newfoundland and Labrador'),
+		mosHTML::makeOption( -3, '(UTC -03:00) Brazil, Buenos Aires, Georgetown'),
+		mosHTML::makeOption( -2, '(UTC -02:00) Mid-Atlantic'),
+		mosHTML::makeOption( -1, '(UTC -01:00 hour) Azores, Cape Verde Islands'),
+		mosHTML::makeOption( 0, '(UTC 00:00) Western Europe Time, London, Lisbon, Casablanca'),
+		mosHTML::makeOption( 1 , '(UTC +01:00 hour) Brussels, Copenhagen, Madrid, Paris'),
+		mosHTML::makeOption( 2, '(UTC +02:00) Kaliningrad, South Africa'),
+		mosHTML::makeOption( 3, '(UTC +03:00) Baghdad, Riyadh, Moscow, St. Petersburg'),
+		mosHTML::makeOption( 3.5, '(UTC +03:30) Tehran'),
+		mosHTML::makeOption( 4, '(UTC +04:00) Abu Dhabi, Muscat, Baku, Tbilisi'),
+		mosHTML::makeOption( 4.5, '(UTC +04:30) Kabul'),
+		mosHTML::makeOption( 5, '(UTC +05:00) Ekaterinburg, Islamabad, Karachi, Tashkent'),
+		mosHTML::makeOption( 5.5, '(UTC +05:30) Bombay, Calcutta, Madras, New Delhi'),
+		mosHTML::makeOption( 5.75, '(UTC +05:45) Kathmandu'),
+		mosHTML::makeOption( 6, '(UTC +06:00) Almaty, Dhaka, Colombo'),
+		mosHTML::makeOption( 6.30, '(UTC +6:30) Yagoon'),
+		mosHTML::makeOption( 7, '(UTC +07:00) Bangkok, Hanoi, Jakarta'),
+		mosHTML::makeOption( 8, '(UTC +08:00) Beijing, Perth, Singapore, Hong Kong'),
+		mosHTML::makeOption( 8.75, '(UTC +08:00) Western Australia'),
+		mosHTML::makeOption( 9, '(UTC +09:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk'),
+		mosHTML::makeOption( 9.5, '(UTC +09:30) Adelaide, Darwin, Yakutsk'),
+		mosHTML::makeOption( 10, '(UTC +10:00) Eastern Australia, Guam, Vladivostok'),
+		mosHTML::makeOption( 10.5, '(UTC +10:30) Lord Howe Island (Australia)'),
+		mosHTML::makeOption( 11, '(UTC +11:00) Magadan, Solomon Islands, New Caledonia'),
+		mosHTML::makeOption( 11.30, '(UTC +11:30) Norfolk Island'),
+		mosHTML::makeOption( 12, '(UTC +12:00) Auckland, Wellington, Fiji, Kamchatka'),
+		mosHTML::makeOption( 12.75, '(UTC +12:45) Chatham Island'),
+		mosHTML::makeOption( 13, '(UTC +13:00) Tonga'),
+		mosHTML::makeOption( 14, '(UTC +14:00) Kiribati'),
+	);
+	
+	$lists['offset'] = mosHTML::selectList( $timeoffset, 'config_offset', 'class="inputbox" size="1"', 'value', 'text', $row->config_offset );
 
 // MAIL SETTINGS
 
@@ -262,7 +300,7 @@ function saveconfig( $task ) {
 	if (!$row->bind( $_POST )) {
 		mosRedirect( 'index2.php', $row->getError() );
 	}
-
+	
 	$config = "<?php \n";
 	$config .= $row->getVarText();
 	$config .= "setlocale (LC_TIME, \$mosConfig_locale);\n";
@@ -270,11 +308,11 @@ function saveconfig( $task ) {
 
 	$fname = $mosConfig_absolute_path . '/configuration.php';
 
-	$enable_write = mosGetParam($_POST,'enable_write',0);
-	$oldperms = fileperms($fname);
-		if ( $enable_write ) {
-			@chmod( $fname, $oldperms | 0222);
-		}
+	$enable_write 	= mosGetParam($_POST,'enable_write',0);
+	$oldperms 		= fileperms($fname);
+	if ( $enable_write ) {
+		@chmod( $fname, $oldperms | 0222);
+	}
 
 	if ( $fp = fopen($fname, 'w') ) {
 		fputs($fp, $config, strlen($config));

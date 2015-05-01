@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.trash.html.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: admin.trash.html.php 212 2005-09-21 07:50:23Z stingrey $
 * @package Joomla
 * @subpackage Trash
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -332,7 +332,6 @@ class HTML_trash {
 		<br /><br />
 
 		<input type="hidden" name="option" value="<?php echo $option;?>" />
-		<input type="hidden" name="sectionid" value="<?php echo $sectionid; ?>" />
 		<input type="hidden" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="1" />
 		<input type="hidden" name="type" value="<?php echo $type; ?>" />

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: install4.php 123 2005-09-16 21:21:02Z Saka $
+* @version $Id: install4.php 215 2005-09-21 14:16:38Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -181,7 +181,7 @@ if ($siteUrl) {
 	$config .= "\$mosConfig_allowUserRegistration = '1';\n";
 	$config .= "\$mosConfig_link_titles = '0';\n";
 	$config .= "\$mosConfig_error_reporting = -1;\n";
-	$config .= "\$mosConfig_list_limit = '10';\n";
+	$config .= "\$mosConfig_list_limit = '30';\n";
 	$config .= "\$mosConfig_caching = '0';\n";
 	$config .= "\$mosConfig_cachepath = '{$configArray['absolutePath']}/cache';\n";
 	$config .= "\$mosConfig_cachetime = '900';\n";

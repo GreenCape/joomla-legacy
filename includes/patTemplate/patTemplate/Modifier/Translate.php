@@ -2,7 +2,7 @@
 /**
  * patTemplate modfifier Translate
  *
- * $Id: Translate.php 47 2005-09-15 02:55:27Z rhuk $
+ * $Id: Translate.php 154 2005-09-18 02:03:25Z eddieajau $
  *
  * @package		patTemplate
  * @subpackage	Modifiers
@@ -27,8 +27,9 @@ class patTemplate_Modifier_Translate extends patTemplate_Modifier
 	*/
 	function modify( $value, $params = array() )
 	{
-		if (is_object( $GLOBALS['_LANG'] )) {
-			return $GLOBALS['_LANG']->_( $value );
+		global $_LANG;
+		if (is_object( $_LANG )) {
+			return $_LANG->_( $value );
 		} else {
 			return $value;
 		}

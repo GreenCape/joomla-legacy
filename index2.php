@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index2.php 86 2005-09-16 01:14:16Z eddieajau $
+* @version $Id: index2.php 217 2005-09-21 15:15:58Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -18,7 +18,6 @@ include_once( 'globals.php' );
 require_once( 'configuration.php' );
 require_once( 'includes/joomla.php' );
 
-// displays offline/maintanance page or bar
 // displays offline/maintanance page or bar
 if ($mosConfig_offline == 1) {
 	require( 'offline.php' );
@@ -140,5 +139,4 @@ if ( $no_html == 0 ) {
 	mosMainBody();
 }
 doGzip();
-
 ?>

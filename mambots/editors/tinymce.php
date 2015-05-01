@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: tinymce.php 109 2005-09-16 17:45:24Z stingrey $
+* @version $Id: tinymce.php 198 2005-09-20 11:31:01Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -37,15 +37,21 @@ function botTinymceEditorInit() {
 	$params = new mosParameters( $mambot->params );
 
 	$theme = $params->get( 'theme', 'advanced' );
-
+	// handling for former default option
+	if ($theme == 'default' ) {
+		$theme = 'advanced';
+	}
+	
 	$toolbar 			= $params->def( 'toolbar', 'top' );
 	$html_height		= $params->def( 'html_height', '550' );
 	$html_width			= $params->def( 'html_width', '750' );
 	$text_direction		= $params->def( 'text_direction', 'ltr' );
 	$content_css		= $params->def( 'content_css', 1 );
 	$content_css_custom	= $params->def( 'content_css_custom', '' );
-	$invalid_elements		= $params->def( 'invalid_elements', 'script,applet,iframe' );
+	$invalid_elements	= $params->def( 'invalid_elements', 'script,applet,iframe' );
 	$newlines			= $params->def( 'newlines', 'false' );
+	$cleanup			= $params->def( 'cleanup', 1 );
+	$compressed			= $params->def( 'compressed', 0 );
 
 	// Plugins
 	// preview
@@ -72,7 +78,11 @@ function botTinymceEditorInit() {
 	$fullscreen			=  $params->def( 'fullscreen', 1 );
 
 	if ( $content_css ) {
-		$query = "SELECT template FROM #__templates_menu WHERE client_id='0' AND menuid='0'";
+		$query = "SELECT template"
+		. "\n FROM #__templates_menu"
+		. "\n WHERE client_id = 0"
+		. "\n AND menuid = 0"
+		;
 		$database->setQuery( $query );
 		$template 		= $database->loadResult();
 		$content_css	= 'content_css : "'. $mosConfig_live_site .'/templates/'. $template .'/css/template_css.css"';
@@ -88,6 +98,18 @@ function botTinymceEditorInit() {
 	$buttons2[]	= '';
 	$buttons3[]	= '';
 	$elements[]	= '';
+
+	if ( $cleanup ) {
+		$cleanup	= 'true';
+	} else {
+		$cleanup	= 'false';
+	}
+
+	if ( $compressed ) {		
+		$load = '<script type="text/javascript" src="'. $mosConfig_live_site .'/mambots/editors/tinymce/jscripts/tiny_mce/tiny_mce_gzip.php"></script>';
+	} else {
+		$load = '<script type="text/javascript" src="'. $mosConfig_live_site .'/mambots/editors/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>';
+	}
 
 // preview
 	if ( $preview ) {
@@ -140,9 +162,9 @@ if ( $searchreplace ) {
 	$buttons3 	= implode( ',', $buttons3 );
 	$plugins 	= implode( ',', $plugins );
 	$elements 	= implode( ',', $elements );
-
+	
 return <<<EOD
-	<script type="text/javascript" src="$mosConfig_live_site/mambots/editors/tinymce/jscripts/tiny_mce/tiny_mce_gzip.php"></script>
+	$load	
 	<script type="text/javascript">
 	tinyMCE.init({
 		theme : "$theme",
@@ -160,6 +182,7 @@ return <<<EOD
 		force_br_newlines : "$newlines",
 		$content_css,
 		debug : false,
+		cleanup : $cleanup,
 		safari_warning : false,
 		plugins : "advlink, advimage, $plugins",
 		theme_advanced_buttons2_add : "$buttons2",

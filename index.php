@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: index.php 133 2005-09-16 23:40:57Z eddieajau $
+* @version $Id: index.php 223 2005-09-21 16:27:10Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -24,18 +24,17 @@ include_once( 'globals.php' );
 require_once( 'configuration.php' );
 require_once( 'includes/joomla.php' );
 
+//Installation sub folder check, removed for work with CVS
+if (file_exists( 'installation/index.php' )) {	
+	define( '_INSTALL_CHECK', 1 );
+	include ('offline.php');
+	exit();
+}
+
 // displays offline/maintanance page or bar
 if ($mosConfig_offline == 1) {
 	require( 'offline.php' );
 }
-
-/**/
-//Installation sub folder check, removed for work with CVS
-if (file_exists( 'installation/index.php' )) {
-	include ('offline.php');
-	exit();
-}
-/**/
 
 // load system bot group
 $_MAMBOTS->loadBotGroup( 'system' );

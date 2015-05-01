@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: registration.php 85 2005-09-15 23:12:03Z eddieajau $
+* @version $Id: registration.php 147 2005-09-17 20:59:30Z Levis $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -168,7 +168,7 @@ function saveRegistration( $option ) {
 		$query = "SELECT name, email"
 		. "\n FROM #__users"
 		. "\n WHERE LOWER( usertype ) = 'superadministrator'"
-		. "\n AND LOWER( usertype ) = 'super administrator'"
+		. "\n OR LOWER( usertype ) = 'super administrator'"
 		;
 		$database->setQuery( $query );
 		$rows = $database->loadObjectList();

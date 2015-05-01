@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: CHANGELOG.php 130 2005-09-16 22:53:18Z Saka $
+* @version $Id: CHANGELOG.php 220 2005-09-21 16:20:30Z stingrey $
 * @package Joomla
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
@@ -30,6 +30,88 @@ Legend:
 - -> Removed
 ! -> Note
 
+
+-------------------- 1.0.1 Released ----------------------
+
+21-Sep-2005 Rey Gigataras
+ # Fixed artf1157 : Section module: Content not displayed, wrong header
+ # Fixed artf1159 : Can't cancel "Submit - Content" menu item type form
+ # Fixed artf1172 : "Help" link in Administration links to Mamboserver.com
+ # Fixed artf1171 : mod_related_items shows all items twice
+ # Fixed artf1167 : Component - Search
+ # Fixed [RC] incorrect redirect when cancelling from Frontend 'Submit - Content'
+ # Fixed undefined variable in Trash Manager
+ # Fixed [RC] `Trash` button when no item selected
+ # Fixed [RC] `New` Menu Item Type `Next` button bug
+
+20-Sep-2005 Levis Bisson
+ ^ added a chmod to the install unlink function
+ # Fixed artf1150 : the created_by on initial creation of Static Content Item
+ 
+20-Sep-2005 Marko Schmuck
+ ^ Changed Time Offsets to hardcoded list with country/city names
+ 
+20-Sep-2005 Rey Gigataras
+ # Fixed /installation/ folder check
+ # Fixed artf1153 : Quote appears in com_poll error
+ # Fixed artf1151 : empty span 
+ # Fixed artf1089 : multile select image insert reverses list order
+ # Fixed artf1138 : Joomla allows creation of double used username
+ # Fixed artf1133 : There is no install request to make /mambot/editor writeable
+
+19-Sep-2005 Andrew Eddie
+ # Fixed incorrect js function in patTemplate sticky and ordering templates/links
+
+19-Sep-2005 Rey Gigataras
+ ^ Changed Overlib styling when creating new menu items
+ ^ Additional Overlib info for non-image files and directories
+ ^ 'Cancel' button for Media Manager
+ ^ Option to run TinyMCE in compressed mode - off by default
+ # Fixed artf1111 : mosShowHead and the order of headers
+ # Fixed artf1117 : database.php - bcc
+ # Fixed artf1114 : database.php _nullDate
+ # Fixed TinyMCE errors caused by use of compressed tinymce_gzip.php [artf1088||artf1034||artf1090||artf1044]
+ # Installed Editor Mambots are now published by default
+ # Fixed error in RSS module
+ # Fixed artf1106 : Default Editor Will Not Take Codes Like Java Script
+ # Fixed delete file in Media Manager 
+
+18-Sep-2005 Arno Zijlstra
+ # Fixed artf1084 : <br> stays in empty content
+ # Fixed artf1101: Typo in Global Config
+ 
+18-Sep-2005 Andrew Eddie
+ # Fixed issues in patTemplate Translate Function and Modifier
+ # Fixed issue with patTemplate variable for Tabs graphics
+
+18-Sep-2005 Rey Gigataras
+ # Fixed artf1046 : Menu Manager Item Publishing
+ # Fixed artf1036 : newsflash error when logged in in frontend
+ # Fixed artf1033 : madeyourweb template logo path
+ # Fixed artf1039 : & to &amp; translation in menu and contenttitle
+ # Fixed PHP5 passed by reference error in admin.content.php
+ # Fixed artf1068 : live bookmark link is wrong
+ # Fixed artf1030 : Bug Joomla 1.0.0 Stable (un)publishing News Feeds
+ # Fixed artf1048 : Custom Module Bug
+ # Fixed artf1080 : Joomla! Installer
+ # Fixed artf1050 : error in sql - database update
+ # Fixed artf1081 : com_categories can't edit category when clicking hyperlink
+ # Fixed artf1053 : Can not unassign template
+ # Fixed artf1079 : com_weblinks can't edit links
+ # Fixed artf1029 : Site -> Global Configuration = greyed out top menu
+ # Fixed artf1064 : Deletion of Modules and Fix
+ # Fixed artf1052 : Double Installer Locations
+ # Fixed artf1051 : Copyright bumped to the right of the site
+ # Fixed artf1059 : component editor bug
+ # Fixed artf1041 : mod_mainmenu.xml: escape character for apostrophe missing
+ # Fixed artf1040 : category manager not in content-menu
+
+17-Sep-2005 Levis Bisson
+ # Fixed artf1037: Media Manager not uploading
+ # Fixed artf1025: Registration admin notification
+ # Fixed artf1043: Template Chooser doesn't work
+ # Fixed artf1042: Template Chooser shows rogue entry
+ 
 -------------------- 1.0.0 Released ----------------------
 
 16-Sep-2005 Andrew Eddie

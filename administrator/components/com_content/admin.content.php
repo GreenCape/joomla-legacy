@@ -1,6 +1,6 @@
 <?php
 /**
-* @version $Id: admin.content.php 106 2005-09-16 11:36:10Z eddieajau $
+* @version $Id: admin.content.php 169 2005-09-18 09:03:48Z stingrey $
 * @package Joomla
 * @subpackage Content
 * @copyright Copyright (C) 2005 Open Source Matters. All rights reserved.
@@ -479,7 +479,8 @@ function editContent( $uid=0, $sectionid=0, $option ) {
 		$sections = array_merge( $sections, $database->loadObjectList() );
 		$lists['sectionid'] = mosHTML::selectList( $sections, 'sectionid', 'class="inputbox" size="1" '. $javascript, 'id', 'title' );
 	} else {
-		$lists['sectionid'] = mosHTML::selectList( $database->loadObjectList(), 'sectionid', 'class="inputbox" size="1" '. $javascript, 'id', 'title', intval( $row->sectionid) );
+		$sections = $database->loadObjectList();
+		$lists['sectionid'] = mosHTML::selectList( $sections, 'sectionid', 'class="inputbox" size="1" '. $javascript, 'id', 'title', intval( $row->sectionid ) );
 	}
 
 	$sections = $database->loadObjectList();
@@ -625,6 +626,8 @@ function saveContent( $sectionid, $task ) {
  	if ( $length && $search ) {
  		$row->fulltext = NULL;
  	}
+	
+	$row->title = ampReplace( $row->title );
 
  	if (!$row->check()) {
 		echo "<script> alert('".$row->getError()."'); window.history.go(-1); </script>\n";
